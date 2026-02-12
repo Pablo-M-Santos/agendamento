@@ -145,7 +145,7 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
       </div>
       <button 
         @click="abrirModal()" 
-        class="bg-[#FA4805] text-[#1B1B1B] px-5 py-2.5 rounded-xl text-sm font-black shadow-[0_0_20px_rgba(0,220,130,0.2)] active:scale-95 transition-all"
+        class="bg-[#FA4805] text-white px-5 py-2.5 rounded-xl text-sm font-black shadow-[0_0_20px_rgba(0,220,130,0.2)] active:scale-95 transition-all"
       >
         Novo Agendamento
       </button>
@@ -195,7 +195,7 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
           @click="abrirModal(item)"
           class="bg-[#131314]/40 hover:bg-[#131314] p-5 rounded-[2.5rem] border border-white/5 flex items-start gap-5 active:scale-[0.98] transition-all group"
         >
-          <div class="flex flex-col items-center justify-center bg-[#131314] px-3 py-4 rounded-2xl min-w-[60px] border border-white/5 shadow-inner">
+          <div class="flex flex-col items-center justify-center bg-[#FA4805] px-3 py-4 rounded-2xl min-w-[60px] border border-white/5 shadow-inner">
             <span class="text-white font-black text-sm">{{ getHora(item.data) }}</span>
           </div>
 
