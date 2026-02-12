@@ -98,14 +98,14 @@ const handleSalvar = () => {
                 {{ format(dataSelecionadaNoPai, "dd 'de' MMMM", { locale: ptBR }) }}
               </span>
               <h3 class="text-2xl font-black text-white mt-3">
-                {{ agendamentoInicial ? 'Editar' : 'Nova' }} <span class="text-[#FA4805]">Sessão</span>
+                {{ agendamentoInicial ? 'Editar' : 'Novo' }} <span class="text-[#FA4805]">Serviço</span>
               </h3>
             </header>
             
             <div class="space-y-6">
               <div>
                 <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1">Cliente</label>
-                <input v-model="cliente" type="text" placeholder="Nome completo" 
+                <input v-model="cliente" type="text" placeholder="Nome do Cliente | Condomínio | Casa" 
                        class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-[#ffffff] focus:border-[#FA4805] text-white outline-none transition-all font-bold placeholder:text-white/20" />
               </div>
 
@@ -128,19 +128,19 @@ const handleSalvar = () => {
               </div>
 
               <div>
-                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1">Descrição - Casa</label>
-                <input v-model="descricao" type="text" placeholder="Ex: Avaliação Inicial ou link" 
+                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1">Descrição</label>
+                <input v-model="descricao" type="text" placeholder="Descrição do Serviço" 
                        class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-white focus:border-[#FA4805] text-white outline-none transition-all font-semibold placeholder:text-white/20" />
               </div>
               
               <button @click="handleSalvar" 
-                      class="w-full bg-[#FA4805] text-[#020618] py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4">
-                {{ agendamentoInicial ? 'Salvar Alterações' : 'Confirmar Agenda' }}
+                      class="w-full bg-[#FA4805] text-white py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4">
+                {{ agendamentoInicial ? 'Salvar Alterações' : 'Confirmar Serviço' }}
               </button>
 
               <button v-if="agendamentoInicial" @click="emit('excluir', agendamentoInicial.id)" 
                       class="w-full text-red-400/60 hover:text-red-400 font-bold text-xs uppercase tracking-widest pt-2 transition-colors">
-                Excluir Agendamento
+                Excluir Serviço
               </button>
             </div>
           </div>
