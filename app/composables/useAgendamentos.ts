@@ -16,9 +16,15 @@ export const useAgendamentos = () => {
   const { $db } = useNuxtApp()
   const { user } = useAuth()
 
+  const formatarDataParaFirestore = (dataString: string) => {
+    const dateFormatted = dataString.includes('T') 
+      ? dataString.replace('T', ' ') 
+      : `${dataString} 00:00:00`;
+    return Timestamp.fromDate(new Date(dateFormatted));
+  }
+
   const criarAgendamento = async (dados: {
     cliente: string
-    telefone: string
     endereco: string
     data: string
     descricao: string
@@ -28,10 +34,9 @@ export const useAgendamentos = () => {
 
     await addDoc(collection($db, 'agendamentos'), {
       cliente: dados.cliente,
-      telefone: dados.telefone,
       endereco: dados.endereco,
       descricao: dados.descricao,
-      data: Timestamp.fromDate(new Date(dados.data)),
+      data: formatarDataParaFirestore(dados.data),
       userId: user.value.uid,
       createdAt: Timestamp.fromDate(new Date())     
     })
@@ -39,7 +44,6 @@ export const useAgendamentos = () => {
 
   const editarAgendamento = async (id: string, dados: {
     cliente: string
-    telefone: string
     endereco: string
     data: string
     descricao: string
@@ -48,7 +52,6 @@ export const useAgendamentos = () => {
 
     await updateDoc(doc($db, 'agendamentos', id), {
         cliente: dados.cliente,
-        telefone: dados.telefone,
         endereco: dados.endereco,
         descricao: dados.descricao,
         data: Timestamp.fromDate(new Date(dados.data))

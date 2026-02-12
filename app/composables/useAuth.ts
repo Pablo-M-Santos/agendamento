@@ -11,7 +11,7 @@ export const useAuth = () => {
   const user = useState<any>('user', () => null)
   const loading = useState<boolean>('loading', () => true)
 
-  // 🔹 Inicializa o listener de autenticação
+ 
   const initAuth = () => {
     onAuthStateChanged($auth, (firebaseUser) => {
       user.value = firebaseUser
@@ -19,7 +19,7 @@ export const useAuth = () => {
     })
   }
 
-  // 🔹 Login com Google
+ 
   const loginWithGoogle = async () => {
   const provider = new GoogleAuthProvider()
 
@@ -31,7 +31,7 @@ export const useAuth = () => {
   }
 
 
-  // 🔹 Logout
+
   const logout = async () => {
     await signOut($auth)
     user.value = null

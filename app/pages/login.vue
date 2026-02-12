@@ -11,9 +11,12 @@ const login = async () => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center h-screen">
-    <UCard class="w-96 text-center">
-      <h1 class="text-xl font-bold mb-4">Agenda do Eletricista</h1>
+  <div class="flex items-center justify-center h-screen" style="background-color: #020618">
+    <UCard
+      class="w-96 text-center p-6"
+      style="background-color: rgba(15, 23, 43, 0.5);"
+    >
+      <h1 class="text-xl font-bold mb-4" >Agenda</h1>
       <UButton block @click="login">
         Entrar com Google
       </UButton>
