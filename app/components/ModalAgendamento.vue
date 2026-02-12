@@ -9,7 +9,7 @@ const props = defineProps<{
   dataSelecionadaNoPai: Date 
 }>()
 
-const emit = defineEmits(['update:modelValue', 'salvar', 'excluir'])
+const emit = defineEmits(['update:modelValue', 'salvar'])
 
 const cliente = ref('')
 const endereco = ref('')
@@ -136,11 +136,6 @@ const handleSalvar = () => {
               <button @click="handleSalvar" 
                       class="w-full bg-[#FA4805] text-white py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4">
                 {{ agendamentoInicial ? 'Salvar Alterações' : 'Confirmar Serviço' }}
-              </button>
-
-              <button v-if="agendamentoInicial" @click="emit('excluir', agendamentoInicial.id)" 
-                      class="w-full text-red-400/60 hover:text-red-400 font-bold text-xs uppercase tracking-widest pt-2 transition-colors">
-                Excluir Serviço
               </button>
             </div>
           </div>

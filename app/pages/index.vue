@@ -20,6 +20,9 @@ const agendamentos = ref<Agendamento[]>([])
 const dataSelecionada = ref(new Date())
 const isModalOpen = ref(false)
 const agendamentoParaEditar = ref<any>(null)
+const isConfirmOpen = ref(false)
+const idParaExcluir = ref<string | null>(null)
+
 
 
 const diasCarrossel = computed(() => {
@@ -34,6 +37,24 @@ const eHoje = (dia: Date) => isSameDay(dia, new Date())
 const carregarAgendamentos = async () => {
   if (!user.value) return 
   agendamentos.value = await listarAgendamentos()
+}
+
+const abrirModalConfirmacao = (id: string) => {
+  idParaExcluir.value = id
+  isConfirmOpen.value = true
+}
+
+const confirmarExclusao = async () => {
+  if (!idParaExcluir.value) return
+
+  try {
+    await excluirAgendamento(idParaExcluir.value)
+    isConfirmOpen.value = false
+    idParaExcluir.value = null
+    await carregarAgendamentos()
+  } catch (error) {
+    console.error("Erro ao excluir:", error)
+  }
 }
 
 
@@ -81,18 +102,6 @@ const handleSalvarAgendamento = async (dados: any) => {
   await carregarAgendamentos()
 }
 
-const handleExcluir = async (id: string) => {
-  if (!id) return
-  if (confirm('Deseja realmente excluir?')) {
-    try {
-      await excluirAgendamento(id)
-      isModalOpen.value = false
-      await carregarAgendamentos()
-    } catch (error) {
-      console.error("Erro ao excluir:", error)
-    }
-  }
-}
 
 const centralizarDiaAtual = () => {
 
@@ -205,11 +214,13 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
                 <span class="text-lg font-black text-white block leading-tight">{{ item.cliente }}</span>
                 <span class="text-xs text-[#ffffff] font-bold mt-1 block opacity-80 uppercase tracking-wider">{{ item.descricao || 'Sem descrição' }}</span>
               </div>
-              <div class="text-white/20 group-hover:text-[#FA4805] transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="#ffffff">
-                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                </svg>
-              </div>
+              <button
+  @click.stop="abrirModalConfirmacao(item.id)"
+  class="bg-red-600/50 text-white px-5 py-3 rounded-2xl font-black text-sm shadow-xl active:scale-95 transition-all"
+>
+  Excluir
+</button>
+
             </div>
 
             
@@ -238,8 +249,42 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
       :agendamento-inicial="agendamentoParaEditar"
       :data-selecionada-no-pai="dataSelecionada" 
       @salvar="handleSalvarAgendamento"
-      @excluir="handleExcluir"
     />
+
+    <!-- Modal Confirmação -->
+<Teleport to="body">
+  <div v-if="isConfirmOpen" class="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center">
+
+    <div class="bg-[#1B1B1B] p-8 rounded-3xl w-full max-w-sm border border-white/10">
+
+      <h3 class="text-white text-xl font-black mb-6">
+        Confirmar Exclusão
+      </h3>
+
+      <p class="text-white/70 mb-8">
+        Deseja realmente excluir este serviço?
+      </p>
+
+      <div class="flex gap-4">
+        <button 
+          @click="isConfirmOpen = false"
+          class="flex-1 bg-white/10 text-white py-3 rounded-xl font-bold"
+        >
+          Cancelar
+        </button>
+
+        <button 
+          @click="confirmarExclusao"
+          class="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold"
+        >
+          Excluir
+        </button>
+      </div>
+
+    </div>
+  </div>
+</Teleport>
+
   </div>
 </template>
 
