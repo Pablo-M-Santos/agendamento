@@ -202,7 +202,7 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
           v-for="item in agendamentosFiltrados" 
           :key="item.id" 
           @click="abrirModal(item)"
-          class="bg-[#131314]/40 hover:bg-[#131314] p-5 rounded-[2.5rem] border border-white/5 flex items-start gap-5 active:scale-[0.98] transition-all group"
+          class="bg-[#131314]/40 hover:bg-[#131314] p-5 rounded-[2.5rem] border-2 border-white flex items-start gap-5 active:scale-[0.98] transition-all group"
         >
           <div class="flex flex-col items-center justify-center bg-[#FA4805] px-3 py-4 rounded-2xl min-w-[60px] border border-white/5 shadow-inner">
             <span class="text-white font-black text-sm">{{ getHora(item.data) }}</span>
@@ -215,11 +215,11 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
                 <span class="text-xs text-[#ffffff] font-bold mt-1 block opacity-80 uppercase tracking-wider">{{ item.descricao || 'Sem descrição' }}</span>
               </div>
               <button
-  @click.stop="abrirModalConfirmacao(item.id)"
-  class="bg-red-600/50 text-white px-5 py-3 rounded-2xl font-black text-sm shadow-xl active:scale-95 transition-all"
->
-  Excluir
-</button>
+                @click.stop="abrirModalConfirmacao(item.id)"
+                class="bg-red-600/50 text-white px-5 py-3 rounded-2xl font-black text-sm shadow-xl active:scale-95 transition-all"
+              >
+                Excluir
+              </button>
 
             </div>
 
@@ -251,39 +251,39 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
       @salvar="handleSalvarAgendamento"
     />
 
-    <!-- Modal Confirmação -->
-<Teleport to="body">
-  <div v-if="isConfirmOpen" class="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center">
+  
+    <Teleport to="body">
+      <div v-if="isConfirmOpen" class="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center">
 
-    <div class="bg-[#1B1B1B] p-8 rounded-3xl w-full max-w-sm border border-white/10">
+        <div class="bg-[#1B1B1B] p-8 rounded-3xl w-full max-w-sm border border-white/10">
 
-      <h3 class="text-white text-xl font-black mb-6">
-        Confirmar Exclusão
-      </h3>
+          <h3 class="text-white text-xl font-black mb-6">
+            Confirmar Exclusão
+          </h3>
 
-      <p class="text-white/70 mb-8">
-        Deseja realmente excluir este serviço?
-      </p>
+          <p class="text-white/70 mb-8">
+            Deseja realmente excluir este serviço?
+          </p>
 
-      <div class="flex gap-4">
-        <button 
-          @click="isConfirmOpen = false"
-          class="flex-1 bg-white/10 text-white py-3 rounded-xl font-bold"
-        >
-          Cancelar
-        </button>
+          <div class="flex gap-4">
+            <button 
+              @click="isConfirmOpen = false"
+              class="flex-1 bg-white/10 text-white py-3 rounded-xl font-bold"
+            >
+              Cancelar
+            </button>
 
-        <button 
-          @click="confirmarExclusao"
-          class="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold"
-        >
-          Excluir
-        </button>
+            <button 
+              @click="confirmarExclusao"
+              class="flex-1 bg-red-600 text-white py-3 rounded-xl font-bold"
+            >
+              Excluir
+            </button>
+          </div>
+
+        </div>
       </div>
-
-    </div>
-  </div>
-</Teleport>
+    </Teleport>
 
   </div>
 </template>
