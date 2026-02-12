@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useAgendamentos, type Agendamento } from '~/composables/useAgendamentos'
 import { 
@@ -13,18 +13,15 @@ import { ptBR } from 'date-fns/locale'
 
 definePageMeta({ middleware: 'auth' })
 
-const { logout } = useAuth()
+const { logout, user } = useAuth() // Certifique-se que o useAuth exporta o 'user'
 const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento } = useAgendamentos()
-
 
 const agendamentos = ref<Agendamento[]>([])
 const dataSelecionada = ref(new Date())
 const isModalOpen = ref(false)
-const editandoId = ref<string | null>(null)
 const agendamentoParaEditar = ref<any>(null)
 
-
-
+// --- Lógica de Dias ---
 const diasCarrossel = computed(() => {
   const inicio = startOfMonth(dataSelecionada.value) 
   const fim = endOfMonth(dataSelecionada.value)     
@@ -33,24 +30,38 @@ const diasCarrossel = computed(() => {
 
 const eHoje = (dia: Date) => isSameDay(dia, new Date())
 
+// --- Lógica de Dados ---
 const carregarAgendamentos = async () => {
+  if (!user.value) return // Evita erro de busca sem usuário
   agendamentos.value = await listarAgendamentos()
 }
+
+// MÁGICA DO F5: Observa o usuário. Quando o Firebase logar, ele carrega e faz o scroll.
+watch(user, async (newUser) => {
+  if (newUser) {
+    await carregarAgendamentos()
+    nextTick(() => {
+      setTimeout(centralizarDiaAtual, 500) // Tempo extra para garantir renderização
+    })
+  }
+}, { immediate: true })
 
 const agendamentosFiltrados = computed(() => {
   return agendamentos.value.filter(item => {
     if (!item.data) return false
     const d = item.data.toDate()
     const s = dataSelecionada.value
-    return d.getDate() === s.getDate() && d.getMonth() === s.getMonth() && d.getFullYear() === s.getFullYear()
+    return d.getDate() === s.getDate() && 
+           d.getMonth() === s.getMonth() && 
+           d.getFullYear() === s.getFullYear()
   }).sort((a, b) => a.data.toMillis() - b.data.toMillis())
 })
 
+// --- Ações ---
 const abrirModal = (item?: Agendamento) => {
   if (item) {
     agendamentoParaEditar.value = {
       ...item,
-      // Garante que o ID passe para o modal
       id: item.id, 
       data: format(item.data.toDate(), "yyyy-MM-dd'T'HH:mm")
     }
@@ -71,8 +82,7 @@ const handleSalvarAgendamento = async (dados: any) => {
 }
 
 const handleExcluir = async (id: string) => {
-  if (!id) return // Segurança extra
-
+  if (!id) return
   if (confirm('Deseja realmente excluir?')) {
     try {
       await excluirAgendamento(id)
@@ -80,34 +90,32 @@ const handleExcluir = async (id: string) => {
       await carregarAgendamentos()
     } catch (error) {
       console.error("Erro ao excluir:", error)
-      alert("Não foi possível excluir o agendamento.")
     }
   }
 }
 
-
+// --- Scroll e Auxiliares ---
 const centralizarDiaAtual = () => {
-  // Pegamos a string do dia de hoje no mesmo formato do ID
-  const hojeId = 'dia-' + format(new Date(), 'yyyy-MM-dd');
-  const elemento = document.getElementById(hojeId);
-
+  const hojeId = 'dia-' + format(new Date(), 'yyyy-MM-dd')
+  const elemento = document.getElementById(hojeId)
   if (elemento) {
     elemento.scrollIntoView({
       behavior: 'smooth',
       inline: 'center',
       block: 'nearest'
-    });
+    })
   }
-};
+}
 
 onMounted(async () => {
-  await carregarAgendamentos();
-  
-  // O nextTick garante que o Vue terminou de renderizar o HTML dos dias
-  nextTick(() => {
-    setTimeout(centralizarDiaAtual, 300); // Um pequeno delay ajuda em dispositivos mais lentos
-  });
-});
+  // Se o usuário já estiver disponível de cara
+  if (user.value) {
+    await carregarAgendamentos()
+    nextTick(() => {
+      setTimeout(centralizarDiaAtual, 600)
+    })
+  }
+})
 
 const getDiaLetra = (date: Date) => format(date, 'eeeeee', { locale: ptBR }).charAt(0).toUpperCase()
 const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
