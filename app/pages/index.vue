@@ -212,12 +212,7 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
               </div>
             </div>
 
-            <div class="mt-4 flex items-center gap-3">
-              <div class="w-7 h-7 rounded-full bg-[#FA4805]/10 border border-[#FA4805]/20 flex items-center justify-center text-[#FA4805] text-[10px] font-black">
-                {{ item.cliente.charAt(0).toUpperCase() }}
-              </div>
-              <span class="text-[10px] font-black text-white/30 uppercase tracking-[0.1em]">Sessão Confirmada</span>
-            </div>
+            
           </div>
         </div>
       </div>
