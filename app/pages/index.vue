@@ -94,18 +94,31 @@ const handleExcluir = async (id: string) => {
   }
 }
 
-// --- Scroll e Auxiliares ---
 const centralizarDiaAtual = () => {
-  const hojeId = 'dia-' + format(new Date(), 'yyyy-MM-dd')
-  const elemento = document.getElementById(hojeId)
+  // Geramos o ID do dia de hoje (ex: dia-2024-05-20)
+  const hojeId = 'dia-' + format(new Date(), 'yyyy-MM-dd');
+  const elemento = document.getElementById(hojeId);
+
   if (elemento) {
     elemento.scrollIntoView({
       behavior: 'smooth',
-      inline: 'center',
+      inline: 'center', // Isso garante que ele fique no MEIO da tela
       block: 'nearest'
-    })
+    });
+  } else {
+    console.warn("Elemento do dia atual não encontrado:", hojeId);
   }
-}
+};
+
+// Monitora o usuário e os dias do carrossel
+watch([user, diasCarrossel], ([newUser, novosDias]) => {
+  if (newUser && novosDias.length > 0) {
+    // Espera o Vue atualizar o DOM e dá um tempo para o layout estabilizar
+    nextTick(() => {
+      setTimeout(centralizarDiaAtual, 800); 
+    });
+  }
+}, { immediate: true });
 
 onMounted(async () => {
   // Se o usuário já estiver disponível de cara
@@ -139,6 +152,7 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
       <button 
         v-for="dia in diasCarrossel" 
         :key="dia.toISOString()"
+        :id="'dia-' + format(dia, 'yyyy-MM-dd')"
         @click="dataSelecionada = dia"
         :class="[
           'flex flex-col items-center min-w-[55px] p-4 rounded-2xl shadow-sm transition-all border-2',
