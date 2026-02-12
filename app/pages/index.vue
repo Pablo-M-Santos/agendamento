@@ -135,48 +135,51 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 pb-24">
-    <header class="p-6 flex justify-between items-center bg-white shadow-sm">
+  <div class="min-h-screen bg-[#020618] text-white pb-24">
+    <header class="p-6 flex justify-between items-center bg-[#020618] border-b border-white/5 sticky top-0 z-50 backdrop-blur-md">
       <div>
-        <h1 class="text-xs text-gray-400 uppercase tracking-widest font-bold">Agenda</h1>
-        <h2 class="text-2xl font-bold text-blue-600 capitalize">
-          {{ format(dataSelecionada, 'MMM, yyyy', { locale: ptBR }) }}
+        <h1 class="text-[10px] text-[#00DC82] uppercase tracking-[0.2em] font-black">Agenda</h1>
+        <h2 class="text-2xl font-black text-white capitalize">
+          {{ format(dataSelecionada, 'MMMM, yyyy', { locale: ptBR }) }}
         </h2>
       </div>
-      <button @click="abrirModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-sm active:scale-95 transition">
-        Adicionar consulta
+      <button 
+        @click="abrirModal()" 
+        class="bg-[#00DC82] text-[#020618] px-5 py-2.5 rounded-xl text-sm font-black shadow-[0_0_20px_rgba(0,220,130,0.2)] active:scale-95 transition-all"
+      >
+        Novo Agendamento
       </button>
     </header>
 
-    <div ref="scrollContainer" class="flex overflow-x-auto px-6 py-4 gap-3 no-scrollbar bg-gray-50 scroll-smooth">
+    <div 
+      ref="scrollContainer"
+      class="flex overflow-x-auto px-6 py-8 gap-4 no-scrollbar bg-[#020618] scroll-smooth"
+    >
       <button 
         v-for="dia in diasCarrossel" 
         :key="dia.toISOString()"
         :id="'dia-' + format(dia, 'yyyy-MM-dd')"
         @click="dataSelecionada = dia"
         :class="[
-          'flex flex-col items-center min-w-[55px] p-4 rounded-2xl shadow-sm transition-all border-2',
-   
+          'flex flex-col items-center min-w-[65px] py-5 rounded-[2rem] transition-all duration-300 ',
           isSameDay(dia, dataSelecionada) 
-            ? 'bg-blue-500 text-white border-blue-500 shadow-md scale-105' 
+            ? 'bg-[#00DC82] border-[#00DC82] text-[#020618] shadow-[0_0_25px_rgba(0,220,130,0.25)] scale-110' 
             : eHoje(dia)
-       
-              ? 'bg-white text-green-600 border-green-500 font-black'
-      
-              : 'bg-white text-gray-400 border-transparent'
+              ? 'bg-[#1D293D] border-[#00DC82]/30 text-[#00DC82] font-black'
+              : 'bg-[#1D293D]/40 border-transparent text-white/30 hover:bg-[#1D293D]'
         ]"
       >
-        <span class="text-[10px] uppercase font-bold">{{ getDiaLetra(dia) }}</span>
-        <span class="font-bold text-lg">{{ format(dia, 'd') }}</span>
+        <span class="text-[10px] uppercase font-black tracking-widest mb-1">{{ getDiaLetra(dia) }}</span>
+        <span class="font-black text-xl">{{ format(dia, 'd') }}</span>
         
-        <div v-if="eHoje(dia) && !isSameDay(dia, dataSelecionada)" class="w-1 h-1 bg-green-500 rounded-full mt-1"></div>
+        <div v-if="eHoje(dia)" :class="['w-1.5 h-1.5 rounded-full mt-2', isSameDay(dia, dataSelecionada) ? 'bg-[#020618]' : 'bg-[#00DC82]']"></div>
       </button>
     </div>
 
     <main class="px-6 mt-4">
-      <div class="flex justify-between items-baseline mb-4">
-        <h3 class="font-bold text-gray-800">Consultas agendadas</h3>
-        <button class="text-blue-500 text-xl font-bold">≡</button>
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="font-black text-white/40 uppercase text-xs tracking-[0.15em]">Consultas do Dia</h3>
+        <div class="h-[1px] flex-1 bg-white/5 ml-4"></div>
       </div>
 
       <div class="space-y-4" v-if="agendamentosFiltrados.length > 0">
@@ -184,56 +187,58 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
           v-for="item in agendamentosFiltrados" 
           :key="item.id" 
           @click="abrirModal(item)"
-          class="bg-white p-5 rounded-[2rem] shadow-sm flex items-start gap-4 border border-gray-50 active:bg-gray-50"
+          class="bg-[#1D293D]/40 hover:bg-[#1D293D] p-5 rounded-[2.5rem] border border-white/5 flex items-start gap-5 active:scale-[0.98] transition-all group"
         >
-          <div class="text-gray-900 text-sm font-bold pt-1 min-w-[45px]">
-            {{ getHora(item.data) }}
+          <div class="flex flex-col items-center justify-center bg-[#1D293D] px-3 py-4 rounded-2xl min-w-[60px] border border-white/5 shadow-inner">
+            <span class="text-white font-black text-sm">{{ getHora(item.data) }}</span>
           </div>
 
           <div class="flex-1">
             <div class="flex justify-between items-start">
               <div>
-                <span class="text-sm font-black text-gray-900 block">{{ item.cliente }}</span>
-                <span class="text-xs text-gray-400 font-medium line-clamp-1">{{ item.descricao}}</span>
+                <span class="text-lg font-black text-white block leading-tight">{{ item.cliente }}</span>
+                <span class="text-xs text-[#00DC82] font-bold mt-1 block opacity-80 uppercase tracking-wider">{{ item.descricao || 'Sem descrição' }}</span>
               </div>
-              <button class="text-gray-300">⋮</button>
+              <div class="text-white/20 group-hover:text-[#00DC82] transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                </svg>
+              </div>
             </div>
 
-            <div class="mt-4 flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">
+            <div class="mt-4 flex items-center gap-3">
+              <div class="w-7 h-7 rounded-full bg-[#00DC82]/10 border border-[#00DC82]/20 flex items-center justify-center text-[#00DC82] text-[10px] font-black">
                 {{ item.cliente.charAt(0).toUpperCase() }}
               </div>
-              <span class="text-sm font-bold text-gray-700">{{ item.cliente }}</span>
+              <span class="text-[10px] font-black text-white/30 uppercase tracking-[0.1em]">Sessão Confirmada</span>
             </div>
           </div>
         </div>
       </div>
       
-      <div v-else class="text-center py-20 text-gray-300 font-medium">
-        Nenhuma consulta para este dia.
+      <div v-else class="flex flex-col items-center justify-center py-20 opacity-20">
+        <div class="w-16 h-16 border-2 border-dashed border-white rounded-full mb-4 flex items-center justify-center">
+          <span class="text-2xl">📅</span>
+        </div>
+        <p class="font-bold uppercase tracking-widest text-xs">Nenhuma sessão agendada</p>
       </div>
     </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-between items-center z-40">
-      <button class="flex flex-col items-center text-blue-600">
+    <nav class="fixed bottom-6 left-6 right-6 bg-[#1D293D]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] px-10 py-4 flex justify-between items-center z-40 shadow-2xl">
+      <NuxtLink to="/perfil" class="text-white/40 hover:text-[#00DC82] transition-all">
+        <span class="text-2xl">👤</span>
+      </NuxtLink>
+      
 
-      </button>
-      <button class="flex flex-col items-center text-gray-400">
-
-      </button>
-      <button @click="logout" class="flex flex-col items-center text-red-400">
-        <span class="text-xl">🚪</span>
-        <span class="text-[10px]">Sair</span>
-      </button>
     </nav>
 
     <ModalAgendamento 
-  v-model="isModalOpen"
-  :agendamento-inicial="agendamentoParaEditar"
-  :data-selecionada-no-pai="dataSelecionada" 
-  @salvar="handleSalvarAgendamento"
-  @excluir="handleExcluir"
-/>
+      v-model="isModalOpen"
+      :agendamento-inicial="agendamentoParaEditar"
+      :data-selecionada-no-pai="dataSelecionada" 
+      @salvar="handleSalvarAgendamento"
+      @excluir="handleExcluir"
+    />
   </div>
 </template>
 

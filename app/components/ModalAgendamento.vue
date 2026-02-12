@@ -68,38 +68,49 @@ const handleSalvar = () => {
 }
 </script>
 
-<template>
+<<template>
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="modelValue" class="fixed inset-0 bg-slate-900/60 z-[60]" @click="emit('update:modelValue', false)"></div>
+      <div v-if="modelValue" class="fixed inset-0 bg-[#020618]/80 backdrop-blur-sm z-[60]" @click="emit('update:modelValue', false)"></div>
     </Transition>
 
     <Transition name="slide-up">
       <div v-if="modelValue" class="fixed inset-x-0 bottom-0 z-[70] flex items-end justify-center">
-        <div class="bg-white w-full max-w-lg rounded-t-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[95vh]">
+        <div class="bg-[#020618] w-full max-w-lg rounded-t-[2.5rem] shadow-2xl border-t border-white/5 overflow-hidden flex flex-col max-h-[95vh]">
           
-          <div class="py-3 w-full flex justify-center bg-white border-b border-slate-50">
-            <div class="w-12 h-1 bg-slate-200 rounded-full"></div>
+          <div class="py-3 w-full flex justify-center border-b border-white/5">
+            <div class="w-12 h-1 bg-[#1D293D] rounded-full"></div>
           </div>
           
-          <div class="px-6 pb-10 pt-4 overflow-y-auto no-scrollbar">
-<header class="mb-8">
-              <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                Agendando para {{ format(dataSelecionadaNoPai, "dd 'de' MMMM", { locale: ptBR }) }}
+          <div class="px-6 pb-10 pt-4 overflow-y-auto no-scrollbar relative">
+            
+            <button 
+              @click="emit('update:modelValue', false)"
+              class="absolute right-6 top-4 w-10 h-10 flex items-center justify-center rounded-full bg-[#1D293D] text-white/50 hover:text-white transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <header class="mb-8 pr-12">
+              <span class="bg-[#00DC82]/10 text-[#00DC82] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                {{ format(dataSelecionadaNoPai, "dd 'de' MMMM", { locale: ptBR }) }}
               </span>
-              <h3 class="text-2xl font-black text-slate-800 mt-3">Nova <span class="text-blue-600">Sessão</span></h3>
+              <h3 class="text-2xl font-black text-white mt-3">
+                {{ agendamentoInicial ? 'Editar' : 'Nova' }} <span class="text-[#00DC82]">Sessão</span>
+              </h3>
             </header>
             
             <div class="space-y-6">
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Paciente</label>
+                <label class="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Paciente</label>
                 <input v-model="cliente" type="text" placeholder="Nome completo" 
-                       class="w-full bg-slate-50 p-4 rounded-2xl border-2 border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all font-bold" />
+                       class="w-full bg-[#1D293D] p-4 rounded-2xl border-2 border-transparent focus:border-[#00DC82] text-white outline-none transition-all font-bold placeholder:text-white/20" />
               </div>
 
-              <div class="bg-slate-50 p-5 rounded-[2rem]">
-
-                <label class="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-6 mb-3 block">Horário (15/15min)</label>
+              <div class="bg-[#0F172B]/50 p-5 rounded-[2rem] border border-white/5">
+                <label class="text-[10px] font-black text-[#00DC82] uppercase tracking-widest mb-3 block">Horário da Sessão</label>
                 <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
                   <button 
                     v-for="hora in horarios" :key="hora"
@@ -107,8 +118,8 @@ const handleSalvar = () => {
                     :class="[
                       'px-5 py-3 rounded-xl font-bold text-sm flex-shrink-0 border-2 transition-all',
                       horaSelecionada === hora 
-                        ? 'bg-slate-800 border-slate-800 text-white shadow-md' 
-                        : 'bg-white border-slate-100 text-slate-400'
+                        ? 'bg-[#00DC82] border-[#00DC82] text-[#020618] shadow-[0_0_15px_rgba(0,220,130,0.3)]' 
+                        : 'bg-[#1D293D] border-transparent text-white/50'
                     ]"
                   >
                     {{ hora }}
@@ -117,19 +128,19 @@ const handleSalvar = () => {
               </div>
 
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Descricao</label>
-                <input v-model="descricao" type="text" placeholder="Endereço ou link" 
-                       class="w-full bg-slate-50 p-4 rounded-2xl border-2 border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all font-semibold" />
+                <label class="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Descrição</label>
+                <input v-model="descricao" type="text" placeholder="Ex: Avaliação Inicial ou link" 
+                       class="w-full bg-[#1D293D] p-4 rounded-2xl border-2 border-transparent focus:border-[#00DC82] text-white outline-none transition-all font-semibold placeholder:text-white/20" />
               </div>
               
               <button @click="handleSalvar" 
-                      class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all">
+                      class="w-full bg-[#00DC82] text-[#020618] py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4">
                 {{ agendamentoInicial ? 'Salvar Alterações' : 'Confirmar Agenda' }}
               </button>
 
               <button v-if="agendamentoInicial" @click="emit('excluir', agendamentoInicial.id)" 
-                      class="w-full text-red-400 font-bold text-xs uppercase tracking-widest pt-2">
-                Remover Consulta
+                      class="w-full text-red-400/60 hover:text-red-400 font-bold text-xs uppercase tracking-widest pt-2 transition-colors">
+                Excluir Agendamento
               </button>
             </div>
           </div>
@@ -142,8 +153,10 @@ const handleSalvar = () => {
 <style scoped>
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
 .slide-up-enter-active { transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 .slide-up-leave-active { transition: transform 0.4s ease-in; }
 .slide-up-enter-from, .slide-up-leave-to { transform: translateY(100%); }
