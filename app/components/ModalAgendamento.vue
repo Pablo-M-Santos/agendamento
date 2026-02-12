@@ -71,22 +71,22 @@ const handleSalvar = () => {
 <<template>
   <Teleport to="body">
     <Transition name="fade">
-      <div v-if="modelValue" class="fixed inset-0 bg-[#020618]/80 backdrop-blur-sm z-[60]" @click="emit('update:modelValue', false)"></div>
+      <div v-if="modelValue" class="fixed inset-0 bg-[#1B1B1B]/80 backdrop-blur-sm z-[60]" @click="emit('update:modelValue', false)"></div>
     </Transition>
 
     <Transition name="slide-up">
       <div v-if="modelValue" class="fixed inset-x-0 bottom-0 z-[70] flex items-end justify-center">
-        <div class="bg-[#020618] w-full max-w-lg rounded-t-[2.5rem] shadow-2xl border-t border-white/5 overflow-hidden flex flex-col max-h-[95vh]">
+        <div class="bg-[#1B1B1B] w-full max-w-lg rounded-t-[2.5rem] shadow-2xl border-t border-white/5 overflow-hidden flex flex-col max-h-[95vh]">
           
           <div class="py-3 w-full flex justify-center border-b border-white/5">
-            <div class="w-12 h-1 bg-[#1D293D] rounded-full"></div>
+            <div class="w-12 h-1 bg-white rounded-full"></div>
           </div>
           
           <div class="px-6 pb-10 pt-4 overflow-y-auto no-scrollbar relative">
             
             <button 
               @click="emit('update:modelValue', false)"
-              class="absolute right-6 top-4 w-10 h-10 flex items-center justify-center rounded-full bg-[#1D293D] text-white/50 hover:text-white transition-colors"
+              class="absolute right-6 top-4 w-10 h-10 flex items-center justify-center rounded-full border-2 border-white bg-[1B1B1B] text-white hover:text-white transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -94,11 +94,11 @@ const handleSalvar = () => {
             </button>
 
             <header class="mb-8 pr-12">
-              <span class="bg-[#00DC82]/10 text-[#00DC82] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+              <span class="bg-[#FA4805]/10 text-[#FA4805] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
                 {{ format(dataSelecionadaNoPai, "dd 'de' MMMM", { locale: ptBR }) }}
               </span>
               <h3 class="text-2xl font-black text-white mt-3">
-                {{ agendamentoInicial ? 'Editar' : 'Nova' }} <span class="text-[#00DC82]">Sessão</span>
+                {{ agendamentoInicial ? 'Editar' : 'Nova' }} <span class="text-[#FA4805]">Sessão</span>
               </h3>
             </header>
             
@@ -106,11 +106,11 @@ const handleSalvar = () => {
               <div>
                 <label class="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Paciente</label>
                 <input v-model="cliente" type="text" placeholder="Nome completo" 
-                       class="w-full bg-[#1D293D] p-4 rounded-2xl border-2 border-transparent focus:border-[#00DC82] text-white outline-none transition-all font-bold placeholder:text-white/20" />
+                       class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-[#ffffff] focus:border-[#FA4805] text-white outline-none transition-all font-bold placeholder:text-white/20" />
               </div>
 
-              <div class="bg-[#0F172B]/50 p-5 rounded-[2rem] border border-white/5">
-                <label class="text-[10px] font-black text-[#00DC82] uppercase tracking-widest mb-3 block">Horário da Sessão</label>
+              <div class="bg-[#1B1B1B]/50 p-5 rounded-[2rem] border-2 border-white">
+                <label class="text-[10px] font-black text-[#ffffff] uppercase tracking-widest mb-3 block">Horário da Sessão</label>
                 <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
                   <button 
                     v-for="hora in horarios" :key="hora"
@@ -118,8 +118,8 @@ const handleSalvar = () => {
                     :class="[
                       'px-5 py-3 rounded-xl font-bold text-sm flex-shrink-0 border-2 transition-all',
                       horaSelecionada === hora 
-                        ? 'bg-[#00DC82] border-[#00DC82] text-[#020618] shadow-[0_0_15px_rgba(0,220,130,0.3)]' 
-                        : 'bg-[#1D293D] border-transparent text-white/50'
+                        ? 'bg-[#FA4805] border-[#FA4805] text-white shadow-[0_0_15px_rgba(0,220,130,0.3)]' 
+                        : 'bg-[#FA4805]/60 border-transparent text-white'
                     ]"
                   >
                     {{ hora }}
@@ -128,13 +128,13 @@ const handleSalvar = () => {
               </div>
 
               <div>
-                <label class="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Descrição</label>
+                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1">Descrição</label>
                 <input v-model="descricao" type="text" placeholder="Ex: Avaliação Inicial ou link" 
-                       class="w-full bg-[#1D293D] p-4 rounded-2xl border-2 border-transparent focus:border-[#00DC82] text-white outline-none transition-all font-semibold placeholder:text-white/20" />
+                       class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-white focus:border-[#FA4805] text-white outline-none transition-all font-semibold placeholder:text-white/20" />
               </div>
               
               <button @click="handleSalvar" 
-                      class="w-full bg-[#00DC82] text-[#020618] py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4">
+                      class="w-full bg-[#FA4805] text-[#020618] py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4">
                 {{ agendamentoInicial ? 'Salvar Alterações' : 'Confirmar Agenda' }}
               </button>
 

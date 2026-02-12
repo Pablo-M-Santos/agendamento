@@ -2,12 +2,12 @@
 import { useAuth } from '~/composables/useAuth'
 import { computed } from 'vue'
 
-// Definimos que esta página precisa de login
+
 definePageMeta({ middleware: 'auth' })
 
 const { user, logout } = useAuth()
 
-// Função para pegar a inicial do nome caso não tenha foto
+
 const inicial = computed(() => {
   return user.value?.email?.charAt(0).toUpperCase() || 'U'
 })
@@ -17,7 +17,7 @@ const voltar = () => useRouter().back()
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#020618] text-white">
+  <div class="min-h-screen bg-[#1B1B1B] text-white">
     <header class="p-6 flex items-center gap-4 border-b border-white/5">
       <button @click="voltar" class="p-2 hover:bg-white/5 rounded-full transition-colors">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -28,8 +28,8 @@ const voltar = () => useRouter().back()
     </header>
 
     <main class="px-6 py-10">
-      <section class="flex flex-col items-center p-8 bg-[#1D293D] rounded-[3rem] border border-white/5 shadow-2xl">
-        <div class="w-24 h-24 rounded-full border-4 border-[#00DC82] flex items-center justify-center bg-[#020618] overflow-hidden mb-6">
+      <section class="flex flex-col items-center p-8 bg-[#1B1B1B] rounded-[3rem] border border-white/5 shadow-2xl">
+        <div class="w-24 h-24 rounded-full border-4 border-[#FA4805] flex items-center justify-center bg-[#020618] overflow-hidden mb-6">
           <img v-if="user?.photoURL" :src="user.photoURL" class="w-full h-full object-cover" />
           <span v-else class="text-4xl font-black text-[#00DC82]">{{ inicial }}</span>
         </div>
@@ -53,7 +53,6 @@ const voltar = () => useRouter().back()
 </template>
 
 <style scoped>
-/* Estilo opcional para suavizar a entrada da página */
 main {
   animation: fadeIn 0.5s ease-out;
 }
