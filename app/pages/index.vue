@@ -184,7 +184,7 @@ const getHora = (ts: any) => ts ? format(ts.toDate(), 'HH:mm') : '--:--'
 
     <main class="px-6 mt-4">
       <div class="flex justify-between items-center mb-6">
-        <h3 class="font-black text-[#F5F6FA] uppercase text-xs tracking-[0.15em]">Consultas do Dia</h3>
+        <h3 class="font-black text-[#F5F6FA] uppercase text-xs tracking-[0.15em]">Serviços do Dia</h3>
         <div class="h-[1px] flex-1 bg-white/5 ml-4"></div>
       </div>
 
