@@ -48,7 +48,7 @@ watch(() => props.modelValue, (isOpen) => {
 
 
 const handleSalvar = () => {
-  if (!cliente.value) return alert('Nome do paciente é obrigatório')
+  if (!cliente.value) return alert('Nome do Cliente é obrigatório')
   
   // Pega a data que já estava selecionada no carrossel
   const dataFinal = new Date(props.dataSelecionadaNoPai)
@@ -104,13 +104,13 @@ const handleSalvar = () => {
             
             <div class="space-y-6">
               <div>
-                <label class="text-[10px] font-black text-white/40 uppercase tracking-widest ml-1">Paciente</label>
+                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1">Cliente</label>
                 <input v-model="cliente" type="text" placeholder="Nome completo" 
                        class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-[#ffffff] focus:border-[#FA4805] text-white outline-none transition-all font-bold placeholder:text-white/20" />
               </div>
 
               <div class="bg-[#1B1B1B]/50 p-5 rounded-[2rem] border-2 border-white">
-                <label class="text-[10px] font-black text-[#ffffff] uppercase tracking-widest mb-3 block">Horário da Sessão</label>
+                <label class="text-[10px] font-black text-[#ffffff] uppercase tracking-widest mb-3 block">Horário do Serviço</label>
                 <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
                   <button 
                     v-for="hora in horarios" :key="hora"
@@ -128,7 +128,7 @@ const handleSalvar = () => {
               </div>
 
               <div>
-                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1">Descrição</label>
+                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1">Descrição - Casa</label>
                 <input v-model="descricao" type="text" placeholder="Ex: Avaliação Inicial ou link" 
                        class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-white focus:border-[#FA4805] text-white outline-none transition-all font-semibold placeholder:text-white/20" />
               </div>
