@@ -1,17 +1,13 @@
-import { 
-  onAuthStateChanged, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
-  signOut 
-} from 'firebase/auth'
+import type { User } from 'firebase/auth'
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth'
 
 export const useAuth = () => {
   const { $auth } = useNuxtApp()
 
-  const user = useState<any>('user', () => null)
+  const user = useState<User | null>('user', () => null)
+
   const loading = useState<boolean>('loading', () => true)
 
- 
   const initAuth = () => {
     onAuthStateChanged($auth, (firebaseUser) => {
       user.value = firebaseUser
@@ -19,9 +15,8 @@ export const useAuth = () => {
     })
   }
 
- 
   const loginWithGoogle = async () => {
-  const provider = new GoogleAuthProvider()
+    const provider = new GoogleAuthProvider()
 
     provider.setCustomParameters({
       prompt: 'select_account'
@@ -29,8 +24,6 @@ export const useAuth = () => {
 
     await signInWithPopup($auth, provider)
   }
-
-
 
   const logout = async () => {
     await signOut($auth)
