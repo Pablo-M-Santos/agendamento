@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {
   GoogleAuthProvider,
-  FacebookAuthProvider,
   signInWithPopup,
-  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
   signOut
 } from 'firebase/auth'
 
@@ -19,6 +19,7 @@ const errors = reactive({
   email: '',
   password: ''
 })
+
 const validateEmail = (value: string) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return regex.test(value)
@@ -50,7 +51,7 @@ const isFormValid = computed(() => {
   return email.value && password.value && !errors.email && !errors.password
 })
 
-const loginWithEmail = async () => {
+const registerWithEmail = async () => {
   validateField('email')
   validateField('password')
 
@@ -59,50 +60,29 @@ const loginWithEmail = async () => {
   try {
     loading.value = true
 
-    const userCredential = await signInWithEmailAndPassword(
+    const userCredential = await createUserWithEmailAndPassword(
       $auth,
       email.value.trim(),
       password.value
     )
 
-    if (!userCredential.user.emailVerified) {
-      toast.add({
-        title: 'Email não verificado',
-        description: 'Verifique seu email antes de entrar 📩',
-        color: 'warning'
-      })
-
-      await signOut($auth)
-      return
-    }
+    await sendEmailVerification(userCredential.user)
+    await signOut($auth)
 
     toast.add({
-      title: 'Login realizado com sucesso!',
+      title: 'Cadastro realizado com sucesso!',
+      description: 'Verifique seu email 📩',
       color: 'success'
     })
 
-    navigateTo('/dashboard')
+    email.value = ''
+    password.value = ''
+
+    navigateTo('/')
   } catch (error: any) {
-    let message = 'Tente novamente.'
-
-    switch (error.code) {
-      case 'auth/user-not-found':
-        message = 'Usuário não encontrado.'
-        break
-      case 'auth/wrong-password':
-        message = 'Senha incorreta.'
-        break
-      case 'auth/invalid-email':
-        message = 'Email inválido.'
-        break
-      case 'auth/too-many-requests':
-        message = 'Muitas tentativas. Tente mais tarde.'
-        break
-    }
-
     toast.add({
-      title: 'Erro no login',
-      description: message,
+      title: 'Erro no cadastro',
+      description: error.message,
       color: 'error'
     })
   } finally {
@@ -116,6 +96,17 @@ const loginWithGoogle = async () => {
 
     const provider = new GoogleAuthProvider()
     const result = await signInWithPopup($auth, provider)
+
+    if (!result.user.emailVerified) {
+      toast.add({
+        title: 'Email não verificado',
+        description: 'Verifique seu email antes de continuar.',
+        color: 'warning'
+      })
+
+      await signOut($auth)
+      return
+    }
 
     toast.add({
       title: 'Login com Google realizado!',
@@ -136,11 +127,11 @@ const loginWithGoogle = async () => {
 </script>
 <template>
   <div class="flex items-center justify-center min-h-screen px-8 py-10 bg-[#003D7A]">
-    <form @submit.prevent="loginWithEmail" class="w-full max-w-md text-center">
+    <form @submit.prevent="registerWithEmail" class="w-full max-w-md text-center">
       <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-1" />
 
-      <h1 class="text-3xl font-bold text-white">Entrar</h1>
-      <p class="text-gray-300 mb-8">Acesse sua conta</p>
+      <h1 class="text-3xl font-bold text-white">Criar Conta</h1>
+      <p class="text-gray-300 mb-8">Preencha os dados para se cadastrar</p>
 
       <UInput
         v-model="email"
@@ -161,7 +152,7 @@ const loginWithGoogle = async () => {
       <UInput
         v-model="password"
         :type="show ? 'text' : 'password'"
-        autocomplete="current-password"
+        autocomplete="new-password"
         icon="i-heroicons-lock-closed"
         placeholder="Digite sua senha"
         size="xl"
@@ -180,20 +171,23 @@ const loginWithGoogle = async () => {
         </template>
       </UInput>
 
+      <p v-if="errors.password" class="text-red-400 text-sm mb-4 text-left">
+        {{ errors.password }}
+      </p>
+
       <UButton
         block
         type="submit"
         size="lg"
         :loading="loading"
         :disabled="!isFormValid || loading"
-        @click="loginWithEmail"
         class="mb-4 bg-[#0063C7] text-white transition-all duration-200 ease-in-out hover:bg-[#0057B0] active:bg-[#004A96] focus:ring-0 disabled:opacity-100 disabled:bg-[#0063C7] disabled:cursor-not-allowed"
       >
-        Entrar
+        Cadastrar
       </UButton>
 
-      <NuxtLink to="/cadastro" class="block text-sm text-primary hover:underline mb-6 text-white">
-        Quero me cadastrar
+      <NuxtLink to="/" class="block text-sm text-primary hover:underline mb-6 text-white">
+        Já tenho uma conta
       </NuxtLink>
 
       <UButton
@@ -210,7 +204,7 @@ const loginWithGoogle = async () => {
           />
         </span>
 
-        <span class="mx-auto text-[#0063C7]"> Entrar com Google </span>
+        <span class="mx-auto text-[#0063C7]"> Cadastrar com Google </span>
       </UButton>
     </form>
   </div>
