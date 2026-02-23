@@ -135,12 +135,12 @@ const loginWithGoogle = async () => {
 }
 </script>
 <template>
-  <div class="flex items-center justify-center min-h-screen px-8 py-10 bg-[#003D7A]">
-    <form @submit.prevent="loginWithEmail" class="w-full max-w-md text-center">
-      <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-1" />
+  <div class="min-h-screen bg-[#003D7A] flex justify-center px-6">
+    <form @submit.prevent="loginWithEmail" class="w-full max-w-md text-center pt-20 pb-10">
+      <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
 
       <h1 class="text-3xl font-bold text-white">Entrar</h1>
-      <p class="text-gray-300 mb-8">Acesse sua conta</p>
+      <p class="text-gray-300 mb-10">Acesse sua conta</p>
 
       <UInput
         v-model="email"
