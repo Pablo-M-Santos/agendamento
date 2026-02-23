@@ -149,7 +149,7 @@ const loginWithGoogle = async () => {
         icon="i-heroicons-envelope"
         placeholder="Digite seu email"
         size="xl"
-        class="w-full mb-2"
+        class="w-full mb-5"
         :color="errors.email ? 'error' : 'neutral'"
         @blur="validateField('email')"
       />
@@ -165,7 +165,7 @@ const loginWithGoogle = async () => {
         icon="i-heroicons-lock-closed"
         placeholder="Digite sua senha"
         size="xl"
-        class="w-full mb-2"
+        class="w-full mb-5"
         :color="errors.password ? 'error' : 'neutral'"
         @blur="validateField('password')"
       >
@@ -183,7 +183,7 @@ const loginWithGoogle = async () => {
       <UButton
         block
         type="submit"
-        size="lg"
+        size="xl"
         :loading="loading"
         :disabled="!isFormValid || loading"
         @click="loginWithEmail"
@@ -199,6 +199,7 @@ const loginWithGoogle = async () => {
       <UButton
         block
         variant="outline"
+        size="xl"
         class="relative mb-3 bg-[#D8D8D8] transition-all duration-200 ease-in-out hover:bg-[#CFCFCF] active:bg-[#BEBEBE] focus:ring-0"
         @click="loginWithGoogle"
       >

@@ -126,12 +126,12 @@ const loginWithGoogle = async () => {
 }
 </script>
 <template>
-  <div class="flex items-center justify-center min-h-screen px-8 py-10 bg-[#003D7A]">
-    <form @submit.prevent="registerWithEmail" class="w-full max-w-md text-center">
-      <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-1" />
+  <div class="min-h-screen bg-[#003D7A] flex justify-center px-6">
+    <form @submit.prevent="registerWithEmail" class="w-full max-w-md text-center pt-20 pb-10">
+      <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
 
       <h1 class="text-3xl font-bold text-white">Criar Conta</h1>
-      <p class="text-gray-300 mb-8">Preencha os dados para se cadastrar</p>
+      <p class="text-gray-300 mb-10">Preencha os dados para se cadastrar</p>
 
       <UInput
         v-model="email"
@@ -140,7 +140,7 @@ const loginWithGoogle = async () => {
         icon="i-heroicons-envelope"
         placeholder="Digite seu email"
         size="xl"
-        class="w-full mb-2"
+        class="w-full mb-5"
         :color="errors.email ? 'error' : 'neutral'"
         @blur="validateField('email')"
       />
@@ -156,7 +156,7 @@ const loginWithGoogle = async () => {
         icon="i-heroicons-lock-closed"
         placeholder="Digite sua senha"
         size="xl"
-        class="w-full mb-2"
+        class="w-full mb-5"
         :color="errors.password ? 'error' : 'neutral'"
         @blur="validateField('password')"
       >
@@ -178,7 +178,7 @@ const loginWithGoogle = async () => {
       <UButton
         block
         type="submit"
-        size="lg"
+        size="xl"
         :loading="loading"
         :disabled="!isFormValid || loading"
         class="mb-4 bg-[#0063C7] text-white transition-all duration-200 ease-in-out hover:bg-[#0057B0] active:bg-[#004A96] focus:ring-0 disabled:opacity-100 disabled:bg-[#0063C7] disabled:cursor-not-allowed"
@@ -193,6 +193,7 @@ const loginWithGoogle = async () => {
       <UButton
         block
         variant="outline"
+        size="xl"
         class="relative mb-3 bg-[#D8D8D8] transition-all duration-200 ease-in-out hover:bg-[#CFCFCF] active:bg-[#BEBEBE] focus:ring-0"
         @click="loginWithGoogle"
       >
