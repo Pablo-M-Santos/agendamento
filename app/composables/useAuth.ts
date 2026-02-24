@@ -28,7 +28,7 @@ export const useAuth = () => {
   const logout = async () => {
     await signOut($auth)
     user.value = null
-    await navigateTo('/login')
+    await navigateTo('/')
   }
 
   return {
