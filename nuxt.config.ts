@@ -30,5 +30,12 @@ export default defineNuxtConfig({
         { rel: 'apple-touch-icon', sizes: '120x120', href: '/icon.png' }
       ]
     }
+  },
+
+  routeRules: {
+    '/agenda': { redirect: { to: '/schedule', statusCode: 301 } },
+    '/cadastro': { redirect: { to: '/register', statusCode: 301 } },
+    '/perfil': { redirect: { to: '/profile', statusCode: 301 } },
+    '/relatorios': { redirect: { to: '/reports', statusCode: 301 } }
   }
 })

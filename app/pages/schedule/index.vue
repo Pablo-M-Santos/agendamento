@@ -282,7 +282,7 @@ const getHora = (ts: Timestamp | null | undefined): string =>
     <nav
       class="fixed bottom-6 left-6 right-6 bg-[#131314]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] px-10 py-4 flex justify-between items-center z-40 shadow-2xl"
     >
-      <NuxtLink to="/perfil" class="text-white/40 hover:text-[#FA4805] transition-all">
+      <NuxtLink to="/profile" class="text-white/40 hover:text-[#FA4805] transition-all">
         <span class="text-2xl">👤</span>
       </NuxtLink>
     </nav>

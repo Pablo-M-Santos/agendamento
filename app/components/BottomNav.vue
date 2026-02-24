@@ -23,9 +23,9 @@ const isActive = (path) => route.path === path
 
     <!-- Agenda -->
     <NuxtLink
-      to="/agenda"
+      to="/schedule"
       class="flex flex-col items-center text-xs font-medium transition"
-      :class="isActive('/agenda') ? 'text-black' : 'text-gray-400'"
+      :class="isActive('/schedule') ? 'text-black' : 'text-gray-400'"
     >
       <CalendarDaysIcon class="w-6 h-6 mb-1" />
       Agenda
@@ -33,9 +33,9 @@ const isActive = (path) => route.path === path
 
     <!-- Perfil -->
     <NuxtLink
-      to="/perfil"
+      to="/profile"
       class="flex flex-col items-center text-xs font-medium transition"
-      :class="isActive('/perfil') ? 'text-black' : 'text-gray-400'"
+      :class="isActive('/profile') ? 'text-black' : 'text-gray-400'"
     >
       <UserIcon class="w-6 h-6 mb-1" />
       Perfil

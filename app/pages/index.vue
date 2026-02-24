@@ -192,7 +192,7 @@ const loginWithGoogle = async () => {
         Entrar
       </UButton>
 
-      <NuxtLink to="/cadastro" class="block text-sm text-primary hover:underline mb-6 text-white">
+      <NuxtLink to="/register" class="block text-sm text-primary hover:underline mb-6 text-white">
         Quero me cadastrar
       </NuxtLink>
 

@@ -28,7 +28,7 @@ const formatarData = (ts: Timestamp) => format(ts.toDate(), 'dd/MM/yyyy HH:mm')
     <!-- CARDS -->
     <div class="grid grid-cols-2 gap-6 mb-10">
       <NuxtLink
-        to="/agenda"
+        to="/schedule"
         class="bg-gradient-to-br from-[#FA4805] to-orange-600 p-6 rounded-3xl shadow-xl active:scale-95 transition"
       >
         <h3 class="font-black text-lg">Serviços</h3>
@@ -36,7 +36,7 @@ const formatarData = (ts: Timestamp) => format(ts.toDate(), 'dd/MM/yyyy HH:mm')
       </NuxtLink>
 
       <NuxtLink
-        to="/relatorios"
+        to="/reports"
         class="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-3xl shadow-xl active:scale-95 transition"
       >
         <h3 class="font-black text-lg">Relatórios</h3>
