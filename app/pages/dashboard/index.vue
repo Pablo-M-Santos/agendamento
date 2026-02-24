@@ -54,8 +54,8 @@ const formatarData = (ts: Timestamp) => format(ts.toDate(), 'dd/MM/yyyy HH:mm')
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#003D7A] p-5">
-    <div class="relative mb-6 min-h-[56px] flex items-center justify-center">
+  <div class="h-screen bg-[#003D7A] p-5 overflow-hidden">
+    <div class="relative mb-6 h-[56px] flex items-center justify-center">
       <button
         class="absolute left-0 p-2 rounded-xl hover:bg-white/10 transition"
         aria-label="Abrir menu lateral"

@@ -4,6 +4,7 @@ import {
   CalendarDaysIcon,
   ChartBarIcon,
   UserIcon,
+  ArrowLeftOnRectangleIcon,
   XMarkIcon
 } from '@heroicons/vue/24/outline'
 
@@ -67,10 +68,24 @@ const links = [
       >
         <aside
           v-if="props.modelValue"
-          class="relative w-80 max-w-[85vw] h-full bg-[#111214] text-white p-6 flex flex-col pointer-events-auto"
+          class="relative w-80 max-w-[85vw] h-full bg-[#0B2F66] text-white p-6 flex flex-col pointer-events-auto"
         >
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="text-sm uppercase tracking-[0.2em] text-white/60 font-black">Menu</h2>
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3 min-w-0">
+              <div
+                class="w-12 h-12 rounded-[50%] overflow-hidden bg-white/10 border border-white/15 flex items-center justify-center"
+              >
+                <img
+                  v-if="user?.photoURL"
+                  :src="user.photoURL"
+                  alt="Foto do perfil"
+                  class="w-full h-full object-cover"
+                />
+                <span v-else class="text-base font-black">{{ initials }}</span>
+              </div>
+              <p class="text-sm font-bold truncate text-white">{{ displayName }}</p>
+            </div>
+
             <button
               class="p-2 rounded-lg hover:bg-white/10 transition"
               aria-label="Fechar"
@@ -80,25 +95,7 @@ const links = [
             </button>
           </div>
 
-          <div class="flex items-center gap-4 mb-8">
-            <div
-              class="w-14 h-14 rounded-[50%] overflow-hidden bg-[#1D1E20] border border-white/10 flex items-center justify-center"
-            >
-              <img
-                v-if="user?.photoURL"
-                :src="user.photoURL"
-                alt="Foto do perfil"
-                class="w-full h-full object-cover"
-              />
-              <span v-else class="text-lg font-black">{{ initials }}</span>
-            </div>
-            <div class="min-w-0">
-              <p class="text-xs uppercase tracking-[0.15em] text-white/50">Bem-vindo</p>
-              <p class="font-bold truncate">{{ displayName }}</p>
-            </div>
-          </div>
-
-          <nav class="space-y-2">
+          <nav class="mt-15 space-y-2">
             <NuxtLink
               v-for="item in links"
               :key="item.to"
@@ -106,8 +103,8 @@ const links = [
               class="flex items-center gap-3 px-4 py-3 rounded-xl transition"
               :class="
                 isActive(item.to)
-                  ? 'bg-white text-[#111214]'
-                  : 'text-white/80 hover:bg-white/10 hover:text-white'
+                  ? 'bg-white/90 text-[#0B2F66]'
+                  : 'text-white/85 hover:bg-white/10 hover:text-white'
               "
               @click="close"
             >
@@ -118,7 +115,7 @@ const links = [
 
           <div class="mt-auto pt-6 border-t border-white/10">
             <button
-              class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-red-500/15 text-red-400 hover:bg-red-500/25 transition font-bold"
+              class="w-full flex items-center justify-start gap-2 px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition font-bold"
               @click="handleLogout"
             >
               <ArrowLeftOnRectangleIcon class="w-5 h-5" />
