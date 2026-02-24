@@ -18,5 +18,17 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
+  },
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon.png' },
+
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/logo.png' },
+        { rel: 'apple-touch-icon', sizes: '152x152', href: '/logo.png' },
+        { rel: 'apple-touch-icon', sizes: '120x120', href: '/logo.png' }
+      ]
+    }
   }
 })
