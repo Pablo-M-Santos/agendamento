@@ -44,7 +44,15 @@ const carregar = async () => {
   agendamentos.value = await listarAgendamentos()
 }
 
-onMounted(carregar)
+watch(
+  () => user.value,
+  async (newUser) => {
+    if (newUser) {
+      await carregar()
+    }
+  },
+  { immediate: true }
+)
 
 const ultimosServicos = computed(() => {
   return [...agendamentos.value].sort((a, b) => b.data.toMillis() - a.data.toMillis()).slice(0, 5)

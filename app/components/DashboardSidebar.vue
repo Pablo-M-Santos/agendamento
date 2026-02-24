@@ -18,6 +18,7 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const { user, logout } = useAuth()
+const toast = useToast()
 
 const displayName = computed(() => user.value?.displayName || user.value?.email || 'Usuário')
 const initials = computed(() => displayName.value.charAt(0).toUpperCase())
@@ -28,6 +29,11 @@ const close = () => emit('update:modelValue', false)
 
 const handleLogout = async () => {
   close()
+  toast.add({
+    title: 'Logout realizado',
+    description: 'Voce saiu da sua conta.',
+    color: 'success'
+  })
   await logout()
 }
 
