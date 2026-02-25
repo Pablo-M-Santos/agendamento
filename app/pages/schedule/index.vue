@@ -3,6 +3,7 @@ import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 import { useAgendamentos, type Agendamento } from '~/composables/useAgendamentos'
 import { format, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns'
+import { Bars3Icon } from '@heroicons/vue/24/outline'
 import { ptBR } from 'date-fns/locale'
 import type { Timestamp } from 'firebase/firestore'
 import type { AgendamentoForm } from '~/types/agendamento'
@@ -19,6 +20,7 @@ const isModalOpen = ref(false)
 const agendamentoParaEditar = ref<AgendamentoForm | null>(null)
 const isConfirmOpen = ref(false)
 const idParaExcluir = ref<string | null>(null)
+const isSidebarOpen = ref(false)
 
 const diasCarrossel = computed(() => {
   const inicio = startOfMonth(dataSelecionada.value)
@@ -168,61 +170,78 @@ const getHora = (ts: Timestamp | null | undefined): string =>
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#1B1B1B] text-white pb-24">
-    <header
-      class="p-6 flex justify-between items-center bg-[#1B1B1B] border-b border-white/5 sticky top-0 z-50 backdrop-blur-md"
-    >
-      <div>
-        <h1 class="text-[10px] text-[#FA4805] uppercase tracking-[0.2em] font-black">Agenda</h1>
-        <h2 class="text-2xl font-black text-white capitalize">
+  <div class="h-screen bg-[#003D7A] p-5 overflow-hidden">
+    <header class="border-b border-white/5 sticky top-0 z-50 backdrop-blur-md">
+      <div class="grid grid-cols-3 items-center">
+        <button
+          class="justify-self-start p-2 rounded-xl hover:bg-white/10 transition"
+          aria-label="Abrir menu lateral"
+          @click="isSidebarOpen = true"
+        >
+          <Bars3Icon class="w-7 h-7" />
+        </button>
+
+        <h1 class="text-base font-black text-white text-center">Agenda</h1>
+
+        <div />
+      </div>
+
+      <div class="mt-4 flex items-center justify-between gap-4">
+        <h2 class="text-base font-black text-white truncate">
           {{ format(dataSelecionada, 'MMMM, yyyy', { locale: ptBR }) }}
         </h2>
+
+        <button
+          class="bg-[#FBFBFB] text-black px-5 py-2.5 rounded-xl text-sm font-black shadow-[0_10px_25px_rgba(250,72,5,0.25)] active:scale-95 transition-all"
+          @click="abrirModal()"
+        >
+          Cadastrar
+        </button>
       </div>
-      <button
-        class="bg-[#FA4805] text-white px-5 py-2.5 rounded-xl text-sm font-black shadow-[0_10px_25px_rgba(250,72,5,0.25)] active:scale-95 transition-all"
-        @click="abrirModal()"
-      >
-        Novo Agendamento
-      </button>
     </header>
 
     <div
       ref="scrollContainer"
-      class="flex overflow-x-auto px-6 py-8 gap-4 no-scrollbar bg-[#1B1B1B] scroll-smooth"
+      class="flex overflow-x-auto px-6 py-8 gap-3 no-scrollbar scroll-smooth"
     >
       <button
         v-for="dia in diasCarrossel"
         :id="'dia-' + format(dia, 'yyyy-MM-dd')"
         :key="dia.toISOString()"
         :class="[
-          'relative flex flex-col items-center min-w-[65px] py-5 rounded-[2rem] transition-all duration-300 border',
+          'relative flex flex-col items-center min-w-[65px] py-4 rounded-[10px] transition-all duration-300',
           isSameDay(dia, dataSelecionada)
-            ? 'bg-[#FA4805] border-[#FA4805] text-white scale-110 shadow-md'
+            ? 'bg-[#FBFBFB] text-white scale-110 shadow-md'
             : eHoje(dia)
-              ? 'bg-white border-[#FA4805] text-[#1B1B1B] font-bold'
-              : 'bg-white border-transparent text-[#1B1B1B] hover:bg-orange-50'
+              ? 'border-[#FBFBFB] text-white font-bold'
+              : 'border-transparent text-white hover:bg-white/10'
         ]"
         @click="dataSelecionada = dia"
       >
         <div
           v-if="getQuantidadePorDia(dia) > 0"
-          class="absolute -top-3 bg-[#FA4805] text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md"
+          class="absolute -top-3 bg-green-500 text-black text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md"
         >
           {{ getQuantidadePorDia(dia) }}
         </div>
 
-        <span class="text-[10px] uppercase font-black tracking-widest mb-1">{{
-          getDiaLetra(dia)
-        }}</span>
-        <span class="font-black text-xl">{{ format(dia, 'd') }}</span>
-
-        <div
-          v-if="eHoje(dia)"
+        <span
           :class="[
-            'w-1.5 h-1.5 rounded-full mt-2',
-            isSameDay(dia, dataSelecionada) ? 'bg-[#ffffff]' : 'bg-[#FA4805]'
+            'text-[16px] uppercase font-black tracking-widest mb-1',
+            isSameDay(dia, dataSelecionada) ? 'text-[#003D7A]' : 'text-white'
           ]"
-        />
+        >
+          {{ getDiaLetra(dia) }}
+        </span>
+
+        <span
+          :class="[
+            'font-black text-xl',
+            isSameDay(dia, dataSelecionada) ? 'text-[#003D7A]' : 'text-white'
+          ]"
+        >
+          {{ format(dia, 'd') }}
+        </span>
       </button>
     </div>
 
@@ -242,7 +261,7 @@ const getHora = (ts: Timestamp | null | undefined): string =>
           @click="abrirModal(item)"
         >
           <div
-            class="flex flex-col items-center justify-center bg-[#FA4805] px-3 py-4 rounded-2xl min-w-[60px] border border-white/5 shadow-inner"
+            class="flex flex-col items-center justify-center bg-[#FBFBFB] px-3 py-4 rounded-2xl min-w-[60px] border border-white/5 shadow-inner"
           >
             <span class="text-white font-black text-sm">{{ getHora(item.data) }}</span>
           </div>
@@ -282,7 +301,7 @@ const getHora = (ts: Timestamp | null | undefined): string =>
     <nav
       class="fixed bottom-6 left-6 right-6 bg-[#131314]/80 backdrop-blur-xl border border-white/10 rounded-[2rem] px-10 py-4 flex justify-between items-center z-40 shadow-2xl"
     >
-      <NuxtLink to="/profile" class="text-white/40 hover:text-[#FA4805] transition-all">
+      <NuxtLink to="/profile" class="text-white/40 hover:text-[#FBFBFB] transition-all">
         <span class="text-2xl">👤</span>
       </NuxtLink>
     </nav>
