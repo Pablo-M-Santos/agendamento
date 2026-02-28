@@ -3,6 +3,12 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui'],
   ssr: false,
 
+  runtimeConfig: {
+    public: {
+      appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    }
+  },
+
   devtools: {
     enabled: true
   },

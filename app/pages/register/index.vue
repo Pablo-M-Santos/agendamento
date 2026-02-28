@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  signOut
-} from 'firebase/auth'
+import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth'
 
 const { $auth } = useNuxtApp()
+const { loginWithGoogle: authLoginWithGoogle } = useAuth()
 const toast = useToast()
 
 const email = ref('')
@@ -93,18 +88,29 @@ const registerWithEmail = async () => {
 const loginWithGoogle = async () => {
   try {
     loading.value = true
+    const result = await authLoginWithGoogle()
 
-    const provider = new GoogleAuthProvider()
-    const result = await signInWithPopup($auth, provider)
+    if (!result.ok) {
+      let message = 'Tente novamente.'
 
-    if (!result.user.emailVerified) {
+      switch (result.code) {
+        case 'auth/account-exists-with-different-credential':
+          message = 'Este email já está cadastrado com senha. Entre com email e senha.'
+          break
+        case 'auth/popup-closed-by-user':
+          message = 'Login com Google cancelado.'
+          break
+        case 'auth/too-many-requests':
+          message = 'Muitas tentativas. Tente mais tarde.'
+          break
+      }
+
       toast.add({
-        title: 'Email não verificado',
-        description: 'Verifique seu email antes de continuar.',
-        color: 'warning'
+        title: 'Erro no login com Google',
+        description: message,
+        color: 'error'
       })
 
-      await signOut($auth)
       return
     }
 
@@ -114,12 +120,6 @@ const loginWithGoogle = async () => {
     })
 
     navigateTo('/dashboard')
-  } catch (error: any) {
-    toast.add({
-      title: 'Erro no login com Google',
-      description: error.message,
-      color: 'error'
-    })
   } finally {
     loading.value = false
   }
@@ -193,6 +193,7 @@ const loginWithGoogle = async () => {
       <UButton
         block
         variant="outline"
+        type="button"
         size="xl"
         class="relative mb-3 bg-[#D8D8D8] transition-all duration-200 ease-in-out hover:bg-[#CFCFCF] active:bg-[#BEBEBE] focus:ring-0"
         @click="loginWithGoogle"

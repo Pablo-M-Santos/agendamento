@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import {
-  GoogleAuthProvider,
-  FacebookAuthProvider,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  signOut
-} from 'firebase/auth'
+import { signOut } from 'firebase/auth'
 
 const { $auth } = useNuxtApp()
+const {
+  loginWithEmail: authLoginWithEmail,
+  loginWithGoogle: authLoginWithGoogle,
+  sendSetPasswordEmail: authSendSetPasswordEmail
+} = useAuth()
 const toast = useToast()
 
 const email = ref('')
@@ -19,6 +18,7 @@ const errors = reactive({
   email: '',
   password: ''
 })
+
 const validateEmail = (value: string) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return regex.test(value)
@@ -58,14 +58,54 @@ const loginWithEmail = async () => {
 
   try {
     loading.value = true
+    const result = await authLoginWithEmail(email.value, password.value)
 
-    const userCredential = await signInWithEmailAndPassword(
-      $auth,
-      email.value.trim(),
-      password.value
-    )
+    if (!result.ok) {
+      let message = 'Tente novamente.'
 
-    if (!userCredential.user.emailVerified) {
+      switch (result.code) {
+        case 'auth/google-only-account':
+          await authSendSetPasswordEmail(email.value.trim())
+
+          toast.add({
+            title: 'Verifique seu e-mail',
+            description:
+              'Se houver uma conta para este e-mail, enviamos um link para definir senha.',
+            color: 'warning'
+          })
+
+          return
+        case 'auth/invalid-login':
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+          await authSendSetPasswordEmail(email.value.trim())
+
+          toast.add({
+            title: 'Verifique seu e-mail',
+            description:
+              'Se houver uma conta para este e-mail, enviamos um link para definir senha.',
+            color: 'warning'
+          })
+
+          return
+        case 'auth/invalid-email':
+          message = 'Email inválido.'
+          break
+        case 'auth/too-many-requests':
+          message = 'Muitas tentativas. Tente mais tarde.'
+          break
+      }
+
+      toast.add({
+        title: 'Erro no login',
+        description: message,
+        color: 'error'
+      })
+
+      return
+    }
+
+    if (!$auth.currentUser?.emailVerified) {
       toast.add({
         title: 'Email não verificado',
         description: 'Verifique seu email antes de entrar 📩',
@@ -82,29 +122,6 @@ const loginWithEmail = async () => {
     })
 
     navigateTo('/dashboard')
-  } catch (error: any) {
-    let message = 'Tente novamente.'
-
-    switch (error.code) {
-      case 'auth/user-not-found':
-        message = 'Usuário não encontrado.'
-        break
-      case 'auth/wrong-password':
-        message = 'Senha incorreta.'
-        break
-      case 'auth/invalid-email':
-        message = 'Email inválido.'
-        break
-      case 'auth/too-many-requests':
-        message = 'Muitas tentativas. Tente mais tarde.'
-        break
-    }
-
-    toast.add({
-      title: 'Erro no login',
-      description: message,
-      color: 'error'
-    })
   } finally {
     loading.value = false
   }
@@ -113,9 +130,31 @@ const loginWithEmail = async () => {
 const loginWithGoogle = async () => {
   try {
     loading.value = true
+    const result = await authLoginWithGoogle()
 
-    const provider = new GoogleAuthProvider()
-    const result = await signInWithPopup($auth, provider)
+    if (!result.ok) {
+      let message = 'Tente novamente.'
+
+      switch (result.code) {
+        case 'auth/account-exists-with-different-credential':
+          message = 'Este email já está cadastrado com senha. Entre com email e senha.'
+          break
+        case 'auth/popup-closed-by-user':
+          message = 'Login com Google cancelado.'
+          break
+        case 'auth/too-many-requests':
+          message = 'Muitas tentativas. Tente mais tarde.'
+          break
+      }
+
+      toast.add({
+        title: 'Erro no login com Google',
+        description: message,
+        color: 'error'
+      })
+
+      return
+    }
 
     toast.add({
       title: 'Login com Google realizado!',
@@ -123,12 +162,6 @@ const loginWithGoogle = async () => {
     })
 
     navigateTo('/dashboard')
-  } catch (error: any) {
-    toast.add({
-      title: 'Erro no login com Google',
-      description: error.message,
-      color: 'error'
-    })
   } finally {
     loading.value = false
   }
@@ -186,7 +219,6 @@ const loginWithGoogle = async () => {
         size="xl"
         :loading="loading"
         :disabled="!isFormValid || loading"
-        @click="loginWithEmail"
         class="mb-4 bg-[#0063C7] text-white transition-all duration-200 ease-in-out hover:bg-[#0057B0] active:bg-[#004A96] focus:ring-0 disabled:opacity-100 disabled:bg-[#0063C7] disabled:cursor-not-allowed"
       >
         Entrar
@@ -199,6 +231,7 @@ const loginWithGoogle = async () => {
       <UButton
         block
         variant="outline"
+        type="button"
         size="xl"
         class="relative mb-3 bg-[#D8D8D8] transition-all duration-200 ease-in-out hover:bg-[#CFCFCF] active:bg-[#BEBEBE] focus:ring-0"
         @click="loginWithGoogle"
