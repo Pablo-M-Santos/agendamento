@@ -50,6 +50,27 @@ const isFormValid = computed(() => {
   return email.value && password.value && !errors.email && !errors.password
 })
 
+const handleSetPasswordByEmail = async () => {
+  const result = await authSendSetPasswordEmail(email.value.trim())
+
+  if (!result.ok) {
+    toast.add({
+      title: 'Erro ao enviar e-mail',
+      description: 'Não foi possível enviar agora. Tente novamente em instantes.',
+      color: 'error'
+    })
+
+    return
+  }
+
+  toast.add({
+    title: 'Confira seu e-mail',
+    description:
+      'Enviamos os próximos passos para definir sua senha. Veja também a caixa de spam ou entre com Google.',
+    color: 'warning'
+  })
+}
+
 const loginWithEmail = async () => {
   validateField('email')
   validateField('password')
@@ -65,27 +86,13 @@ const loginWithEmail = async () => {
 
       switch (result.code) {
         case 'auth/google-only-account':
-          await authSendSetPasswordEmail(email.value.trim())
-
-          toast.add({
-            title: 'Verifique seu e-mail',
-            description:
-              'Se houver uma conta para este e-mail, enviamos um link para definir senha.',
-            color: 'warning'
-          })
+          await handleSetPasswordByEmail()
 
           return
         case 'auth/invalid-login':
         case 'auth/wrong-password':
         case 'auth/invalid-credential':
-          await authSendSetPasswordEmail(email.value.trim())
-
-          toast.add({
-            title: 'Verifique seu e-mail',
-            description:
-              'Se houver uma conta para este e-mail, enviamos um link para definir senha.',
-            color: 'warning'
-          })
+          await handleSetPasswordByEmail()
 
           return
         case 'auth/invalid-email':

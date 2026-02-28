@@ -75,9 +75,26 @@ const registerWithEmail = async () => {
 
     navigateTo('/')
   } catch (error: any) {
+    let message = 'Não foi possível concluir seu cadastro. Tente novamente.'
+
+    switch (error?.code) {
+      case 'auth/email-already-in-use':
+        message = 'Este e-mail já está cadastrado. Faça login ou use outro e-mail.'
+        break
+      case 'auth/invalid-email':
+        message = 'Email inválido.'
+        break
+      case 'auth/weak-password':
+        message = 'Senha muito fraca. Use pelo menos 6 caracteres.'
+        break
+      case 'auth/too-many-requests':
+        message = 'Muitas tentativas. Tente novamente mais tarde.'
+        break
+    }
+
     toast.add({
       title: 'Erro no cadastro',
-      description: error.message,
+      description: message,
       color: 'error'
     })
   } finally {
