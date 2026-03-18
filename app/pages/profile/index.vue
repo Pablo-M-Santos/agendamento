@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { useAuth } from '~/composables/useAuth'
 import { computed } from 'vue'
+import { useUserSettings } from '~/composables/useUserSettings'
 
 definePageMeta({ middleware: 'auth' })
 
 const { user, logout } = useAuth()
+const { settings, settingsSaving, availableLanguages, saveLanguage } = useUserSettings()
+const { t } = useAppI18n()
 
 const inicial = computed(() => {
   return user.value?.email?.charAt(0).toUpperCase() || 'U'
@@ -15,9 +18,9 @@ const provedorConta = computed(() => {
   const hasGoogle = providers.some((item) => item.providerId === 'google.com')
   const hasPassword = providers.some((item) => item.providerId === 'password')
 
-  if (hasGoogle) return 'Google'
-  if (hasPassword) return 'Email e senha'
-  return 'Nao identificado'
+  if (hasGoogle) return t('provider.google')
+  if (hasPassword) return t('provider.emailPassword')
+  return t('provider.unknown')
 })
 
 const uidCurto = computed(() => {
@@ -27,6 +30,11 @@ const uidCurto = computed(() => {
 })
 
 const voltar = () => useRouter().back()
+
+const handleSelectLanguage = async (language: (typeof availableLanguages)[number]['value']) => {
+  if (settings.value.language === language) return
+  await saveLanguage(language)
+}
 </script>
 
 <template>
@@ -48,7 +56,7 @@ const voltar = () => useRouter().back()
           />
         </svg>
       </button>
-      <h1 class="text-xl font-black">Meu Perfil</h1>
+      <h1 class="text-xl font-black">{{ t('profile.title') }}</h1>
     </header>
 
     <main class="px-6 py-10">
@@ -64,7 +72,7 @@ const voltar = () => useRouter().back()
 
         <div class="text-center space-y-2">
           <h2 class="text-2xl font-black">
-            {{ user?.displayName || 'Usuário' }}
+            {{ user?.displayName || t('profile.userFallback') }}
           </h2>
           <p class="text-sm text-white/40 font-bold tracking-widest uppercase">
             {{ user?.email }}
@@ -74,16 +82,44 @@ const voltar = () => useRouter().back()
 
       <div class="mt-12">
         <section class="mb-6 p-5 rounded-3xl border border-white/10 bg-white/5">
-          <h3 class="text-xs font-black uppercase tracking-[0.2em] text-white/70 mb-4">Sobre</h3>
+          <h3 class="text-xs font-black uppercase tracking-[0.2em] text-white/70 mb-4">
+            {{ t('profile.language') }}
+          </h3>
+
+          <div class="space-y-2">
+            <button
+              v-for="option in availableLanguages"
+              :key="option.value"
+              class="w-full p-3 rounded-2xl border text-left font-bold text-sm transition"
+              :class="
+                settings.language === option.value
+                  ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
+                  : 'bg-white/5 border-white/15 text-white'
+              "
+              @click="handleSelectLanguage(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+
+          <p class="text-xs text-white/60 mt-3">
+            {{ settingsSaving ? t('profile.savingLanguage') : t('profile.languageSaved') }}
+          </p>
+        </section>
+
+        <section class="mb-6 p-5 rounded-3xl border border-white/10 bg-white/5">
+          <h3 class="text-xs font-black uppercase tracking-[0.2em] text-white/70 mb-4">
+            {{ t('profile.about') }}
+          </h3>
 
           <div class="space-y-3 text-sm">
             <div class="flex items-center justify-between gap-3">
-              <span class="text-white/60">Provedor de login</span>
+              <span class="text-white/60">{{ t('profile.loginProvider') }}</span>
               <span class="font-bold text-white">{{ provedorConta }}</span>
             </div>
 
             <div class="flex items-center justify-between gap-3">
-              <span class="text-white/60">UID da conta</span>
+              <span class="text-white/60">{{ t('profile.accountUid') }}</span>
               <span class="font-bold text-white">{{ uidCurto }}</span>
             </div>
           </div>
@@ -93,7 +129,7 @@ const voltar = () => useRouter().back()
           class="w-full py-5 rounded-2xl border-2 border-red-500/20 text-red-500 font-black uppercase tracking-[0.2em] text-xs active:scale-95 transition-all"
           @click="logout"
         >
-          Encerrar Sessão
+          {{ t('profile.logout') }}
         </button>
       </div>
     </main>

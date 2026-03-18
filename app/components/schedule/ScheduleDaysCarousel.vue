@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, watch } from 'vue'
 import { format, isSameDay } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
+
+const { dateLocale } = useUserSettings()
 
 const props = defineProps<{
   diasCarrossel: Date[]
@@ -18,7 +19,8 @@ const eHoje = (dia: Date) => isSameDay(dia, new Date())
 const carouselRef = ref<HTMLElement | null>(null)
 let selectedCenterTimer: ReturnType<typeof setTimeout> | null = null
 
-const getDiaLetra = (date: Date) => format(date, 'eeeeee', { locale: ptBR }).charAt(0).toUpperCase()
+const getDiaLetra = (date: Date) =>
+  format(date, 'eeeeee', { locale: dateLocale.value }).charAt(0).toUpperCase()
 
 const getQuantidadePorDia = (dia: Date) => {
   const chave = format(dia, 'yyyy-MM-dd')

@@ -2,6 +2,8 @@
 import { format } from 'date-fns'
 import type { Agendamento } from '~/composables/useAgendamentos'
 
+const { t } = useAppI18n()
+
 const props = defineProps<{
   modelValue: boolean
   agendamento: Agendamento | null
@@ -41,9 +43,11 @@ const formatarDataHora = (item: Agendamento) => format(item.data.toDate(), 'dd/M
           <div class="w-12 h-1 rounded-full bg-white/35 mx-auto mb-4" />
 
           <header class="mb-6">
-            <p class="text-[11px] uppercase tracking-[0.18em] font-black text-white/70">Detalhes</p>
+            <p class="text-[11px] uppercase tracking-[0.18em] font-black text-white/70">
+              {{ t('schedule.details') }}
+            </p>
             <h3 class="text-2xl font-black mt-1 leading-tight">
-              {{ agendamento.cliente || 'Cliente' }}
+              {{ agendamento.cliente || t('schedule.client') }}
             </h3>
             <p class="text-sm text-white/80 mt-1">{{ formatarDataHora(agendamento) }}</p>
           </header>
@@ -51,10 +55,10 @@ const formatarDataHora = (item: Agendamento) => format(item.data.toDate(), 'dd/M
           <div class="space-y-4">
             <article class="rounded-2xl border border-white/20 bg-white/8 p-4">
               <p class="text-[10px] uppercase tracking-[0.18em] font-black text-white/70">
-                Endereco
+                {{ t('schedule.address') }}
               </p>
               <p class="text-sm font-semibold mt-1">
-                {{ agendamento.endereco || 'Nao informado' }}
+                {{ agendamento.endereco || t('schedule.notInformed') }}
                 <template v-if="agendamento.numeroCasa"
                   >, Casa {{ agendamento.numeroCasa }}</template
                 >
@@ -63,76 +67,80 @@ const formatarDataHora = (item: Agendamento) => format(item.data.toDate(), 'dd/M
 
             <article class="rounded-2xl border border-white/20 bg-white/8 p-4">
               <p class="text-[10px] uppercase tracking-[0.18em] font-black text-white/70">
-                Servico
+                {{ t('schedule.service') }}
               </p>
               <p class="text-sm font-semibold mt-1">
-                {{ agendamento.descricao || 'Sem descricao' }}
+                {{ agendamento.descricao || t('schedule.noDescription') }}
               </p>
             </article>
 
             <article class="rounded-2xl border border-white/20 bg-white/8 p-4">
               <p class="text-[10px] uppercase tracking-[0.18em] font-black text-white/70 mb-2">
-                Status
+                {{ t('schedule.status') }}
               </p>
               <div class="flex flex-wrap gap-2">
                 <span
                   v-if="agendamento.materialPronto === true"
                   class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-400 text-[#003D7A]"
                 >
-                  Material pronto
+                  {{ t('schedule.materialReady') }}
                 </span>
                 <span
                   v-else-if="agendamento.materialPronto === false"
                   class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-300 text-[#4A2C00]"
                 >
-                  Sem material
+                  {{ t('schedule.noMaterial') }}
                 </span>
                 <span
                   v-else
                   class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
                 >
-                  Material nao informado
+                  {{ t('schedule.materialNotInformed') }}
                 </span>
 
                 <span
                   v-if="agendamento.servicoConcluido === true"
                   class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#00D3B8] text-[#003D7A]"
                 >
-                  Servico finalizado
+                  {{ t('schedule.serviceFinished') }}
                 </span>
                 <span
                   v-else-if="agendamento.servicoConcluido === false"
                   class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/15 text-white"
                 >
-                  Servico em aberto
+                  {{ t('schedule.serviceInProgress') }}
                 </span>
                 <span
                   v-else
                   class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
                 >
-                  Servico nao concluido
+                  {{ t('schedule.serviceNotCompleted') }}
                 </span>
               </div>
             </article>
 
             <article class="rounded-2xl border border-white/20 bg-white/8 p-4">
               <p class="text-[10px] uppercase tracking-[0.18em] font-black text-white/70 mb-2">
-                Complementos
+                {{ t('schedule.extras') }}
               </p>
               <ul class="space-y-2 text-sm">
                 <li>
-                  <span class="text-white/65">Telefone:</span>
-                  <span class="font-semibold"> {{ agendamento.telefone || 'Nao informado' }}</span>
-                </li>
-                <li>
-                  <span class="text-white/65">Referencia:</span>
+                  <span class="text-white/65">{{ t('schedule.phone') }}:</span>
                   <span class="font-semibold">
-                    {{ agendamento.referencia || 'Nao informada' }}</span
+                    {{ agendamento.telefone || t('schedule.notInformed') }}</span
                   >
                 </li>
                 <li>
-                  <span class="text-white/65">Observacoes:</span>
-                  <span class="font-semibold"> {{ agendamento.observacoes || 'Nenhuma' }}</span>
+                  <span class="text-white/65">{{ t('schedule.reference') }}:</span>
+                  <span class="font-semibold">
+                    {{ agendamento.referencia || t('schedule.notInformed') }}</span
+                  >
+                </li>
+                <li>
+                  <span class="text-white/65">{{ t('schedule.notes') }}:</span>
+                  <span class="font-semibold">
+                    {{ agendamento.observacoes || t('schedule.none') }}</span
+                  >
                 </li>
               </ul>
             </article>
@@ -143,13 +151,13 @@ const formatarDataHora = (item: Agendamento) => format(item.data.toDate(), 'dd/M
               class="py-3 rounded-xl border border-white/25 bg-white/10 font-black text-sm"
               @click="fechar"
             >
-              Fechar
+              {{ t('schedule.close') }}
             </button>
             <button
               class="py-3 rounded-xl bg-[#00D3B8] text-[#003D7A] font-black text-sm"
               @click="editar"
             >
-              Editar
+              {{ t('schedule.edit') }}
             </button>
           </div>
         </div>

@@ -7,6 +7,7 @@ definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { user } = useAuth()
 const { listarAgendamentos } = useAgendamentos()
+const { t } = useAppI18n()
 
 const agendamentos = ref<Agendamento[]>([])
 const isSidebarOpen = ref(false)
@@ -23,8 +24,10 @@ const primeiroNomeGoogle = computed(() => {
 })
 
 const saudacaoDashboard = computed(() => {
-  if (primeiroNomeGoogle.value) return `Seja bem vindo, ${primeiroNomeGoogle.value}`
-  return 'Seja bem vindo'
+  if (primeiroNomeGoogle.value) {
+    return t('dashboard.welcomeName', { name: primeiroNomeGoogle.value })
+  }
+  return t('dashboard.welcome')
 })
 
 const inicialUsuario = computed(() => {
@@ -32,8 +35,6 @@ const inicialUsuario = computed(() => {
   if (!nome) return 'U'
   return nome.charAt(0).toUpperCase()
 })
-
-
 
 const carregar = async () => {
   if (!user.value) return
@@ -63,7 +64,7 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
     <div class="relative mb-6 h-[56px] flex items-center justify-center">
       <button
         class="absolute left-0 p-2 rounded-xl hover:bg-white/10 transition"
-        aria-label="Abrir menu lateral"
+        :aria-label="t('dashboard.openSidebar')"
         @click="isSidebarOpen = true"
       >
         <Bars3Icon class="w-7 h-7" />
@@ -76,7 +77,7 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
       <NuxtLink
         to="/profile"
         class="absolute right-0 w-11 h-11 rounded-[50%] overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center hover:scale-105 transition"
-        aria-label="Ir para o perfil"
+        :aria-label="t('dashboard.goProfile')"
       >
         <img
           v-if="user?.photoURL"
@@ -101,7 +102,7 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
               <CalendarDaysIcon class="w-5 h-5 text-white/95" />
             </span>
           </div>
-          <h3 class="font-black text-base tracking-wide">Agenda</h3>
+          <h3 class="font-black text-base tracking-wide">{{ t('dashboard.scheduleCard') }}</h3>
         </div>
       </NuxtLink>
 
@@ -115,14 +116,14 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
               <ChartBarIcon class="w-5 h-5 text-white/95" />
             </span>
           </div>
-          <h3 class="font-black text-base tracking-wide">Relatorios</h3>
+          <h3 class="font-black text-base tracking-wide">{{ t('dashboard.reportsCard') }}</h3>
         </div>
       </NuxtLink>
     </div>
 
     <section>
       <div class="flex items-center mb-4">
-        <h3 class="font-black text-white/90 text-sm">Serviços recentes</h3>
+        <h3 class="font-black text-white/90 text-sm">{{ t('dashboard.recentServices') }}</h3>
         <div class="flex-1 h-[1px] bg-white/15 ml-4" />
       </div>
 
@@ -143,7 +144,9 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
             <div
               class="inline-flex items-center gap-2 bg-[#E8F1FF] text-[#003D7A] px-3 py-2 rounded-xl"
             >
-              <span class="text-[10px] font-black uppercase tracking-[0.14em]">Horario</span>
+              <span class="text-[10px] font-black uppercase tracking-[0.14em]">{{
+                t('schedule.time')
+              }}</span>
               <span class="text-sm font-black">{{ format(item.data.toDate(), 'HH:mm') }}</span>
             </div>
 
@@ -151,28 +154,28 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
               v-if="item.materialPronto === true"
               class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-400 text-[#003D7A]"
             >
-              Material pronto
+              {{ t('schedule.materialReady') }}
             </span>
             <span
               v-else-if="item.materialPronto === false"
               class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-300 text-[#4A2C00]"
             >
-              Sem material
+              {{ t('schedule.noMaterial') }}
             </span>
             <span
               v-else
               class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#E8F1FF] text-[#5B6B8A]"
             >
-              Sem status
+              {{ t('schedule.noStatus') }}
             </span>
           </div>
 
           <div class="mt-3 rounded-xl border border-[#D8E7FF] bg-[#F4F8FF] p-3">
             <p class="text-[10px] text-[#5B6B8A] font-black uppercase tracking-[0.16em]">
-              Endereco
+              {{ t('schedule.address') }}
             </p>
             <p class="text-sm text-[#0B1F3A] font-bold mt-1 leading-relaxed">
-              {{ item.endereco || 'Endereco nao informado' }}
+              {{ item.endereco || t('schedule.addressNotInformed') }}
               <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
             </p>
           </div>
@@ -182,19 +185,19 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
               v-if="item.servicoConcluido === true"
               class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#00D3B8] text-[#003D7A]"
             >
-              Finalizado
+              {{ t('schedule.serviceCompleted') }}
             </span>
             <span
               v-else-if="item.servicoConcluido === false"
               class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#DDE7FA] text-[#3F5170]"
             >
-              Em aberto
+              {{ t('schedule.serviceOpen') }}
             </span>
             <span
               v-else
               class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#E8F1FF] text-[#5B6B8A]"
             >
-              Servico nao concluido
+              {{ t('schedule.serviceNotCompleted') }}
             </span>
           </div>
 
@@ -208,7 +211,7 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
         v-else
         class="bg-white/10 border border-white/15 rounded-2xl p-6 text-center text-white/80"
       >
-        Nenhum servico recente.
+        {{ t('dashboard.noRecentServices') }}
       </div>
     </section>
   </div>

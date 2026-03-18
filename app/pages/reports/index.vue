@@ -22,16 +22,17 @@ type Periodo = '7d' | '30d' | 'mes'
 
 const { user } = useAuth()
 const { listarAgendamentos } = useAgendamentos()
+const { t } = useAppI18n()
 
 const periodoSelecionado = ref<Periodo>('30d')
 const carregando = ref(true)
 const agendamentos = ref<Agendamento[]>([])
 
-const opcoesPeriodo: Array<{ key: Periodo; label: string }> = [
-  { key: '7d', label: '7 dias' },
-  { key: '30d', label: '30 dias' },
-  { key: 'mes', label: 'Mes atual' }
-]
+const opcoesPeriodo = computed<Array<{ key: Periodo; label: string }>>(() => [
+  { key: '7d', label: t('reports.period.7d') },
+  { key: '30d', label: t('reports.period.30d') },
+  { key: 'mes', label: t('reports.period.month') }
+])
 
 const carregar = async () => {
   if (!user.value) {
@@ -197,12 +198,12 @@ const diaMaisCheio = computed(() => {
         <NuxtLink
           to="/dashboard"
           class="justify-self-start p-2 rounded-xl hover:bg-white/10 transition"
-          aria-label="Voltar para dashboard"
+          :aria-label="t('common.backToDashboard')"
         >
           <ArrowLeftIcon class="w-7 h-7" />
         </NuxtLink>
 
-        <h1 class="text-base font-black text-center">Relatorios</h1>
+        <h1 class="text-base font-black text-center">{{ t('reports.title') }}</h1>
 
         <div />
       </div>
@@ -214,8 +215,10 @@ const diaMaisCheio = computed(() => {
           <ChartBarIcon class="w-5 h-5" />
         </span>
         <div>
-          <h2 class="text-xl font-black tracking-wide">Relatorios</h2>
-          <p class="text-xs text-white/70 uppercase tracking-[0.16em]">Visao geral da operacao</p>
+          <h2 class="text-xl font-black tracking-wide">{{ t('reports.title') }}</h2>
+          <p class="text-xs text-white/70 uppercase tracking-[0.16em]">
+            {{ t('reports.subtitle') }}
+          </p>
         </div>
       </div>
 
@@ -240,32 +243,36 @@ const diaMaisCheio = computed(() => {
       v-if="carregando"
       class="rounded-3xl border border-white/20 bg-white/8 p-6 text-center"
     >
-      <p class="font-black uppercase tracking-[0.16em] text-sm">Carregando relatorios...</p>
+      <p class="font-black uppercase tracking-[0.16em] text-sm">{{ t('reports.loading') }}</p>
     </section>
 
     <template v-else>
       <section class="grid grid-cols-2 gap-3 mb-6">
         <article class="rounded-2xl bg-white/95 text-[#0B1F3A] p-4 shadow-sm">
           <p class="text-[10px] uppercase tracking-[0.16em] font-black text-[#56709A]">
-            Agendamentos
+            {{ t('reports.card.bookings') }}
           </p>
           <p class="text-2xl font-black mt-1">{{ totalAgendamentos }}</p>
         </article>
 
         <article class="rounded-2xl bg-[#00D3B8] text-[#003D7A] p-4 shadow-sm">
-          <p class="text-[10px] uppercase tracking-[0.16em] font-black">Servico concluido</p>
+          <p class="text-[10px] uppercase tracking-[0.16em] font-black">
+            {{ t('reports.card.completedService') }}
+          </p>
           <p class="text-2xl font-black mt-1">{{ totalFinalizados }}</p>
         </article>
 
         <article class="rounded-2xl bg-white/12 border border-white/20 p-4 shadow-sm">
           <p class="text-[10px] uppercase tracking-[0.16em] font-black text-white/75">
-            Servico nao finalizado
+            {{ t('reports.card.unfinishedService') }}
           </p>
           <p class="text-2xl font-black mt-1">{{ totalNaoConcluidos }}</p>
         </article>
 
         <article class="rounded-2xl bg-[#E8F1FF] text-[#3F5170] p-4 shadow-sm">
-          <p class="text-[10px] uppercase tracking-[0.16em] font-black">Material pronto</p>
+          <p class="text-[10px] uppercase tracking-[0.16em] font-black">
+            {{ t('reports.card.materialReady') }}
+          </p>
           <p class="text-2xl font-black mt-1">{{ totalMaterialPronto }}</p>
         </article>
       </section>
@@ -274,7 +281,7 @@ const diaMaisCheio = computed(() => {
         <div class="flex items-start justify-between gap-3">
           <div>
             <p class="text-[10px] uppercase tracking-[0.16em] font-black text-white/70">
-              Taxa de conclusao
+              {{ t('reports.completionRate') }}
             </p>
             <p class="text-3xl font-black mt-1">{{ taxaConclusao.toFixed(1) }}%</p>
           </div>
@@ -295,10 +302,12 @@ const diaMaisCheio = computed(() => {
 
       <section class="rounded-3xl border border-white/20 bg-white/8 p-5 mb-6">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-black uppercase tracking-[0.16em]">Evolucao diaria</h2>
-          <span class="text-[10px] text-white/70 uppercase tracking-[0.16em]"
-            >Total x Finalizados</span
-          >
+          <h2 class="text-sm font-black uppercase tracking-[0.16em]">
+            {{ t('reports.dailyEvolution') }}
+          </h2>
+          <span class="text-[10px] text-white/70 uppercase tracking-[0.16em]">{{
+            t('reports.totalVsCompleted')
+          }}</span>
         </div>
 
         <div class="overflow-x-auto no-scrollbar">
@@ -325,12 +334,15 @@ const diaMaisCheio = computed(() => {
       </section>
 
       <section class="rounded-3xl border border-white/20 bg-white/8 p-5 mb-7">
-        <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">Material</h2>
+        <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
+          {{ t('reports.material') }}
+        </h2>
 
         <div class="space-y-4 text-xs font-bold">
           <div>
             <div class="flex justify-between text-white/80 mb-1">
-              <span>Material pronto</span><span>{{ materialResumo.pronto }}</span>
+              <span>{{ t('reports.materialReady') }}</span
+              ><span>{{ materialResumo.pronto }}</span>
             </div>
             <div class="h-2 rounded-full bg-white/15 overflow-hidden">
               <div
@@ -344,7 +356,8 @@ const diaMaisCheio = computed(() => {
 
           <div>
             <div class="flex justify-between text-white/80 mb-1">
-              <span>Sem material</span><span>{{ materialResumo.semMaterial }}</span>
+              <span>{{ t('reports.noMaterial') }}</span
+              ><span>{{ materialResumo.semMaterial }}</span>
             </div>
             <div class="h-2 rounded-full bg-white/15 overflow-hidden">
               <div
@@ -358,7 +371,8 @@ const diaMaisCheio = computed(() => {
 
           <div>
             <div class="flex justify-between text-white/80 mb-1">
-              <span>Nao informado</span><span>{{ materialResumo.naoInformado }}</span>
+              <span>{{ t('reports.notInformed') }}</span
+              ><span>{{ materialResumo.naoInformado }}</span>
             </div>
             <div class="h-2 rounded-full bg-white/15 overflow-hidden">
               <div
@@ -373,32 +387,32 @@ const diaMaisCheio = computed(() => {
       </section>
 
       <section class="rounded-3xl border border-white/20 bg-white/8 p-5 mb-10">
-        <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">Insights rapidos</h2>
+        <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
+          {{ t('reports.quickInsights') }}
+        </h2>
 
         <div class="space-y-3 text-sm font-semibold">
           <p class="flex items-start gap-2">
             <CalendarDaysIcon class="w-4 h-4 mt-0.5 text-[#B5FFF6]" />
             <span>
-              Dia com maior volume: <strong>{{ diaMaisCheio?.label || '--/--' }}</strong> ({{
-                diaMaisCheio?.total || 0
-              }}
-              agendamentos)
+              {{ t('reports.busyDay') }} <strong>{{ diaMaisCheio?.label || '--/--' }}</strong> ({
+              diaMaisCheio?.total || 0 }} {{ t('reports.bookingsSuffix') }})
             </span>
           </p>
 
           <p class="flex items-start gap-2">
             <CheckBadgeIcon class="w-4 h-4 mt-0.5 text-[#B5FFF6]" />
             <span>
-              Melhor cliente no periodo:
-              <strong>{{ topClientes[0]?.cliente || 'Sem dados' }}</strong>
-              ({{ topClientes[0]?.total || 0 }} servicos)
+              {{ t('reports.bestClient') }}
+              <strong>{{ topClientes[0]?.cliente || t('reports.noData') }}</strong>
+              ({{ topClientes[0]?.total || 0 }} {{ t('reports.servicesSuffix') }})
             </span>
           </p>
         </div>
 
         <div class="mt-5" v-if="topClientes.length">
           <p class="text-[10px] uppercase tracking-[0.16em] text-white/70 font-black mb-2">
-            Top clientes
+            {{ t('reports.topClients') }}
           </p>
           <div class="space-y-3">
             <div
@@ -408,7 +422,12 @@ const diaMaisCheio = computed(() => {
             >
               <span class="font-bold text-sm truncate pr-3">{{ cliente.cliente }}</span>
               <span class="text-xs font-black uppercase tracking-[0.14em] text-[#B5FFF6]">
-                {{ cliente.total }} total / {{ cliente.finalizados }} finalizados
+                {{
+                  t('reports.totalCompleted', {
+                    total: cliente.total,
+                    completed: cliente.finalizados
+                  })
+                }}
               </span>
             </div>
           </div>

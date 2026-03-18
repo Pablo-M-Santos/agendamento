@@ -19,8 +19,11 @@ const emit = defineEmits<{
 const route = useRoute()
 const { user, logout } = useAuth()
 const toast = useToast()
+const { t } = useAppI18n()
 
-const displayName = computed(() => user.value?.displayName || user.value?.email || 'Usuário')
+const displayName = computed(() => {
+  return user.value?.displayName || user.value?.email || t('profile.userFallback')
+})
 const initials = computed(() => displayName.value.charAt(0).toUpperCase())
 
 const isActive = (path: string) => route.path === path
@@ -30,19 +33,19 @@ const close = () => emit('update:modelValue', false)
 const handleLogout = async () => {
   close()
   toast.add({
-    title: 'Logout realizado',
-    description: 'Voce saiu da sua conta.',
+    title: t('sidebar.logoutDoneTitle'),
+    description: t('sidebar.logoutDoneDescription'),
     color: 'success'
   })
   await logout()
 }
 
-const links = [
-  { to: '/dashboard', label: 'Dashboard', icon: HomeIcon },
-  { to: '/schedule', label: 'Agenda', icon: CalendarDaysIcon },
-  { to: '/reports', label: 'Relatórios', icon: ChartBarIcon },
-  { to: '/profile', label: 'Perfil', icon: UserIcon }
-]
+const links = computed(() => [
+  { to: '/dashboard', label: t('sidebar.dashboard'), icon: HomeIcon },
+  { to: '/schedule', label: t('sidebar.schedule'), icon: CalendarDaysIcon },
+  { to: '/reports', label: t('sidebar.reports'), icon: ChartBarIcon },
+  { to: '/profile', label: t('sidebar.profile'), icon: UserIcon }
+])
 </script>
 
 <template>
@@ -59,7 +62,7 @@ const links = [
         <button
           v-if="props.modelValue"
           class="absolute inset-0 bg-black/50 pointer-events-auto"
-          aria-label="Fechar menu"
+          :aria-label="t('sidebar.closeMenu')"
           @click="close"
         />
       </Transition>
@@ -94,7 +97,7 @@ const links = [
 
             <button
               class="p-2 rounded-lg hover:bg-white/10 transition"
-              aria-label="Fechar"
+              :aria-label="t('sidebar.close')"
               @click="close"
             >
               <XMarkIcon class="w-6 h-6" />
@@ -125,7 +128,7 @@ const links = [
               @click="handleLogout"
             >
               <ArrowLeftOnRectangleIcon class="w-5 h-5" />
-              Logout
+              {{ t('sidebar.logout') }}
             </button>
           </div>
         </aside>

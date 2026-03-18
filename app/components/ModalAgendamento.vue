@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, computed, nextTick } from 'vue'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import type { AgendamentoForm } from '~/types/agendamento'
+
+const { dateLocale } = useUserSettings()
+const { t, language } = useAppI18n()
 
 const props = defineProps<{
   modelValue: boolean
@@ -45,6 +47,11 @@ const horarios = computed(() => {
     }
   }
   return lista
+})
+
+const dataHeaderFormat = computed(() => {
+  if (language.value === 'en-US') return 'MMMM dd, yyyy'
+  return "dd 'de' MMMM, yyyy"
 })
 
 const pegarHorarioMaisProximo = () => {
@@ -112,9 +119,9 @@ watch(
 )
 
 const handleSalvar = () => {
-  if (!cliente.value.trim()) return alert('Nome do cliente e obrigatorio')
-  if (!numeroCasa.value.trim()) return alert('Numero da casa e obrigatorio')
-  if (!endereco.value.trim()) return alert('Endereco e obrigatorio')
+  if (!cliente.value.trim()) return alert(t('schedule.validation.clientRequired'))
+  if (!numeroCasa.value.trim()) return alert(t('schedule.validation.houseRequired'))
+  if (!endereco.value.trim()) return alert(t('schedule.validation.addressRequired'))
 
   const dataFinal = new Date(props.dataSelecionadaNoPai)
   const [h, m] = horaSelecionada.value.split(':')
@@ -150,19 +157,23 @@ const handleSalvar = () => {
         <div class="h-full flex flex-col">
           <header class="px-6 pt-6 pb-4 border-b border-white/15 flex items-center justify-between">
             <div>
-              <p class="text-[11px] font-black uppercase tracking-[0.2em] text-white/70">Agenda</p>
+              <p class="text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
+                {{ t('schedule.title') }}
+              </p>
               <h3 class="text-2xl font-black mt-1">
-                {{ agendamentoInicial ? 'Editar Servico' : 'Cadastrar Servico' }}
+                {{
+                  agendamentoInicial ? t('schedule.modalTitleEdit') : t('schedule.modalTitleCreate')
+                }}
               </h3>
               <p class="text-sm text-white/80 mt-1">
-                {{ format(dataSelecionadaNoPai, "dd 'de' MMMM, yyyy", { locale: ptBR }) }}
+                {{ format(dataSelecionadaNoPai, dataHeaderFormat, { locale: dateLocale }) }}
               </p>
-              <p class="text-xs text-white/60 mt-1">Preencha os campos principais para salvar.</p>
+              <p class="text-xs text-white/60 mt-1">{{ t('schedule.fillMainFields') }}</p>
             </div>
 
             <button
               class="w-11 h-11 rounded-xl border border-white/25 bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
-              aria-label="Fechar cadastro"
+              :aria-label="t('schedule.closeForm')"
               @click="emit('update:modelValue', false)"
             >
               <svg
@@ -186,46 +197,46 @@ const handleSalvar = () => {
             <section class="rounded-3xl border border-[#00D3B8]/40 bg-[#00D3B8]/10 p-5 space-y-4">
               <div class="flex items-center justify-between">
                 <h4 class="text-sm font-black uppercase tracking-wider text-[#B5FFF6]">
-                  Dados principais
+                  {{ t('schedule.mainData') }}
                 </h4>
                 <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#B5FFF6]">
-                  Obrigatorio
+                  {{ t('schedule.required') }}
                 </span>
               </div>
 
               <div>
                 <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  Nome do Cliente
+                  {{ t('schedule.clientName') }}
                 </label>
                 <input
                   v-model="cliente"
                   type="text"
-                  placeholder="Ex: Joao Silva"
+                  :placeholder="t('schedule.clientName')"
                   class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
                 />
               </div>
 
               <div>
                 <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  Numero da Casa
+                  {{ t('schedule.houseNumber') }}
                 </label>
                 <input
                   v-model="numeroCasa"
                   type="text"
                   inputmode="numeric"
-                  placeholder="Ex: 120"
+                  :placeholder="t('schedule.houseNumber')"
                   class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
                 />
               </div>
 
               <div>
                 <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  Endereco do Cliente
+                  {{ t('schedule.clientAddress') }}
                 </label>
                 <input
                   v-model="endereco"
                   type="text"
-                  placeholder="Rua, bairro ou condominio"
+                  :placeholder="t('schedule.clientAddress')"
                   class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
                 />
               </div>
@@ -233,7 +244,7 @@ const handleSalvar = () => {
 
             <section class="rounded-3xl border border-white/20 bg-white/8 p-5">
               <label class="text-[10px] font-black uppercase tracking-[0.18em] block mb-3">
-                Horario do Servico
+                {{ t('schedule.serviceTime') }}
               </label>
               <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
                 <button
@@ -256,9 +267,11 @@ const handleSalvar = () => {
             <section class="rounded-3xl border border-white/20 bg-white/8 p-5">
               <div class="flex items-center justify-between gap-4">
                 <div>
-                  <p class="text-sm font-black uppercase tracking-wider">Material Pronto</p>
+                  <p class="text-sm font-black uppercase tracking-wider">
+                    {{ t('schedule.materialReadyQuestion') }}
+                  </p>
                   <p class="text-xs text-white/70 mt-1">
-                    Opcional: marque se o material ja esta no local
+                    {{ t('schedule.materialReadyHint') }}
                   </p>
                 </div>
 
@@ -272,7 +285,7 @@ const handleSalvar = () => {
                     "
                     @click="materialPronto = true"
                   >
-                    Sim
+                    {{ t('schedule.yes') }}
                   </button>
                   <button
                     class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
@@ -283,7 +296,7 @@ const handleSalvar = () => {
                     "
                     @click="materialPronto = false"
                   >
-                    Nao
+                    {{ t('schedule.no') }}
                   </button>
                 </div>
               </div>
@@ -292,9 +305,11 @@ const handleSalvar = () => {
             <section class="rounded-3xl border border-white/20 bg-white/8 p-5">
               <div class="flex items-center justify-between gap-4">
                 <div>
-                  <p class="text-sm font-black uppercase tracking-wider">Status do Servico</p>
+                  <p class="text-sm font-black uppercase tracking-wider">
+                    {{ t('schedule.serviceStatusQuestion') }}
+                  </p>
                   <p class="text-xs text-white/70 mt-1">
-                    Informe se o atendimento ja foi finalizado
+                    {{ t('schedule.serviceStatusHint') }}
                   </p>
                 </div>
 
@@ -308,7 +323,7 @@ const handleSalvar = () => {
                     "
                     @click="servicoConcluido = true"
                   >
-                    Finalizado
+                    {{ t('schedule.serviceCompleted') }}
                   </button>
                   <button
                     class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
@@ -319,59 +334,61 @@ const handleSalvar = () => {
                     "
                     @click="servicoConcluido = false"
                   >
-                    Em aberto
+                    {{ t('schedule.serviceOpen') }}
                   </button>
                 </div>
               </div>
             </section>
 
             <section class="rounded-3xl border border-white/20 bg-white/8 p-5 space-y-4">
-              <h4 class="text-sm font-black uppercase tracking-wider">Campos Opcionais</h4>
+              <h4 class="text-sm font-black uppercase tracking-wider">
+                {{ t('schedule.optionalFields') }}
+              </h4>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1"
-                  >Telefone</label
-                >
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">{{
+                  t('schedule.phone')
+                }}</label>
                 <input
                   v-model="telefone"
                   type="tel"
-                  placeholder="Ex: (11) 99999-0000"
+                  :placeholder="t('schedule.phone')"
                   class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
                 />
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1"
-                  >Referencia</label
-                >
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">{{
+                  t('schedule.reference')
+                }}</label>
                 <input
                   v-model="referencia"
                   type="text"
-                  placeholder="Ex: Casa com portao preto"
+                  :placeholder="t('schedule.reference')"
                   class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
                 />
               </div>
 
               <div>
                 <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  Detalhes do Servico
+                  {{ t('schedule.serviceDetails') }}
                 </label>
                 <textarea
                   v-model="descricao"
                   rows="3"
-                  placeholder="Opcional: escopo do servico"
+                  :placeholder="t('schedule.serviceDetails')"
                   class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45 resize-none"
                 />
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1"
-                  >Observacoes</label
-                >
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">{{
+                  t('schedule.notes')
+                }}</label>
                 <textarea
                   v-model="observacoes"
                   rows="2"
-                  placeholder="Opcional: observacoes internas"
+                  :placeholder="t('schedule.notes')"
                   class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45 resize-none"
                 />
               </div>
@@ -384,14 +401,14 @@ const handleSalvar = () => {
                 class="py-4 rounded-2xl border border-white/25 bg-white/10 text-white font-black text-sm"
                 @click="emit('update:modelValue', false)"
               >
-                Cancelar
+                {{ t('schedule.cancel') }}
               </button>
 
               <button
                 class="py-4 rounded-2xl bg-[#00D3B8] text-[#003D7A] font-black text-sm shadow-xl active:scale-[0.99] transition-all"
                 @click="handleSalvar"
               >
-                {{ agendamentoInicial ? 'Salvar Alteracoes' : 'Confirmar Servico' }}
+                {{ agendamentoInicial ? t('schedule.saveChanges') : t('schedule.confirmService') }}
               </button>
             </div>
           </footer>
