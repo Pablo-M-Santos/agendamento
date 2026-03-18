@@ -39,56 +39,43 @@ Observacao importante:
 - A versao atual e mobile-first.
 - A grande atualizacao planejada e uma versao otimizada para tablets e telas maiores, com melhor aproveitamento de layout em dispositivos amplos.
 
-## Fotos do Sistema
-
-Voce pode adicionar capturas de tela aqui para mostrar o uso real do app em mobile.
-
-Sugestao de estrutura:
-
-```text
-docs/
-  images/
-    mobile-login.png
-    mobile-dashboard.png
-    mobile-agenda.png
-    mobile-relatorios.png
-    mobile-perfil.png
-```
-
-Exemplo para inserir no README:
-
-```markdown
-![Login mobile](docs/images/mobile-login.png)
-![Dashboard mobile](docs/images/mobile-dashboard.png)
-![Agenda mobile](docs/images/mobile-agenda.png)
-```
-
 ## Galeria Mobile
 
-### Login
+<div align="center">
 
-![Login - Tela principal](docs/images/mobile-login.png)
+<table style="margin: 0 auto; border-collapse: collapse; border-spacing: 0; border: none;">
+<tr>
+<td width="33%" align="center" style="border: none; padding: 0;">
+  <img src="docs/images/mobile-login.png" width="260" style="display: block; border: none; box-shadow: none;">
+  <br><small style="color: #666; font-weight: 500; margin-top: 10px; display: block;">Login</small>
+</td>
+<td width="33%" align="center" style="border: none; padding: 0;">
+  <img src="docs/images/mobile-register.png" width="260" style="display: block; border: none; box-shadow: none;">
+  <br><small style="color: #666; font-weight: 500; margin-top: 10px; display: block;">Cadastro</small>
+</td>
+<td width="33%" align="center" style="border: none; padding: 0;">
+  <img src="docs/images/mobile-dashboard.png" width="260" style="display: block; border: none; box-shadow: none;">
+  <br><small style="color: #666; font-weight: 500; margin-top: 10px; display: block;">Dashboard</small>
+</td>
+</tr>
 
-### Cadastro
+<tr>
+<td width="33%" align="center" style="border: none; padding: 0;">
+  <img src="docs/images/mobile-agenda.png" width="260" style="display: block; border: none; box-shadow: none;">
+  <br><small style="color: #666; font-weight: 500; margin-top: 10px; display: block;">Agenda</small>
+</td>
+<td width="33%" align="center" style="border: none; padding: 0;">
+  <img src="docs/images/mobile-relatorios.png" width="260" style="display: block; border: none; box-shadow: none;">
+  <br><small style="color: #666; font-weight: 500; margin-top: 10px; display: block;">Relatórios</small>
+</td>
+<td width="33%" align="center" style="border: none; padding: 0;">
+  <img src="docs/images/mobile-perfil.png" width="260" style="display: block; border: none; box-shadow: none;">
+  <br><small style="color: #666; font-weight: 500; margin-top: 10px; display: block;">Perfil</small>
+</td>
+</tr>
+</table>
 
-![Cadastro - Criacao de conta](docs/images/mobile-register.png)
-
-
-### Dashboard
-
-![Dashboard - Visao geral](docs/images/mobile-dashboard.png)
-
-### Agenda
-
-![Agenda - Lista de servicos do dia](docs/images/mobile-agenda.png)
-
-### Relatorios
-
-![Relatorios - Indicadores e desempenho](docs/images/mobile-relatorios.png)
-
-### Perfil
-
-![Perfil - Preferencias e conta](docs/images/mobile-perfil.png)
+</div>
 
 ## Fluxo do Usuario
 
