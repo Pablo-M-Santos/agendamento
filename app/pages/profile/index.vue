@@ -17,6 +17,8 @@ type LanguageValue = (typeof availableLanguages)[number]['value']
 type ThemeValue = (typeof availableThemes)[number]['value']
 
 const inicial = computed(() => {
+  const nome = user.value?.displayName?.trim()
+  if (nome) return nome.charAt(0).toUpperCase()
   return user.value?.email?.charAt(0).toUpperCase() || 'U'
 })
 

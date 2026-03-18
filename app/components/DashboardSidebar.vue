@@ -7,6 +7,7 @@ import {
   ArrowLeftOnRectangleIcon,
   XMarkIcon
 } from '@heroicons/vue/24/outline'
+import { ref, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -27,6 +28,14 @@ const displayName = computed(() => {
   return user.value?.displayName || user.value?.email || t('profile.userFallback')
 })
 const initials = computed(() => displayName.value.charAt(0).toUpperCase())
+const avatarLoadError = ref(false)
+
+watch(
+  () => user.value?.photoURL,
+  () => {
+    avatarLoadError.value = false
+  }
+)
 
 const isActive = (path: string) => route.path === path
 
@@ -89,10 +98,11 @@ const links = computed(() => [
                 :class="isLightTheme ? 'bg-white border-[#D8E7FF]' : 'bg-white/10 border-white/15'"
               >
                 <img
-                  v-if="user?.photoURL"
+                  v-if="user?.photoURL && !avatarLoadError"
                   :src="user.photoURL"
                   alt="Foto do perfil"
                   class="w-full h-full object-cover"
+                  @error="avatarLoadError = true"
                 />
                 <span v-else class="text-base font-black">{{ initials }}</span>
               </div>

@@ -1,68 +1,250 @@
-# Nuxt Starter Template
+# Agendamento de Servicos
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+Sistema web de agendamento criado para resolver um problema real do dia a dia: organizar horarios e servicos de forma simples, gratuita e confiavel.
 
-Use this template to get started with [Nuxt UI](https://ui.nuxt.com) quickly.
+## Mobile First
 
-- [Live demo](https://starter-template.nuxt.dev/)
-- [Documentation](https://ui.nuxt.com/docs/getting-started/installation/nuxt)
+> Este sistema foi desenvolvido prioritariamente para uso no celular.
+> Toda a experiencia atual foi pensada para navegacao mobile no dia a dia.
 
-<a href="https://starter-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png">
-    <img alt="Nuxt Starter Template" src="https://ui.nuxt.com/assets/templates/nuxt/starter-light.png" width="830" height="466">
-  </picture>
-</a>
+- Interface otimizada para telas pequenas.
+- Fluxo rapido para operacao com uma mao.
+- Componentes e navegacao ajustados para uso frequente em smartphone.
 
-> The starter template for Vue is on https://github.com/nuxt-ui-templates/starter-vue.
+## Historia do Projeto
 
-## Quick Start
+Este projeto nasceu de uma necessidade familiar.
 
-```bash [Terminal]
-npm create nuxt@latest -- -t github:nuxt-ui-templates/starter
+Meu pai atende muitos clientes e, com o volume de atendimentos, comecou a ficar dificil lembrar com precisao o dia e a hora de cada servico. Procuramos uma alternativa gratuita no mercado, mas nada atendia bem o que ele precisava.
+
+Entao desenvolvi esta aplicacao especialmente para ele.
+
+Hoje ele e usuario ativo do sistema e usa todos os dias para agendar servicos. O projeto segue em evolucao continua, sempre com novas ideias e melhorias baseadas nas necessidades reais do uso diario.
+
+Uma das ultimas features adicionadas foi o controle de material por servico, indicando se o material daquele atendimento ja esta pronto ou nao.
+
+## Objetivo
+
+- Entregar uma solucao gratuita e pratica para gestao de agendamentos.
+- Melhorar a organizacao do trabalho diario.
+- Reduzir esquecimentos de data/hora dos atendimentos.
+- Evoluir continuamente com base em uso real.
+
+## Publico e Plataforma
+
+Este sistema foi projetado com foco principal em experiencia mobile (web para celular).
+
+Observacao importante:
+
+- A versao atual e mobile-first.
+- A grande atualizacao planejada e uma versao otimizada para tablets e telas maiores, com melhor aproveitamento de layout em dispositivos amplos.
+
+## Fotos do Sistema
+
+Voce pode adicionar capturas de tela aqui para mostrar o uso real do app em mobile.
+
+Sugestao de estrutura:
+
+```text
+docs/
+  images/
+    mobile-login.png
+    mobile-dashboard.png
+    mobile-agenda.png
+    mobile-relatorios.png
+    mobile-perfil.png
 ```
 
-## Deploy your own
+Exemplo para inserir no README:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-name=starter&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fstarter&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fstarter-dark.png&demo-url=https%3A%2F%2Fstarter-template.nuxt.dev%2F&demo-title=Nuxt%20Starter%20Template&demo-description=A%20minimal%20template%20to%20get%20started%20with%20Nuxt%20UI.)
-
-## Setup
-
-Make sure to install the dependencies:
-
-```bash
-pnpm install
+```markdown
+![Login mobile](docs/images/mobile-login.png)
+![Dashboard mobile](docs/images/mobile-dashboard.png)
+![Agenda mobile](docs/images/mobile-agenda.png)
 ```
 
-Create your local environment file before running the app:
+## Galeria Mobile
+
+### Login
+
+![Login - Tela principal](docs/images/mobile-login.png)
+
+### Cadastro
+
+![Cadastro - Criacao de conta](docs/images/mobile-register.png)
+
+
+### Dashboard
+
+![Dashboard - Visao geral](docs/images/mobile-dashboard.png)
+
+### Agenda
+
+![Agenda - Lista de servicos do dia](docs/images/mobile-agenda.png)
+
+### Relatorios
+
+![Relatorios - Indicadores e desempenho](docs/images/mobile-relatorios.png)
+
+### Perfil
+
+![Perfil - Preferencias e conta](docs/images/mobile-perfil.png)
+
+## Fluxo do Usuario
+
+1. O usuario faz login com email/senha ou Google.
+2. Acessa o dashboard e visualiza os atalhos principais e os servicos recentes.
+3. Entra na agenda para criar, editar, excluir ou consultar agendamentos.
+4. Seleciona o dia no carrossel e acompanha os servicos daquele dia.
+5. Marca status do servico e material (pronto, sem material ou nao informado).
+6. Consulta relatorios para acompanhar desempenho, volume e indicadores.
+7. Ajusta preferencias no perfil (idioma e tema).
+
+## Funcionalidades por Pagina
+
+### Login (`/`)
+
+- Autenticacao com email/senha.
+- Login com Google.
+- Tratamento de erros de autenticacao com feedback via toast.
+
+### Cadastro (`/register`)
+
+- Criacao de conta com email/senha.
+- Envio de verificacao de email.
+- Cadastro/login rapido com Google.
+
+### Recuperacao/Definicao de senha (`/reset-password`)
+
+- Validacao de link de redefinicao recebido por email.
+- Definicao de nova senha.
+- Login automatico apos sucesso.
+
+### Dashboard (`/dashboard`)
+
+- Saudacao do usuario.
+- Atalhos rapidos para agenda e relatorios.
+- Lista de servicos recentes com status e acesso direto ao item na agenda.
+
+### Agenda (`/schedule`)
+
+- Visualizacao diaria com carrossel de dias do mes.
+- Lista dos servicos do dia selecionado.
+- Cadastro, edicao e exclusao de agendamentos.
+- Modal de detalhes do servico.
+- Confirmacao de exclusao.
+- Status de servico concluido e material pronto.
+
+### Relatorios (`/reports`)
+
+- Filtro por periodo (7 dias, 30 dias e mes atual).
+- Cards de resumo (total, concluidos, nao concluidos, material pronto).
+- Taxa de conclusao.
+- Evolucao diaria.
+- Indicadores de material.
+- Insights rapidos e top clientes.
+
+### Perfil (`/profile`)
+
+- Dados do usuario.
+- Preferencias de idioma.
+- Selecao de tema (claro/escuro).
+- Informacoes da conta.
+
+## Stack Tecnologica
+
+- `Nuxt 4` (SPA com `ssr: false`)
+- `Vue 3` + Composition API
+- `TypeScript`
+- `Nuxt UI`
+- `Tailwind CSS`
+- `Firebase`
+  - Authentication
+  - Firestore
+- `date-fns` para manipulacao de datas
+
+## Firebase e Integracoes
+
+### Firebase Authentication
+
+- Login com email/senha.
+- Login social com Google.
+- Verificacao de email.
+- Fluxo de redefinicao de senha.
+
+### Firestore
+
+- Persistencia dos agendamentos.
+- Persistencia de configuracoes do usuario (tema/idioma).
+
+### Integracao Google
+
+- Entrada com conta Google para agilizar autenticacao.
+- Tratamento de cenarios como credencial divergente e cancelamento de popup.
+
+## Seguranca e Configuracao
+
+As configuracoes do Firebase sao carregadas por variaveis de ambiente via `runtimeConfig.public`.
+
+Nao deixe credenciais fixas em codigo.
+
+1. Copie o arquivo de exemplo:
 
 ```bash
 cp .env.example .env
 ```
 
-Then fill all Firebase variables in `.env`.
+2. Preencha as variaveis no `.env`:
 
-## Development Server
+- `NUXT_PUBLIC_FIREBASE_API_KEY`
+- `NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `NUXT_PUBLIC_FIREBASE_PROJECT_ID`
+- `NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+- `NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+- `NUXT_PUBLIC_FIREBASE_APP_ID`
+- `NUXT_PUBLIC_FIREBASE_MEASUREMENT_ID` (opcional)
 
-Start the development server on `http://localhost:3000`:
+## Como Rodar o Projeto
+
+Instalar dependencias:
+
+```bash
+pnpm install
+```
+
+Executar em desenvolvimento:
 
 ```bash
 pnpm dev
 ```
 
-## Production
+Rodar lint:
 
-Build the application for production:
+```bash
+pnpm lint
+```
+
+Build de producao:
 
 ```bash
 pnpm build
 ```
 
-Locally preview production build:
+Preview de producao:
 
 ```bash
 pnpm preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Proximos Passos (Roadmap)
+
+- Criacao de testes unitarios no front-end.
+- Melhorias de layout para tablet e telas maiores.
+- Exportacao de documentos (CSV/SVC e PDF).
+- Evolucao continua de UX com base no uso diario real.
+
+## Status
+
+Projeto em uso real e evolucao ativa.
+
+Cada atualizacao e guiada por necessidade pratica de operacao no dia a dia.
