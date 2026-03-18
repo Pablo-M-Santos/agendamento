@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth'
+import type { FirebaseError } from 'firebase/app'
 
 const { $auth } = useNuxtApp()
 const { loginWithGoogle: authLoginWithGoogle } = useAuth()
@@ -74,10 +75,11 @@ const registerWithEmail = async () => {
     password.value = ''
 
     navigateTo('/')
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as FirebaseError
     let message = 'Não foi possível concluir seu cadastro. Tente novamente.'
 
-    switch (error?.code) {
+    switch (err?.code) {
       case 'auth/email-already-in-use':
         message = 'Este e-mail já está cadastrado. Faça login ou use outro e-mail.'
         break
@@ -142,9 +144,10 @@ const loginWithGoogle = async () => {
   }
 }
 </script>
+
 <template>
   <div class="h-dvh bg-[#003D7A] flex justify-center overflow-hidden">
-    <form @submit.prevent="registerWithEmail" class="w-full max-w-md text-center px-6 pt-20">
+    <form class="w-full max-w-md text-center px-6 pt-20" @submit.prevent="registerWithEmail">
       <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
 
       <h1 class="text-3xl font-bold text-white">Criar Conta</h1>

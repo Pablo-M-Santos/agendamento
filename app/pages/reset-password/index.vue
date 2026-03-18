@@ -89,7 +89,7 @@ const submit = async () => {
 
       <div v-else-if="success" class="text-green-300">Senha atualizada com sucesso!</div>
 
-      <form v-else @submit.prevent="submit" class="text-left">
+      <form v-else class="text-left" @submit.prevent="submit">
         <p class="text-sm text-gray-300 mb-4">Conta: {{ email }}</p>
 
         <UInput

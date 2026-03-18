@@ -8,6 +8,7 @@ import {
   GoogleAuthProvider,
   signOut
 } from 'firebase/auth'
+import type { FirebaseError } from 'firebase/app'
 
 const SESSION_STORAGE_KEY = 'agendamento-auth-session'
 const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000
@@ -34,7 +35,7 @@ export const useAuth = () => {
   const authInitialized = useState<boolean>('auth-initialized', () => false)
 
   const getStoredSession = (): AuthSession | null => {
-    if (!process.client) return null
+    if (!import.meta.client) return null
 
     const raw = localStorage.getItem(SESSION_STORAGE_KEY)
     if (!raw) return null
@@ -59,12 +60,12 @@ export const useAuth = () => {
   }
 
   const clearStoredSession = () => {
-    if (!process.client) return
+    if (!import.meta.client) return
     localStorage.removeItem(SESSION_STORAGE_KEY)
   }
 
   const createStoredSession = (method: LoginMethod) => {
-    if (!process.client) return
+    if (!import.meta.client) return
 
     const now = Date.now()
     const payload: AuthSession = {
@@ -144,11 +145,12 @@ export const useAuth = () => {
     try {
       await signInWithEmailAndPassword($auth, currentEmail, password)
       createStoredSession('email-senha')
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as FirebaseError
       if (
-        error?.code === 'auth/invalid-credential' ||
-        error?.code === 'auth/wrong-password' ||
-        error?.code === 'auth/user-not-found'
+        err.code === 'auth/invalid-credential' ||
+        err.code === 'auth/wrong-password' ||
+        err.code === 'auth/user-not-found'
       ) {
         let fallbackMethods: string[] = []
 
@@ -173,7 +175,7 @@ export const useAuth = () => {
 
       return {
         ok: false,
-        code: error?.code || 'auth/unknown'
+        code: err?.code || 'auth/unknown'
       }
     }
 
@@ -196,10 +198,11 @@ export const useAuth = () => {
       return {
         ok: true
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as FirebaseError
       return {
         ok: false,
-        code: error?.code || 'auth/unknown'
+        code: err?.code || 'auth/unknown'
       }
     }
   }
@@ -215,10 +218,11 @@ export const useAuth = () => {
       return {
         ok: true
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as FirebaseError
       return {
         ok: false,
-        code: error?.code || 'auth/unknown'
+        code: err?.code || 'auth/unknown'
       }
     }
   }

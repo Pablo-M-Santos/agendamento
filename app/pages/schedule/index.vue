@@ -5,6 +5,7 @@ import { useAuth } from '~/composables/useAuth'
 import { useAgendamentos, type Agendamento } from '~/composables/useAgendamentos'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns'
 import type { AgendamentoForm } from '~/types/agendamento'
+import type { FirebaseError } from 'firebase/app'
 
 definePageMeta({ middleware: 'auth' })
 
@@ -50,8 +51,9 @@ const confirmarExclusao = async () => {
     isConfirmOpen.value = false
     idParaExcluir.value = null
     await carregarAgendamentos()
-  } catch (error) {
-    console.error('Erro ao excluir:', error)
+  } catch (error: unknown) {
+    const err = error as FirebaseError
+    console.error('Erro ao excluir:', err)
   }
 }
 
@@ -147,9 +149,10 @@ const handleSalvarAgendamento = async (dados: AgendamentoForm) => {
 
     isModalOpen.value = false
     await carregarAgendamentos()
-  } catch (error: any) {
-    console.error('Erro ao salvar agendamento:', error)
-    alert(error?.message || 'Nao foi possivel salvar o agendamento.')
+  } catch (error: unknown) {
+    const err = error as FirebaseError
+    console.error('Erro ao salvar agendamento:', err)
+    alert(err?.message || 'Nao foi possivel salvar o agendamento.')
   }
 }
 

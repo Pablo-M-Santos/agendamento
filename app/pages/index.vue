@@ -174,9 +174,10 @@ const loginWithGoogle = async () => {
   }
 }
 </script>
+
 <template>
   <div class="h-dvh bg-[#003D7A] flex justify-center overflow-hidden">
-    <form @submit.prevent="loginWithEmail" class="w-full max-w-md text-center px-6 pt-20">
+    <form class="w-full max-w-md text-center px-6 pt-20" @submit.prevent="loginWithEmail">
       <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
 
       <h1 class="text-3xl font-bold text-white">Entrar</h1>

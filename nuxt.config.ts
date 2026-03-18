@@ -3,27 +3,8 @@ export default defineNuxtConfig({
   modules: ['@nuxt/eslint', '@nuxt/ui'],
   ssr: false,
 
-  runtimeConfig: {
-    public: {
-      appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000'
-    }
-  },
-
   devtools: {
     enabled: true
-  },
-
-  css: ['~/assets/css/main.css'],
-
-  compatibilityDate: '2025-01-15',
-
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
-    }
   },
   app: {
     head: {
@@ -38,10 +19,29 @@ export default defineNuxtConfig({
     }
   },
 
+  css: ['~/assets/css/main.css'],
+
+  runtimeConfig: {
+    public: {
+      appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    }
+  },
+
   routeRules: {
     '/agenda': { redirect: { to: '/schedule', statusCode: 301 } },
     '/cadastro': { redirect: { to: '/register', statusCode: 301 } },
     '/perfil': { redirect: { to: '/profile', statusCode: 301 } },
     '/relatorios': { redirect: { to: '/reports', statusCode: 301 } }
-  }
+  },
+
+  compatibilityDate: '2025-01-15',
+
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'never',
+        braceStyle: '1tbs'
+      }
+    }
+  },
 })

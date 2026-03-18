@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, watch } from 'vue'
+import { nextTick, watch } from 'vue'
 import { format } from 'date-fns'
 import type { Timestamp } from 'firebase/firestore'
 import type { Agendamento } from '~/composables/useAgendamentos'
@@ -10,19 +10,12 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'details', item: Agendamento): void
-  (e: 'edit', item: Agendamento): void
+  (e: 'details' | 'edit', item: Agendamento): void
   (e: 'delete', id: string): void
 }>()
 
 const getHora = (ts: Timestamp | null | undefined): string =>
   ts ? format(ts.toDate(), 'HH:mm') : '--:--'
-
-const indiceAlvo = computed(() => {
-  const alvo = props.highlightedId
-  if (!alvo) return -1
-  return props.agendamentos.findIndex((item) => item.id === alvo)
-})
 
 watch(
   () => [props.agendamentos, props.highlightedId],
@@ -51,8 +44,8 @@ watch(
     <div v-if="agendamentos.length > 0" class="space-y-4">
       <div
         v-for="item in agendamentos"
-        :key="item.id"
         :id="`agendamento-${item.id}`"
+        :key="item.id"
         :class="[
           'bg-[#131314]/45 hover:bg-[#131314] p-4 rounded-3xl border active:scale-[0.99] transition-all',
           item.id === highlightedId
