@@ -19,6 +19,7 @@ export interface Agendamento {
   data: Timestamp
   descricao: string
   materialPronto?: boolean | null
+  servicoConcluido?: boolean | null
   telefone?: string
   referencia?: string
   observacoes?: string
@@ -56,6 +57,7 @@ export const useAgendamentos = () => {
     data: string
     descricao: string
     materialPronto?: boolean | null
+    servicoConcluido?: boolean | null
     telefone?: string
     referencia?: string
     observacoes?: string
@@ -78,6 +80,7 @@ export const useAgendamentos = () => {
       endereco,
       descricao,
       materialPronto: dados.materialPronto ?? null,
+      servicoConcluido: dados.servicoConcluido ?? null,
       telefone,
       referencia,
       observacoes,
@@ -96,6 +99,7 @@ export const useAgendamentos = () => {
       data: string
       descricao: string
       materialPronto?: boolean | null
+      servicoConcluido?: boolean | null
       telefone?: string
       referencia?: string
       observacoes?: string
@@ -119,6 +123,7 @@ export const useAgendamentos = () => {
       endereco,
       descricao,
       materialPronto: dados.materialPronto ?? null,
+      servicoConcluido: dados.servicoConcluido ?? null,
       telefone,
       referencia,
       observacoes,

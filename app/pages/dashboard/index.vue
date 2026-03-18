@@ -186,6 +186,27 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
             </p>
           </div>
 
+          <div class="mt-3 flex justify-end">
+            <span
+              v-if="item.servicoConcluido === true"
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#00D3B8] text-[#003D7A]"
+            >
+              Finalizado
+            </span>
+            <span
+              v-else-if="item.servicoConcluido === false"
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#DDE7FA] text-[#3F5170]"
+            >
+              Em aberto
+            </span>
+            <span
+              v-else
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#E8F1FF] text-[#5B6B8A]"
+            >
+              Servico nao concluido
+            </span>
+          </div>
+
           <div class="mt-3 text-[11px] text-[#5B6B8A] font-semibold text-right">
             {{ formatarData(item.data) }}
           </div>

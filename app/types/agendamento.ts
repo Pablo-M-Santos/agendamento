@@ -7,6 +7,7 @@ export interface Agendamento {
   endereco: string
   descricao: string
   materialPronto?: boolean | null
+  servicoConcluido?: boolean | null
   telefone?: string
   referencia?: string
   observacoes?: string
@@ -22,6 +23,7 @@ export type AgendamentoForm = {
   endereco: string
   descricao: string
   materialPronto?: boolean | null
+  servicoConcluido?: boolean | null
   telefone?: string
   referencia?: string
   observacoes?: string

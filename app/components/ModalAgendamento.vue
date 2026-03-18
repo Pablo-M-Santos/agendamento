@@ -17,6 +17,7 @@ type AgendamentoPayload = {
   endereco: string
   descricao: string
   materialPronto?: boolean | null
+  servicoConcluido?: boolean | null
   telefone?: string
   referencia?: string
   observacoes?: string
@@ -30,6 +31,7 @@ const numeroCasa = ref('')
 const endereco = ref('')
 const descricao = ref('')
 const materialPronto = ref<boolean | null>(null)
+const servicoConcluido = ref<boolean | null>(null)
 const telefone = ref('')
 const referencia = ref('')
 const observacoes = ref('')
@@ -74,6 +76,7 @@ watch(
         endereco.value = props.agendamentoInicial.endereco || ''
         descricao.value = props.agendamentoInicial.descricao || ''
         materialPronto.value = props.agendamentoInicial.materialPronto ?? null
+        servicoConcluido.value = props.agendamentoInicial.servicoConcluido ?? null
         telefone.value = props.agendamentoInicial.telefone || ''
         referencia.value = props.agendamentoInicial.referencia || ''
         observacoes.value = props.agendamentoInicial.observacoes || ''
@@ -86,6 +89,7 @@ watch(
         endereco.value = ''
         descricao.value = ''
         materialPronto.value = null
+        servicoConcluido.value = null
         telefone.value = ''
         referencia.value = ''
         observacoes.value = ''
@@ -122,6 +126,7 @@ const handleSalvar = () => {
     endereco: endereco.value.trim(),
     descricao: descricao.value.trim(),
     materialPronto: materialPronto.value,
+    servicoConcluido: servicoConcluido.value,
     telefone: telefone.value.trim(),
     referencia: referencia.value.trim(),
     observacoes: observacoes.value.trim(),
@@ -279,6 +284,42 @@ const handleSalvar = () => {
                     @click="materialPronto = false"
                   >
                     Nao
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section class="rounded-3xl border border-white/20 bg-white/8 p-5">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-sm font-black uppercase tracking-wider">Status do Servico</p>
+                  <p class="text-xs text-white/70 mt-1">
+                    Informe se o atendimento ja foi finalizado
+                  </p>
+                </div>
+
+                <div class="flex gap-2">
+                  <button
+                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
+                    :class="
+                      servicoConcluido === true
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
+                        : 'bg-white/10 border-white/30 text-white'
+                    "
+                    @click="servicoConcluido = true"
+                  >
+                    Finalizado
+                  </button>
+                  <button
+                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
+                    :class="
+                      servicoConcluido === false
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
+                        : 'bg-white/10 border-white/30 text-white'
+                    "
+                    @click="servicoConcluido = false"
+                  >
+                    Em aberto
                   </button>
                 </div>
               </div>

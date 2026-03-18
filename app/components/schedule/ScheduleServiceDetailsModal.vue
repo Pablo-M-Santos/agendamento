@@ -74,19 +74,45 @@ const formatarDataHora = (item: Agendamento) => format(item.data.toDate(), 'dd/M
               <p class="text-[10px] uppercase tracking-[0.18em] font-black text-white/70 mb-2">
                 Status
               </p>
-              <span
-                v-if="agendamento.materialPronto === true"
-                class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-400 text-[#003D7A]"
-              >
-                Material pronto
-              </span>
-              <span
-                v-else-if="agendamento.materialPronto === false"
-                class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-300 text-[#4A2C00]"
-              >
-                Sem material
-              </span>
-              <span v-else class="text-sm text-white/70">Nao informado</span>
+              <div class="flex flex-wrap gap-2">
+                <span
+                  v-if="agendamento.materialPronto === true"
+                  class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-400 text-[#003D7A]"
+                >
+                  Material pronto
+                </span>
+                <span
+                  v-else-if="agendamento.materialPronto === false"
+                  class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-300 text-[#4A2C00]"
+                >
+                  Sem material
+                </span>
+                <span
+                  v-else
+                  class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
+                >
+                  Material nao informado
+                </span>
+
+                <span
+                  v-if="agendamento.servicoConcluido === true"
+                  class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#00D3B8] text-[#003D7A]"
+                >
+                  Servico finalizado
+                </span>
+                <span
+                  v-else-if="agendamento.servicoConcluido === false"
+                  class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/15 text-white"
+                >
+                  Servico em aberto
+                </span>
+                <span
+                  v-else
+                  class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
+                >
+                  Servico nao concluido
+                </span>
+              </div>
             </article>
 
             <article class="rounded-2xl border border-white/20 bg-white/8 p-4">

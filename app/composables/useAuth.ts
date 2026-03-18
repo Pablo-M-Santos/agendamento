@@ -9,6 +9,17 @@ import {
   signOut
 } from 'firebase/auth'
 
+const SESSION_STORAGE_KEY = 'agendamento-auth-session'
+const SESSION_DURATION_MS = 7 * 24 * 60 * 60 * 1000
+
+type LoginMethod = 'google' | 'email-senha' | 'desconhecido'
+
+type AuthSession = {
+  method: LoginMethod
+  loginAt: number
+  expiresAt: number
+}
+
 type AuthResult = {
   ok: boolean
   code?: string
@@ -19,11 +30,91 @@ export const useAuth = () => {
   const config = useRuntimeConfig()
 
   const user = useState<User | null>('user', () => null)
-
   const loading = useState<boolean>('loading', () => true)
+  const authInitialized = useState<boolean>('auth-initialized', () => false)
+
+  const getStoredSession = (): AuthSession | null => {
+    if (!process.client) return null
+
+    const raw = localStorage.getItem(SESSION_STORAGE_KEY)
+    if (!raw) return null
+
+    try {
+      const parsed = JSON.parse(raw) as Partial<AuthSession>
+      if (typeof parsed.loginAt !== 'number' || typeof parsed.expiresAt !== 'number') return null
+
+      const method: LoginMethod =
+        parsed.method === 'google' || parsed.method === 'email-senha'
+          ? parsed.method
+          : 'desconhecido'
+
+      return {
+        method,
+        loginAt: parsed.loginAt,
+        expiresAt: parsed.expiresAt
+      }
+    } catch {
+      return null
+    }
+  }
+
+  const clearStoredSession = () => {
+    if (!process.client) return
+    localStorage.removeItem(SESSION_STORAGE_KEY)
+  }
+
+  const createStoredSession = (method: LoginMethod) => {
+    if (!process.client) return
+
+    const now = Date.now()
+    const payload: AuthSession = {
+      method,
+      loginAt: now,
+      expiresAt: now + SESSION_DURATION_MS
+    }
+
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(payload))
+  }
+
+  const inferLoginMethod = (firebaseUser: User): LoginMethod => {
+    const providers = (firebaseUser.providerData || []).map((provider) => provider.providerId)
+
+    if (providers.includes('google.com')) return 'google'
+    if (providers.includes('password') || providers.includes('emailLink')) return 'email-senha'
+
+    return 'desconhecido'
+  }
 
   const initAuth = () => {
-    onAuthStateChanged($auth, (firebaseUser) => {
+    if (authInitialized.value) {
+      loading.value = false
+      return
+    }
+
+    authInitialized.value = true
+
+    onAuthStateChanged($auth, async (firebaseUser) => {
+      if (!firebaseUser) {
+        clearStoredSession()
+        user.value = null
+        loading.value = false
+        return
+      }
+
+      const storedSession = getStoredSession()
+
+      if (storedSession && storedSession.expiresAt <= Date.now()) {
+        clearStoredSession()
+        await signOut($auth)
+        user.value = null
+        loading.value = false
+        return
+      }
+
+      if (!storedSession) {
+        createStoredSession(inferLoginMethod(firebaseUser))
+      }
+
       user.value = firebaseUser
       loading.value = false
     })
@@ -52,6 +143,7 @@ export const useAuth = () => {
 
     try {
       await signInWithEmailAndPassword($auth, currentEmail, password)
+      createStoredSession('email-senha')
     } catch (error: any) {
       if (
         error?.code === 'auth/invalid-credential' ||
@@ -99,6 +191,7 @@ export const useAuth = () => {
 
     try {
       await signInWithPopup($auth, provider)
+      createStoredSession('google')
 
       return {
         ok: true
@@ -131,6 +224,7 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
+    clearStoredSession()
     await signOut($auth)
     user.value = null
     await navigateTo('/')

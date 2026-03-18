@@ -95,6 +95,27 @@ watch(
           </p>
         </div>
 
+        <div class="mt-3 flex items-center justify-end">
+          <span
+            v-if="item.servicoConcluido === true"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#00D3B8] text-[#003D7A]"
+          >
+            Finalizado
+          </span>
+          <span
+            v-else-if="item.servicoConcluido === false"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/15 text-white"
+          >
+            Em aberto
+          </span>
+          <span
+            v-else
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
+          >
+            Servico nao concluido
+          </span>
+        </div>
+
         <div class="mt-4 grid grid-cols-2 gap-2">
           <button
             class="bg-[#00D3B8]/25 text-white py-2.5 rounded-xl font-black text-xs active:scale-95 transition-all"

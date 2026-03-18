@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
+import { browserLocalPersistence, getAuth, setPersistence } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 export default defineNuxtPlugin(() => {
@@ -16,6 +16,10 @@ export default defineNuxtPlugin(() => {
   const app = initializeApp(firebaseConfig)
 
   const auth = getAuth(app)
+  setPersistence(auth, browserLocalPersistence).catch(() => {
+    // If browser blocks persistence, Firebase keeps the best available fallback.
+  })
+
   const db = getFirestore(app)
 
   return {
