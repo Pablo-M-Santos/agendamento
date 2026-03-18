@@ -26,7 +26,7 @@ const formatarDiaParaRota = (data: Agendamento['data']) => format(data.toDate(),
 </script>
 
 <template>
-  <section>
+  <section class="pb-24 md:pb-6">
     <div class="flex items-center mb-4">
       <h3 class="font-black text-sm" :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white/90'">
         {{ labels.recentServices }}
