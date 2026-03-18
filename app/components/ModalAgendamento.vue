@@ -13,16 +13,26 @@ const props = defineProps<{
 type AgendamentoPayload = {
   id?: string
   cliente: string
+  numeroCasa: string
   endereco: string
   descricao: string
+  materialPronto?: boolean | null
+  telefone?: string
+  referencia?: string
+  observacoes?: string
   data: string
 }
 
 const emit = defineEmits(['update:modelValue', 'salvar'])
 
 const cliente = ref('')
+const numeroCasa = ref('')
 const endereco = ref('')
 const descricao = ref('')
+const materialPronto = ref<boolean | null>(null)
+const telefone = ref('')
+const referencia = ref('')
+const observacoes = ref('')
 const horaSelecionada = ref('09:00')
 
 const horarios = computed(() => {
@@ -57,16 +67,28 @@ watch(
   async (isOpen) => {
     if (isOpen) {
       if (props.agendamentoInicial) {
-        const dataDoc = props.agendamentoInicial.data
+        const dataDoc = new Date(props.agendamentoInicial.data)
 
         cliente.value = props.agendamentoInicial.cliente
+        numeroCasa.value = props.agendamentoInicial.numeroCasa || ''
         endereco.value = props.agendamentoInicial.endereco || ''
         descricao.value = props.agendamentoInicial.descricao || ''
-        horaSelecionada.value = format(dataDoc, 'HH:mm')
+        materialPronto.value = props.agendamentoInicial.materialPronto ?? null
+        telefone.value = props.agendamentoInicial.telefone || ''
+        referencia.value = props.agendamentoInicial.referencia || ''
+        observacoes.value = props.agendamentoInicial.observacoes || ''
+        horaSelecionada.value = Number.isNaN(dataDoc.getTime())
+          ? pegarHorarioMaisProximo()
+          : format(dataDoc, 'HH:mm')
       } else {
         cliente.value = ''
+        numeroCasa.value = ''
         endereco.value = ''
         descricao.value = ''
+        materialPronto.value = null
+        telefone.value = ''
+        referencia.value = ''
+        observacoes.value = ''
 
         horaSelecionada.value = pegarHorarioMaisProximo()
       }
@@ -86,16 +108,23 @@ watch(
 )
 
 const handleSalvar = () => {
-  if (!cliente.value) return alert('Nome do Cliente é obrigatório')
+  if (!cliente.value.trim()) return alert('Nome do cliente e obrigatorio')
+  if (!numeroCasa.value.trim()) return alert('Numero da casa e obrigatorio')
+  if (!endereco.value.trim()) return alert('Endereco e obrigatorio')
 
   const dataFinal = new Date(props.dataSelecionadaNoPai)
   const [h, m] = horaSelecionada.value.split(':')
   dataFinal.setHours(Number(h), Number(m), 0)
 
   const dados: AgendamentoPayload = {
-    cliente: cliente.value,
-    endereco: endereco.value,
-    descricao: descricao.value,
+    cliente: cliente.value.trim(),
+    numeroCasa: numeroCasa.value.trim(),
+    endereco: endereco.value.trim(),
+    descricao: descricao.value.trim(),
+    materialPronto: materialPronto.value,
+    telefone: telefone.value.trim(),
+    referencia: referencia.value.trim(),
+    observacoes: observacoes.value.trim(),
     data: format(dataFinal, "yyyy-MM-dd'T'HH:mm")
   }
 
@@ -108,25 +137,27 @@ const handleSalvar = () => {
 <template>
   <Teleport to="body">
     <Transition name="fade">
-      <div
-        v-if="modelValue"
-        class="fixed inset-0 bg-[#1B1B1B]/80 backdrop-blur-sm z-[60]"
-        @click="emit('update:modelValue', false)"
-      />
+      <div v-if="modelValue" class="fixed inset-0 bg-[#0A2A52]/85 backdrop-blur-sm z-[60]" />
     </Transition>
 
-    <Transition name="slide-up">
-      <div v-if="modelValue" class="fixed inset-x-0 bottom-0 z-[70] flex items-end justify-center">
-        <div
-          class="bg-[#1B1B1B] w-full max-w-lg rounded-t-[2.5rem] shadow-2xl border-t border-white/5 overflow-hidden flex flex-col max-h-[95vh]"
-        >
-          <div class="py-3 w-full flex justify-center border-b border-white/5">
-            <div class="w-12 h-1 bg-white rounded-full" />
-          </div>
+    <Transition name="zoom-in">
+      <div v-if="modelValue" class="fixed inset-0 z-[70] bg-[#003D7A] text-white">
+        <div class="h-full flex flex-col">
+          <header class="px-6 pt-6 pb-4 border-b border-white/15 flex items-center justify-between">
+            <div>
+              <p class="text-[11px] font-black uppercase tracking-[0.2em] text-white/70">Agenda</p>
+              <h3 class="text-2xl font-black mt-1">
+                {{ agendamentoInicial ? 'Editar Servico' : 'Cadastrar Servico' }}
+              </h3>
+              <p class="text-sm text-white/80 mt-1">
+                {{ format(dataSelecionadaNoPai, "dd 'de' MMMM, yyyy", { locale: ptBR }) }}
+              </p>
+              <p class="text-xs text-white/60 mt-1">Preencha os campos principais para salvar.</p>
+            </div>
 
-          <div class="px-6 pb-10 pt-4 overflow-y-auto no-scrollbar relative">
             <button
-              class="absolute right-6 top-4 w-10 h-10 flex items-center justify-center rounded-full border-2 border-white bg-[1B1B1B] text-white hover:text-white transition-colors"
+              class="w-11 h-11 rounded-xl border border-white/25 bg-white/10 flex items-center justify-center hover:bg-white/20 transition"
+              aria-label="Fechar cadastro"
               @click="emit('update:modelValue', false)"
             >
               <svg
@@ -144,75 +175,185 @@ const handleSalvar = () => {
                 />
               </svg>
             </button>
+          </header>
 
-            <header class="mb-8 pr-12">
-              <span
-                class="bg-[#FA4805]/10 text-[#FA4805] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
-              >
-                {{ format(dataSelecionadaNoPai, "dd 'de' MMMM", { locale: ptBR }) }}
-              </span>
-              <h3 class="text-2xl font-black text-white mt-3">
-                {{ agendamentoInicial ? 'Editar' : 'Novo' }}
-                <span class="text-[#FA4805]">Serviço</span>
-              </h3>
-            </header>
+          <div class="flex-1 overflow-y-auto px-6 py-6 no-scrollbar space-y-6">
+            <section class="rounded-3xl border border-[#00D3B8]/40 bg-[#00D3B8]/10 p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <h4 class="text-sm font-black uppercase tracking-wider text-[#B5FFF6]">
+                  Dados principais
+                </h4>
+                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#B5FFF6]">
+                  Obrigatorio
+                </span>
+              </div>
 
-            <div class="space-y-6">
               <div>
-                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1"
-                  >Cliente</label
-                >
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
+                  Nome do Cliente
+                </label>
                 <input
                   v-model="cliente"
                   type="text"
-                  placeholder="Nome do Cliente | Condomínio | Casa"
-                  class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-[#ffffff] focus:border-[#FA4805] text-white outline-none transition-all font-bold placeholder:text-white/20"
+                  placeholder="Ex: Joao Silva"
+                  class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
                 />
-              </div>
-
-              <div class="bg-[# 1B1B1B]/50 p-5 rounded-[2rem] border-2 border-white">
-                <label
-                  class="text-[10px] font-black text-[#ffffff] uppercase tracking-widest mb-3 block"
-                  >Horário do Serviço</label
-                >
-                <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
-                  <button
-                    v-for="hora in horarios"
-                    :id="'hora-' + hora"
-                    :key="hora"
-                    :class="[
-                      'px-5 py-3 rounded-xl font-bold text-sm flex-shrink-0 border-2 transition-all',
-                      horaSelecionada === hora
-                        ? 'bg-[#FA4805] border-[#FA4805] text-white shadow-[0_0_15px_rgba(250,72,5,0.3)]'
-                        : 'bg-[#FA4805]/60 border-transparent text-white'
-                    ]"
-                    @click="horaSelecionada = hora"
-                  >
-                    {{ hora }}
-                  </button>
-                </div>
               </div>
 
               <div>
-                <label class="text-[10px] font-black text-white uppercase tracking-widest ml-1"
-                  >Descrição</label
-                >
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
+                  Numero da Casa
+                </label>
                 <input
-                  v-model="descricao"
+                  v-model="numeroCasa"
                   type="text"
-                  placeholder="Descrição do Serviço"
-                  class="w-full bg-[#1B1B1B] p-4 rounded-2xl border-2 border-white focus:border-[#FA4805] text-white outline-none transition-all font-semibold placeholder:text-white/20"
+                  inputmode="numeric"
+                  placeholder="Ex: 120"
+                  class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
                 />
               </div>
 
+              <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
+                  Endereco do Cliente
+                </label>
+                <input
+                  v-model="endereco"
+                  type="text"
+                  placeholder="Rua, bairro ou condominio"
+                  class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
+                />
+              </div>
+            </section>
+
+            <section class="rounded-3xl border border-white/20 bg-white/8 p-5">
+              <label class="text-[10px] font-black uppercase tracking-[0.18em] block mb-3">
+                Horario do Servico
+              </label>
+              <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
+                <button
+                  v-for="hora in horarios"
+                  :id="'hora-' + hora"
+                  :key="hora"
+                  :class="[
+                    'px-5 py-3 rounded-xl font-bold text-sm flex-shrink-0 border transition-all',
+                    horaSelecionada === hora
+                      ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
+                      : 'bg-white/10 border-white/25 text-white'
+                  ]"
+                  @click="horaSelecionada = hora"
+                >
+                  {{ hora }}
+                </button>
+              </div>
+            </section>
+
+            <section class="rounded-3xl border border-white/20 bg-white/8 p-5">
+              <div class="flex items-center justify-between gap-4">
+                <div>
+                  <p class="text-sm font-black uppercase tracking-wider">Material Pronto</p>
+                  <p class="text-xs text-white/70 mt-1">
+                    Opcional: marque se o material ja esta no local
+                  </p>
+                </div>
+
+                <div class="flex gap-2">
+                  <button
+                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
+                    :class="
+                      materialPronto === true
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
+                        : 'bg-white/10 border-white/30 text-white'
+                    "
+                    @click="materialPronto = true"
+                  >
+                    Sim
+                  </button>
+                  <button
+                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
+                    :class="
+                      materialPronto === false
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
+                        : 'bg-white/10 border-white/30 text-white'
+                    "
+                    @click="materialPronto = false"
+                  >
+                    Nao
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section class="rounded-3xl border border-white/20 bg-white/8 p-5 space-y-4">
+              <h4 class="text-sm font-black uppercase tracking-wider">Campos Opcionais</h4>
+
+              <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1"
+                  >Telefone</label
+                >
+                <input
+                  v-model="telefone"
+                  type="tel"
+                  placeholder="Ex: (11) 99999-0000"
+                  class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
+                />
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1"
+                  >Referencia</label
+                >
+                <input
+                  v-model="referencia"
+                  type="text"
+                  placeholder="Ex: Casa com portao preto"
+                  class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45"
+                />
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
+                  Detalhes do Servico
+                </label>
+                <textarea
+                  v-model="descricao"
+                  rows="3"
+                  placeholder="Opcional: escopo do servico"
+                  class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45 resize-none"
+                />
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1"
+                  >Observacoes</label
+                >
+                <textarea
+                  v-model="observacoes"
+                  rows="2"
+                  placeholder="Opcional: observacoes internas"
+                  class="w-full mt-1 bg-white/8 p-4 rounded-2xl border border-white/30 focus:border-[#00D3B8] text-white outline-none transition-all font-semibold placeholder:text-white/45 resize-none"
+                />
+              </div>
+            </section>
+          </div>
+
+          <footer class="px-6 py-4 border-t border-white/15 bg-[#003870]">
+            <div class="grid grid-cols-2 gap-3">
               <button
-                class="w-full bg-[#FA4805] text-white py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-all mt-4"
+                class="py-4 rounded-2xl border border-white/25 bg-white/10 text-white font-black text-sm"
+                @click="emit('update:modelValue', false)"
+              >
+                Cancelar
+              </button>
+
+              <button
+                class="py-4 rounded-2xl bg-[#00D3B8] text-[#003D7A] font-black text-sm shadow-xl active:scale-[0.99] transition-all"
                 @click="handleSalvar"
               >
-                {{ agendamentoInicial ? 'Salvar Alterações' : 'Confirmar Serviço' }}
+                {{ agendamentoInicial ? 'Salvar Alteracoes' : 'Confirmar Servico' }}
               </button>
             </div>
-          </div>
+          </footer>
         </div>
       </div>
     </Transition>
@@ -237,14 +378,15 @@ const handleSalvar = () => {
   opacity: 0;
 }
 
-.slide-up-enter-active {
-  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+.zoom-in-enter-active,
+.zoom-in-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.25s ease;
 }
-.slide-up-leave-active {
-  transition: transform 0.4s ease-in;
-}
-.slide-up-enter-from,
-.slide-up-leave-to {
-  transform: translateY(100%);
+.zoom-in-enter-from,
+.zoom-in-leave-to {
+  opacity: 0;
+  transform: scale(0.98);
 }
 </style>

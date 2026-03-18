@@ -14,10 +14,14 @@ import { useAuth } from './useAuth'
 export interface Agendamento {
   id: string
   cliente: string
-  telefone: string
+  numeroCasa: string
   endereco: string
   data: Timestamp
   descricao: string
+  materialPronto?: boolean | null
+  telefone?: string
+  referencia?: string
+  observacoes?: string
   userId: string
   createdAt: Timestamp
 }
@@ -25,6 +29,18 @@ export interface Agendamento {
 export const useAgendamentos = () => {
   const { $db } = useNuxtApp()
   const { user } = useAuth()
+
+  const validarCamposObrigatorios = (dados: {
+    cliente: string
+    numeroCasa: string
+    endereco: string
+    data: string
+  }) => {
+    if (!dados.cliente.trim()) throw new Error('Nome do cliente obrigatorio')
+    if (!dados.numeroCasa.trim()) throw new Error('Numero da casa obrigatorio')
+    if (!dados.endereco.trim()) throw new Error('Endereco obrigatorio')
+    if (!dados.data) throw new Error('Data/hora obrigatoria')
+  }
 
   const formatarDataParaFirestore = (dataString: string) => {
     const dateFormatted = dataString.includes('T')
@@ -35,16 +51,36 @@ export const useAgendamentos = () => {
 
   const criarAgendamento = async (dados: {
     cliente: string
+    numeroCasa: string
     endereco: string
     data: string
     descricao: string
+    materialPronto?: boolean | null
+    telefone?: string
+    referencia?: string
+    observacoes?: string
   }) => {
-    if (!user.value) return
+    if (!user.value?.uid) throw new Error('Usuario nao autenticado')
+
+    validarCamposObrigatorios(dados)
+
+    const cliente = dados.cliente.trim()
+    const numeroCasa = dados.numeroCasa.trim()
+    const endereco = dados.endereco.trim()
+    const descricao = dados.descricao.trim()
+    const telefone = (dados.telefone || '').trim()
+    const referencia = (dados.referencia || '').trim()
+    const observacoes = (dados.observacoes || '').trim()
 
     await addDoc(collection($db, 'agendamentos'), {
-      cliente: dados.cliente,
-      endereco: dados.endereco,
-      descricao: dados.descricao,
+      cliente,
+      numeroCasa,
+      endereco,
+      descricao,
+      materialPronto: dados.materialPronto ?? null,
+      telefone,
+      referencia,
+      observacoes,
       data: formatarDataParaFirestore(dados.data),
       userId: user.value.uid,
       createdAt: Timestamp.fromDate(new Date())
@@ -55,17 +91,37 @@ export const useAgendamentos = () => {
     id: string,
     dados: {
       cliente: string
+      numeroCasa: string
       endereco: string
       data: string
       descricao: string
+      materialPronto?: boolean | null
+      telefone?: string
+      referencia?: string
+      observacoes?: string
     }
   ) => {
-    if (!user.value) return
+    if (!user.value?.uid) throw new Error('Usuario nao autenticado')
+
+    validarCamposObrigatorios(dados)
+
+    const cliente = dados.cliente.trim()
+    const numeroCasa = dados.numeroCasa.trim()
+    const endereco = dados.endereco.trim()
+    const descricao = dados.descricao.trim()
+    const telefone = (dados.telefone || '').trim()
+    const referencia = (dados.referencia || '').trim()
+    const observacoes = (dados.observacoes || '').trim()
 
     await updateDoc(doc($db, 'agendamentos', id), {
-      cliente: dados.cliente,
-      endereco: dados.endereco,
-      descricao: dados.descricao,
+      cliente,
+      numeroCasa,
+      endereco,
+      descricao,
+      materialPronto: dados.materialPronto ?? null,
+      telefone,
+      referencia,
+      observacoes,
       data: Timestamp.fromDate(new Date(dados.data))
     })
   }

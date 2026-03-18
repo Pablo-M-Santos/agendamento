@@ -11,22 +11,27 @@ const { listarAgendamentos } = useAgendamentos()
 const agendamentos = ref<Agendamento[]>([])
 const isSidebarOpen = ref(false)
 
-const primeiroNome = computed(() => {
+const isGoogleLogin = computed(() => {
+  return user.value?.providerData?.some((provider) => provider.providerId === 'google.com') ?? false
+})
+
+const primeiroNomeGoogle = computed(() => {
+  if (!isGoogleLogin.value) return ''
   const nome = user.value?.displayName?.trim()
-  if (nome) return nome.split(' ')[0] || 'Usuário'
-
-  const email = user.value?.email?.trim()
-  if (email) return email.split('@')[0] || 'Usuário'
-
-  return 'Usuário'
+  if (!nome) return ''
+  return nome.split(' ')[0] || ''
 })
 
-const saudacaoGenero = computed(() => {
-  const nome = primeiroNome.value.toLowerCase()
-  return nome.endsWith('a') ? 'vinda' : 'vindo'
+const saudacaoDashboard = computed(() => {
+  if (primeiroNomeGoogle.value) return `Seja bem vindo, ${primeiroNomeGoogle.value}`
+  return 'Seja bem vindo'
 })
 
-const inicialUsuario = computed(() => primeiroNome.value.charAt(0).toUpperCase())
+const inicialUsuario = computed(() => {
+  const nome = user.value?.displayName?.trim()
+  if (!nome) return 'U'
+  return nome.charAt(0).toUpperCase()
+})
 
 const getInitials = (nome?: string) => {
   if (!nome) return 'U'
@@ -59,6 +64,7 @@ const ultimosServicos = computed(() => {
 })
 
 const formatarData = (ts: Timestamp) => format(ts.toDate(), 'dd/MM/yyyy HH:mm')
+const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
 </script>
 
 <template>
@@ -73,8 +79,7 @@ const formatarData = (ts: Timestamp) => format(ts.toDate(), 'dd/MM/yyyy HH:mm')
       </button>
 
       <div class="text-center px-12">
-        <p class="text-base font-black text-white">Seja bem {{ saudacaoGenero }},</p>
-        <p class="text-base font-black text-white truncate">{{ primeiroNome }}</p>
+        <p class="text-base font-black text-white truncate">{{ saudacaoDashboard }}</p>
       </div>
 
       <NuxtLink
@@ -131,32 +136,67 @@ const formatarData = (ts: Timestamp) => format(ts.toDate(), 'dd/MM/yyyy HH:mm')
       </div>
 
       <div v-if="ultimosServicos.length" class="space-y-3">
-        <div
+        <NuxtLink
           v-for="item in ultimosServicos"
           :key="item.id"
-          class="bg-white/95 text-[#0B1F3A] p-4 rounded-2xl shadow-md"
+          :to="{
+            path: '/schedule',
+            query: {
+              data: formatarDiaParaRota(item.data),
+              agendamento: item.id
+            }
+          }"
+          class="block bg-white/95 text-[#0B1F3A] p-4 rounded-2xl shadow-md active:scale-[0.99] transition"
         >
-          <div class="flex items-center gap-4">
+          <div class="flex items-center justify-between gap-3">
             <div
-              class="w-12 h-12 rounded-full bg-[#E8F1FF] text-[#1D4ED8] font-black flex items-center justify-center"
+              class="inline-flex items-center gap-2 bg-[#E8F1FF] text-[#003D7A] px-3 py-2 rounded-xl"
             >
-              {{ getInitials(item.cliente) }}
+              <span class="text-[10px] font-black uppercase tracking-[0.14em]">Horario</span>
+              <span class="text-sm font-black">{{ format(item.data.toDate(), 'HH:mm') }}</span>
             </div>
 
-            <div class="min-w-0 flex-1">
-              <p class="font-bold text-sm text-[#0B1F3A] truncate">
-                {{ item.cliente || 'Cliente' }}
-              </p>
-              <p class="text-xs text-[#5B6B8A] truncate">
-                {{ item.descricao || 'Servico agendado' }}
-              </p>
-            </div>
-
-            <div class="text-[11px] text-[#5B6B8A] font-semibold text-right">
-              {{ formatarData(item.data) }}
-            </div>
+            <span
+              v-if="item.materialPronto === true"
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-400 text-[#003D7A]"
+            >
+              Material pronto
+            </span>
+            <span
+              v-else-if="item.materialPronto === false"
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-300 text-[#4A2C00]"
+            >
+              Sem material
+            </span>
+            <span
+              v-else
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#E8F1FF] text-[#5B6B8A]"
+            >
+              Sem status
+            </span>
           </div>
-        </div>
+
+          <div class="mt-3 rounded-xl border border-[#D8E7FF] bg-[#F4F8FF] p-3">
+            <p class="text-[10px] text-[#5B6B8A] font-black uppercase tracking-[0.16em]">
+              Endereco
+            </p>
+            <p class="text-sm text-[#0B1F3A] font-bold mt-1 leading-relaxed">
+              {{ item.endereco || 'Endereco nao informado' }}
+              <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
+            </p>
+          </div>
+
+          <div class="mt-3 text-[11px] text-[#5B6B8A] font-semibold text-right">
+            {{ formatarData(item.data) }}
+          </div>
+        </NuxtLink>
+      </div>
+
+      <div
+        v-else
+        class="bg-white/10 border border-white/15 rounded-2xl p-6 text-center text-white/80"
+      >
+        Nenhum servico recente.
       </div>
     </section>
   </div>

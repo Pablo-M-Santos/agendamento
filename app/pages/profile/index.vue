@@ -10,6 +10,22 @@ const inicial = computed(() => {
   return user.value?.email?.charAt(0).toUpperCase() || 'U'
 })
 
+const provedorConta = computed(() => {
+  const providers = user.value?.providerData || []
+  const hasGoogle = providers.some((item) => item.providerId === 'google.com')
+  const hasPassword = providers.some((item) => item.providerId === 'password')
+
+  if (hasGoogle) return 'Google'
+  if (hasPassword) return 'Email e senha'
+  return 'Nao identificado'
+})
+
+const uidCurto = computed(() => {
+  const uid = user.value?.uid || ''
+  if (!uid) return '--'
+  return `${uid.slice(0, 6)}...${uid.slice(-4)}`
+})
+
 const voltar = () => useRouter().back()
 </script>
 
@@ -57,6 +73,22 @@ const voltar = () => useRouter().back()
       </section>
 
       <div class="mt-12">
+        <section class="mb-6 p-5 rounded-3xl border border-white/10 bg-white/5">
+          <h3 class="text-xs font-black uppercase tracking-[0.2em] text-white/70 mb-4">Sobre</h3>
+
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-white/60">Provedor de login</span>
+              <span class="font-bold text-white">{{ provedorConta }}</span>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-white/60">UID da conta</span>
+              <span class="font-bold text-white">{{ uidCurto }}</span>
+            </div>
+          </div>
+        </section>
+
         <button
           class="w-full py-5 rounded-2xl border-2 border-red-500/20 text-red-500 font-black uppercase tracking-[0.2em] text-xs active:scale-95 transition-all"
           @click="logout"
