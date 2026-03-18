@@ -1,196 +1,36 @@
 <script setup lang="ts">
-import {
-  ArrowLeftIcon,
-  CalendarDaysIcon,
-  CheckBadgeIcon,
-  ChartBarIcon
-} from '@heroicons/vue/24/outline'
-import {
-  eachDayOfInterval,
-  endOfMonth,
-  format,
-  isWithinInterval,
-  startOfDay,
-  startOfMonth,
-  subDays
-} from 'date-fns'
-import type { Agendamento } from '~/composables/useAgendamentos'
+import { CheckBadgeIcon } from '@heroicons/vue/24/outline'
+import type { ReportsPeriod } from '~/composables/useReportsPage'
 
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
-type Periodo = '7d' | '30d' | 'mes'
-
-const { user } = useAuth()
-const { listarAgendamentos } = useAgendamentos()
-const { settings } = useUserSettings()
 const { t } = useAppI18n()
-const isLightTheme = computed(() => settings.value.theme === 'light')
 
-const periodoSelecionado = ref<Periodo>('30d')
-const carregando = ref(true)
-const agendamentos = ref<Agendamento[]>([])
+const {
+  isLightTheme,
+  periodoSelecionado,
+  carregando,
+  totalAgendamentos,
+  totalFinalizados,
+  totalNaoConcluidos,
+  totalMaterialPronto,
+  taxaConclusao,
+  materialResumo,
+  serieDiaria,
+  topClientes,
+  diaMaisCheio
+} = useReportsPage()
 
-const opcoesPeriodo = computed<Array<{ key: Periodo; label: string }>>(() => [
+const opcoesPeriodo = computed<Array<{ key: string; label: string }>>(() => [
   { key: '7d', label: t('reports.period.7d') },
   { key: '30d', label: t('reports.period.30d') },
   { key: 'mes', label: t('reports.period.month') }
 ])
 
-const carregar = async () => {
-  if (!user.value) {
-    agendamentos.value = []
-    carregando.value = false
-    return
-  }
-
-  carregando.value = true
-
-  try {
-    agendamentos.value = await listarAgendamentos()
-  } finally {
-    carregando.value = false
-  }
+const handlePeriodoSelect = (periodo: string) => {
+  if (periodo !== '7d' && periodo !== '30d' && periodo !== 'mes') return
+  periodoSelecionado.value = periodo as ReportsPeriod
 }
-
-watch(
-  () => user.value,
-  async (newUser) => {
-    if (newUser) {
-      await carregar()
-      return
-    }
-
-    agendamentos.value = []
-    carregando.value = false
-  },
-  { immediate: true }
-)
-
-const intervaloSelecionado = computed(() => {
-  const agora = new Date()
-  const fim = startOfDay(agora)
-
-  if (periodoSelecionado.value === '7d') {
-    return {
-      inicio: startOfDay(subDays(agora, 6)),
-      fim
-    }
-  }
-
-  if (periodoSelecionado.value === '30d') {
-    return {
-      inicio: startOfDay(subDays(agora, 29)),
-      fim
-    }
-  }
-
-  return {
-    inicio: startOfDay(startOfMonth(agora)),
-    fim: startOfDay(endOfMonth(agora))
-  }
-})
-
-const agendamentosNoPeriodo = computed(() => {
-  const { inicio, fim } = intervaloSelecionado.value
-
-  return agendamentos.value.filter((item) => {
-    if (!item.data) return false
-
-    const diaItem = startOfDay(item.data.toDate())
-    return isWithinInterval(diaItem, { start: inicio, end: fim })
-  })
-})
-
-const totalAgendamentos = computed(() => agendamentosNoPeriodo.value.length)
-const totalFinalizados = computed(
-  () => agendamentosNoPeriodo.value.filter((item) => item.servicoConcluido === true).length
-)
-const totalNaoConcluidos = computed(
-  () => agendamentosNoPeriodo.value.filter((item) => item.servicoConcluido !== true).length
-)
-const totalMaterialPronto = computed(
-  () => agendamentosNoPeriodo.value.filter((item) => item.materialPronto === true).length
-)
-
-const taxaConclusao = computed(() => {
-  if (!totalAgendamentos.value) return 0
-  return (totalFinalizados.value / totalAgendamentos.value) * 100
-})
-
-const materialResumo = computed(() => {
-  const pronto = agendamentosNoPeriodo.value.filter((item) => item.materialPronto === true).length
-  const semMaterial = agendamentosNoPeriodo.value.filter(
-    (item) => item.materialPronto === false
-  ).length
-  const naoInformado = agendamentosNoPeriodo.value.length - pronto - semMaterial
-
-  return {
-    pronto,
-    semMaterial,
-    naoInformado
-  }
-})
-
-const serieDiaria = computed(() => {
-  const { inicio, fim } = intervaloSelecionado.value
-  const dias = eachDayOfInterval({ start: inicio, end: fim })
-
-  const mapa = new Map<string, { total: number; finalizados: number }>()
-
-  dias.forEach((dia) => {
-    mapa.set(format(dia, 'yyyy-MM-dd'), { total: 0, finalizados: 0 })
-  })
-
-  agendamentosNoPeriodo.value.forEach((item) => {
-    const chave = format(item.data.toDate(), 'yyyy-MM-dd')
-    const atual = mapa.get(chave)
-    if (!atual) return
-
-    atual.total += 1
-    if (item.servicoConcluido === true) atual.finalizados += 1
-  })
-
-  const maximo = Math.max(
-    1,
-    ...Array.from(mapa.values()).map((item) => Math.max(item.total, item.finalizados))
-  )
-
-  return Array.from(mapa.entries()).map(([chave, valor]) => ({
-    chave,
-    label: format(new Date(`${chave}T00:00:00`), 'dd/MM'),
-    total: valor.total,
-    finalizados: valor.finalizados,
-    alturaTotal: Math.max(8, Math.round((valor.total / maximo) * 92)),
-    alturaFinalizados: Math.max(6, Math.round((valor.finalizados / maximo) * 92))
-  }))
-})
-
-const topClientes = computed(() => {
-  const mapa = new Map<string, { total: number; finalizados: number }>()
-
-  agendamentosNoPeriodo.value.forEach((item) => {
-    const nome = (item.cliente || 'Cliente nao informado').trim() || 'Cliente nao informado'
-    const atual = mapa.get(nome) || { total: 0, finalizados: 0 }
-    atual.total += 1
-    if (item.servicoConcluido === true) atual.finalizados += 1
-    mapa.set(nome, atual)
-  })
-
-  return Array.from(mapa.entries())
-    .map(([cliente, dados]) => ({
-      cliente,
-      total: dados.total,
-      finalizados: dados.finalizados
-    }))
-    .sort((a, b) => b.total - a.total)
-    .slice(0, 5)
-})
-
-const diaMaisCheio = computed(() => {
-  if (!serieDiaria.value.length) return null
-
-  return [...serieDiaria.value].sort((a, b) => b.total - a.total)[0] || null
-})
 </script>
 
 <template>
@@ -198,59 +38,15 @@ const diaMaisCheio = computed(() => {
     class="h-screen overflow-y-auto p-5 transition-colors"
     :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
   >
-    <header class="mb-7">
-      <div class="grid grid-cols-3 items-center mb-4">
-        <NuxtLink
-          to="/dashboard"
-          class="justify-self-start p-2 rounded-xl transition"
-          :class="isLightTheme ? 'hover:bg-[#E8F1FF]' : 'hover:bg-white/10'"
-          :aria-label="t('common.backToDashboard')"
-        >
-          <ArrowLeftIcon class="w-7 h-7" />
-        </NuxtLink>
-
-        <h1 class="text-base font-black text-center">{{ t('reports.title') }}</h1>
-
-        <div />
-      </div>
-
-      <div class="flex items-center gap-3">
-        <span
-          class="w-10 h-10 rounded-xl border flex items-center justify-center"
-          :class="
-            isLightTheme ? 'bg-[#003D7A] border-white/20 text-white' : 'bg-white/15 border-white/20'
-          "
-        >
-          <ChartBarIcon class="w-5 h-5" />
-        </span>
-        <div>
-          <h2 class="text-xl font-black tracking-wide">{{ t('reports.title') }}</h2>
-          <p class="text-xs uppercase tracking-[0.16em] font-black tracking-wide">
-            {{ t('reports.subtitle') }}
-          </p>
-        </div>
-      </div>
-
-      <div class="mt-5 flex gap-2 overflow-x-auto no-scrollbar">
-        <button
-          v-for="opcao in opcoesPeriodo"
-          :key="opcao.key"
-          class="px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-[0.16em] whitespace-nowrap transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-          :class="
-            periodoSelecionado === opcao.key
-              ? isLightTheme
-                ? 'bg-[#00D3B8] text-[#003D7A] border-[#00D3B8] ring-2 ring-white/40 shadow-[0_6px_18px_rgba(0,211,184,0.35)]'
-                : 'bg-[#00D3B8] text-[#003D7A] border-[#00D3B8]'
-              : isLightTheme
-                ? 'bg-[#003D7A] border-white/20 text-white hover:bg-[#004E99] hover:border-white/35'
-                : 'bg-white/10 border-white/25 text-white'
-          "
-          @click="periodoSelecionado = opcao.key"
-        >
-          {{ opcao.label }}
-        </button>
-      </div>
-    </header>
+    <ReportsPageHeader
+      :is-light-theme="isLightTheme"
+      :title="t('reports.title')"
+      :subtitle="t('reports.subtitle')"
+      :back-to-dashboard-label="t('common.backToDashboard')"
+      :period-options="opcoesPeriodo"
+      :selected-period="periodoSelecionado"
+      @select-period="handlePeriodoSelect"
+    />
 
     <section
       v-if="carregando"
@@ -263,55 +59,17 @@ const diaMaisCheio = computed(() => {
     </section>
 
     <template v-else>
-      <section class="grid grid-cols-2 gap-3 mb-6">
-        <article
-          class="rounded-2xl p-4 shadow-sm"
-          :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-white/95 text-[#0B1F3A]'"
-        >
-          <p
-            class="text-[10px] uppercase tracking-[0.16em] font-black"
-            :class="isLightTheme ? 'text-white/75' : 'text-[#56709A]'"
-          >
-            {{ t('reports.card.bookings') }}
-          </p>
-          <p class="text-2xl font-black mt-1">{{ totalAgendamentos }}</p>
-        </article>
-
-        <article
-          class="rounded-2xl p-4 shadow-sm"
-          :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-[#00D3B8] text-[#003D7A]'"
-        >
-          <p class="text-[10px] uppercase tracking-[0.16em] font-black">
-            {{ t('reports.card.completedService') }}
-          </p>
-          <p class="text-2xl font-black mt-1">{{ totalFinalizados }}</p>
-        </article>
-
-        <article
-          class="rounded-2xl border p-4 shadow-sm"
-          :class="
-            isLightTheme ? 'bg-[#003D7A] border-white/20 text-white' : 'bg-white/12 border-white/20'
-          "
-        >
-          <p
-            class="text-[10px] uppercase tracking-[0.16em] font-black"
-            :class="isLightTheme ? 'text-white/75' : 'text-white/75'"
-          >
-            {{ t('reports.card.unfinishedService') }}
-          </p>
-          <p class="text-2xl font-black mt-1">{{ totalNaoConcluidos }}</p>
-        </article>
-
-        <article
-          class="rounded-2xl p-4 shadow-sm"
-          :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-[#E8F1FF] text-[#3F5170]'"
-        >
-          <p class="text-[10px] uppercase tracking-[0.16em] font-black">
-            {{ t('reports.card.materialReady') }}
-          </p>
-          <p class="text-2xl font-black mt-1">{{ totalMaterialPronto }}</p>
-        </article>
-      </section>
+      <ReportsSummaryCards
+        :is-light-theme="isLightTheme"
+        :bookings-label="t('reports.card.bookings')"
+        :completed-label="t('reports.card.completedService')"
+        :unfinished-label="t('reports.card.unfinishedService')"
+        :material-ready-label="t('reports.card.materialReady')"
+        :total-bookings="totalAgendamentos"
+        :total-completed="totalFinalizados"
+        :total-unfinished="totalNaoConcluidos"
+        :total-material-ready="totalMaterialPronto"
+      />
 
       <section
         class="rounded-3xl border p-5 mb-6"
@@ -468,71 +226,19 @@ const diaMaisCheio = computed(() => {
         </div>
       </section>
 
-      <section
-        class="rounded-3xl border p-5 mb-10"
-        :class="
-          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
-        "
-      >
-        <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
-          {{ t('reports.quickInsights') }}
-        </h2>
-
-        <div class="space-y-3 text-sm font-semibold">
-          <p class="flex items-start gap-2">
-            <CalendarDaysIcon
-              class="w-4 h-4 mt-0.5"
-              :class="isLightTheme ? 'text-[#B5FFF6]' : 'text-[#B5FFF6]'"
-            />
-            <span>
-              {{ t('reports.busyDay') }} <strong>{{ diaMaisCheio?.label || '--/--' }}</strong> ({
-              diaMaisCheio?.total || 0 }} {{ t('reports.bookingsSuffix') }})
-            </span>
-          </p>
-
-          <p class="flex items-start gap-2">
-            <CheckBadgeIcon
-              class="w-4 h-4 mt-0.5"
-              :class="isLightTheme ? 'text-[#B5FFF6]' : 'text-[#B5FFF6]'"
-            />
-            <span>
-              {{ t('reports.bestClient') }}
-              <strong>{{ topClientes[0]?.cliente || t('reports.noData') }}</strong>
-              ({{ topClientes[0]?.total || 0 }} {{ t('reports.servicesSuffix') }})
-            </span>
-          </p>
-        </div>
-
-        <div class="mt-5" v-if="topClientes.length">
-          <p
-            class="text-[10px] uppercase tracking-[0.16em] font-black mb-2"
-            :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
-          >
-            {{ t('reports.topClients') }}
-          </p>
-          <div class="space-y-3">
-            <div
-              v-for="cliente in topClientes"
-              :key="cliente.cliente"
-              class="rounded-xl p-3 flex items-center justify-between border"
-              :class="isLightTheme ? 'bg-white/10 border-white/15' : 'bg-white/8 border-white/15'"
-            >
-              <span class="font-bold text-sm truncate pr-3">{{ cliente.cliente }}</span>
-              <span
-                class="text-xs font-black uppercase tracking-[0.14em]"
-                :class="isLightTheme ? 'text-[#B5FFF6]' : 'text-[#B5FFF6]'"
-              >
-                {{
-                  t('reports.totalCompleted', {
-                    total: cliente.total,
-                    completed: cliente.finalizados
-                  })
-                }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ReportsQuickInsights
+        :is-light-theme="isLightTheme"
+        :title="t('reports.quickInsights')"
+        :busy-day-label="t('reports.busyDay')"
+        :best-client-label="t('reports.bestClient')"
+        :bookings-suffix="t('reports.bookingsSuffix')"
+        :services-suffix="t('reports.servicesSuffix')"
+        :no-data-label="t('reports.noData')"
+        :top-clients-label="t('reports.topClients')"
+        :total-completed-label="(payload) => t('reports.totalCompleted', payload)"
+        :day-busiest="diaMaisCheio"
+        :top-clients="topClientes"
+      />
     </template>
   </div>
 </template>

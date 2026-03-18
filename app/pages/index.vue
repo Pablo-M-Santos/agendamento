@@ -1,197 +1,21 @@
 <script setup lang="ts">
-import { signOut } from 'firebase/auth'
-
-const { $auth } = useNuxtApp()
 const {
-  loginWithEmail: authLoginWithEmail,
-  loginWithGoogle: authLoginWithGoogle,
-  sendSetPasswordEmail: authSendSetPasswordEmail
-} = useAuth()
-const { settings } = useUserSettings()
-const toast = useToast()
-const isLightTheme = computed(() => settings.value.theme === 'light')
-
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
-const show = ref(false)
-
-const errors = reactive({
-  email: '',
-  password: ''
-})
-
-const validateEmail = (value: string) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return regex.test(value)
-}
-
-const validateField = (field: 'email' | 'password') => {
-  if (field === 'email') {
-    if (!email.value) {
-      errors.email = 'Email é obrigatório'
-    } else if (!validateEmail(email.value)) {
-      errors.email = 'Digite um email válido'
-    } else {
-      errors.email = ''
-    }
-  }
-
-  if (field === 'password') {
-    if (!password.value) {
-      errors.password = 'Senha é obrigatória'
-    } else if (password.value.length < 6) {
-      errors.password = 'Mínimo de 6 caracteres'
-    } else {
-      errors.password = ''
-    }
-  }
-}
-
-const isFormValid = computed(() => {
-  return email.value && password.value && !errors.email && !errors.password
-})
-
-const handleSetPasswordByEmail = async () => {
-  const result = await authSendSetPasswordEmail(email.value.trim())
-
-  if (!result.ok) {
-    toast.add({
-      title: 'Erro ao enviar e-mail',
-      description: 'Não foi possível enviar agora. Tente novamente em instantes.',
-      color: 'error'
-    })
-
-    return
-  }
-
-  toast.add({
-    title: 'Confira seu e-mail',
-    description:
-      'Enviamos os próximos passos para definir sua senha. Veja também a caixa de spam ou entre com Google.',
-    color: 'warning'
-  })
-}
-
-const loginWithEmail = async () => {
-  validateField('email')
-  validateField('password')
-
-  if (!isFormValid.value) return
-
-  try {
-    loading.value = true
-    const result = await authLoginWithEmail(email.value, password.value)
-
-    if (!result.ok) {
-      let message = 'Tente novamente.'
-
-      switch (result.code) {
-        case 'auth/google-only-account':
-          await handleSetPasswordByEmail()
-
-          return
-        case 'auth/invalid-login':
-        case 'auth/wrong-password':
-        case 'auth/invalid-credential':
-          await handleSetPasswordByEmail()
-
-          return
-        case 'auth/invalid-email':
-          message = 'Email inválido.'
-          break
-        case 'auth/too-many-requests':
-          message = 'Muitas tentativas. Tente mais tarde.'
-          break
-      }
-
-      toast.add({
-        title: 'Erro no login',
-        description: message,
-        color: 'error'
-      })
-
-      return
-    }
-
-    if (!$auth.currentUser?.emailVerified) {
-      toast.add({
-        title: 'Email não verificado',
-        description: 'Verifique seu email antes de entrar 📩',
-        color: 'warning'
-      })
-
-      await signOut($auth)
-      return
-    }
-
-    toast.add({
-      title: 'Login realizado com sucesso!',
-      color: 'success'
-    })
-
-    navigateTo('/dashboard')
-  } finally {
-    loading.value = false
-  }
-}
-
-const loginWithGoogle = async () => {
-  try {
-    loading.value = true
-    const result = await authLoginWithGoogle()
-
-    if (!result.ok) {
-      let message = 'Tente novamente.'
-
-      switch (result.code) {
-        case 'auth/account-exists-with-different-credential':
-          message = 'Este email já está cadastrado com senha. Entre com email e senha.'
-          break
-        case 'auth/popup-closed-by-user':
-          message = 'Login com Google cancelado.'
-          break
-        case 'auth/too-many-requests':
-          message = 'Muitas tentativas. Tente mais tarde.'
-          break
-      }
-
-      toast.add({
-        title: 'Erro no login com Google',
-        description: message,
-        color: 'error'
-      })
-
-      return
-    }
-
-    toast.add({
-      title: 'Login com Google realizado!',
-      color: 'success'
-    })
-
-    navigateTo('/dashboard')
-  } finally {
-    loading.value = false
-  }
-}
+  isLightTheme,
+  email,
+  password,
+  loading,
+  showPassword,
+  errors,
+  isFormValid,
+  validateField,
+  loginWithEmail,
+  loginWithGoogle
+} = useLoginPage()
 </script>
 
 <template>
-  <div
-    class="h-dvh flex justify-center overflow-hidden transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
-  >
-    <form class="w-full max-w-md text-center px-6 pt-20" @submit.prevent="loginWithEmail">
-      <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
-
-      <h1 class="text-3xl font-bold" :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white'">
-        Entrar
-      </h1>
-      <p class="mb-10" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-gray-300'">
-        Acesse sua conta
-      </p>
-
+  <AuthPageShell :is-light-theme="isLightTheme" title="Entrar" subtitle="Acesse sua conta">
+    <form @submit.prevent="loginWithEmail">
       <UInput
         v-model="email"
         type="email"
@@ -208,27 +32,20 @@ const loginWithGoogle = async () => {
         {{ errors.email }}
       </p>
 
-      <UInput
+      <AuthPasswordInput
         v-model="password"
-        :type="show ? 'text' : 'password'"
-        autocomplete="current-password"
-        icon="i-heroicons-lock-closed"
+        :show="showPassword"
         placeholder="Digite sua senha"
-        size="xl"
-        class="w-full mb-5"
+        autocomplete="current-password"
+        input-class="w-full mb-5"
         :color="errors.password ? 'error' : 'neutral'"
+        @update:show="showPassword = $event"
         @blur="validateField('password')"
-      >
-        <template #trailing>
-          <UButton
-            color="neutral"
-            variant="link"
-            size="sm"
-            :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-            @click="show = !show"
-          />
-        </template>
-      </UInput>
+      />
+
+      <p v-if="errors.password" class="text-red-400 text-sm mb-4 text-left">
+        {{ errors.password }}
+      </p>
 
       <UButton
         block
@@ -275,5 +92,5 @@ const loginWithGoogle = async () => {
         </span>
       </UButton>
     </form>
-  </div>
+  </AuthPageShell>
 </template>

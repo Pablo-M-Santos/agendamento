@@ -39,7 +39,7 @@ watch(
 </script>
 
 <template>
-  <main class="px-4 mt-4">
+  <main class="px-4 mt-4 pb-24 md:pb-6">
     <div class="flex justify-between items-center mb-6">
       <h3
         class="font-black uppercase text-xs tracking-[0.15em]"

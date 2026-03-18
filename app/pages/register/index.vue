@@ -1,167 +1,25 @@
 <script setup lang="ts">
-import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth'
-import type { FirebaseError } from 'firebase/app'
-
-const { $auth } = useNuxtApp()
-const { loginWithGoogle: authLoginWithGoogle } = useAuth()
-const { settings } = useUserSettings()
-const toast = useToast()
-const isLightTheme = computed(() => settings.value.theme === 'light')
-
-const email = ref('')
-const password = ref('')
-const loading = ref(false)
-const show = ref(false)
-
-const errors = reactive({
-  email: '',
-  password: ''
-})
-
-const validateEmail = (value: string) => {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return regex.test(value)
-}
-
-const validateField = (field: 'email' | 'password') => {
-  if (field === 'email') {
-    if (!email.value) {
-      errors.email = 'Email é obrigatório'
-    } else if (!validateEmail(email.value)) {
-      errors.email = 'Digite um email válido'
-    } else {
-      errors.email = ''
-    }
-  }
-
-  if (field === 'password') {
-    if (!password.value) {
-      errors.password = 'Senha é obrigatória'
-    } else if (password.value.length < 6) {
-      errors.password = 'Mínimo de 6 caracteres'
-    } else {
-      errors.password = ''
-    }
-  }
-}
-
-const isFormValid = computed(() => {
-  return email.value && password.value && !errors.email && !errors.password
-})
-
-const registerWithEmail = async () => {
-  validateField('email')
-  validateField('password')
-
-  if (!isFormValid.value) return
-
-  try {
-    loading.value = true
-
-    const userCredential = await createUserWithEmailAndPassword(
-      $auth,
-      email.value.trim(),
-      password.value
-    )
-
-    await sendEmailVerification(userCredential.user)
-    await signOut($auth)
-
-    toast.add({
-      title: 'Cadastro realizado com sucesso!',
-      description: 'Verifique seu email 📩',
-      color: 'success'
-    })
-
-    email.value = ''
-    password.value = ''
-
-    navigateTo('/')
-  } catch (error: unknown) {
-    const err = error as FirebaseError
-    let message = 'Não foi possível concluir seu cadastro. Tente novamente.'
-
-    switch (err?.code) {
-      case 'auth/email-already-in-use':
-        message = 'Este e-mail já está cadastrado. Faça login ou use outro e-mail.'
-        break
-      case 'auth/invalid-email':
-        message = 'Email inválido.'
-        break
-      case 'auth/weak-password':
-        message = 'Senha muito fraca. Use pelo menos 6 caracteres.'
-        break
-      case 'auth/too-many-requests':
-        message = 'Muitas tentativas. Tente novamente mais tarde.'
-        break
-    }
-
-    toast.add({
-      title: 'Erro no cadastro',
-      description: message,
-      color: 'error'
-    })
-  } finally {
-    loading.value = false
-  }
-}
-
-const loginWithGoogle = async () => {
-  try {
-    loading.value = true
-    const result = await authLoginWithGoogle()
-
-    if (!result.ok) {
-      let message = 'Tente novamente.'
-
-      switch (result.code) {
-        case 'auth/account-exists-with-different-credential':
-          message = 'Este email já está cadastrado com senha. Entre com email e senha.'
-          break
-        case 'auth/popup-closed-by-user':
-          message = 'Login com Google cancelado.'
-          break
-        case 'auth/too-many-requests':
-          message = 'Muitas tentativas. Tente mais tarde.'
-          break
-      }
-
-      toast.add({
-        title: 'Erro no login com Google',
-        description: message,
-        color: 'error'
-      })
-
-      return
-    }
-
-    toast.add({
-      title: 'Login com Google realizado!',
-      color: 'success'
-    })
-
-    navigateTo('/dashboard')
-  } finally {
-    loading.value = false
-  }
-}
+const {
+  isLightTheme,
+  email,
+  password,
+  loading,
+  showPassword,
+  errors,
+  isFormValid,
+  validateField,
+  registerWithEmail,
+  registerWithGoogle
+} = useRegisterPage()
 </script>
 
 <template>
-  <div
-    class="h-dvh flex justify-center overflow-hidden transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+  <AuthPageShell
+    :is-light-theme="isLightTheme"
+    title="Criar Conta"
+    subtitle="Preencha os dados para se cadastrar"
   >
-    <form class="w-full max-w-md text-center px-6 pt-20" @submit.prevent="registerWithEmail">
-      <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
-
-      <h1 class="text-3xl font-bold" :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white'">
-        Criar Conta
-      </h1>
-      <p class="mb-10" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-gray-300'">
-        Preencha os dados para se cadastrar
-      </p>
-
+    <form @submit.prevent="registerWithEmail">
       <UInput
         v-model="email"
         type="email"
@@ -178,27 +36,16 @@ const loginWithGoogle = async () => {
         {{ errors.email }}
       </p>
 
-      <UInput
+      <AuthPasswordInput
         v-model="password"
-        :type="show ? 'text' : 'password'"
-        autocomplete="new-password"
-        icon="i-heroicons-lock-closed"
+        :show="showPassword"
         placeholder="Digite sua senha"
-        size="xl"
-        class="w-full mb-5"
+        autocomplete="new-password"
+        input-class="w-full mb-5"
         :color="errors.password ? 'error' : 'neutral'"
+        @update:show="showPassword = $event"
         @blur="validateField('password')"
-      >
-        <template #trailing>
-          <UButton
-            color="neutral"
-            variant="link"
-            size="sm"
-            :icon="show ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-            @click="show = !show"
-          />
-        </template>
-      </UInput>
+      />
 
       <p v-if="errors.password" class="text-red-400 text-sm mb-4 text-left">
         {{ errors.password }}
@@ -234,7 +81,7 @@ const loginWithGoogle = async () => {
             ? 'bg-white border-[#D8E7FF] hover:bg-[#F7FAFF] active:bg-[#E8F1FF]'
             : 'bg-[#D8D8D8] hover:bg-[#CFCFCF] active:bg-[#BEBEBE]'
         "
-        @click="loginWithGoogle"
+        @click="registerWithGoogle"
       >
         <span class="absolute left-8 flex items-center">
           <img
@@ -249,5 +96,5 @@ const loginWithGoogle = async () => {
         </span>
       </UButton>
     </form>
-  </div>
+  </AuthPageShell>
 </template>
