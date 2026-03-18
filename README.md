@@ -35,6 +35,14 @@ Make sure to install the dependencies:
 pnpm install
 ```
 
+Create your local environment file before running the app:
+
+```bash
+cp .env.example .env
+```
+
+Then fill all Firebase variables in `.env`.
+
 ## Development Server
 
 Start the development server on `http://localhost:3000`:

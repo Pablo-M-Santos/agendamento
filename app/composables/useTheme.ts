@@ -2,7 +2,7 @@ import { watch } from 'vue'
 import type { AppTheme } from './useUserSettings'
 
 export const useTheme = () => {
-  const { settings, initUserSettings } = useUserSettings()
+  const { settings } = useUserSettings()
 
   const applyTheme = (theme: AppTheme) => {
     if (!import.meta.client) return
