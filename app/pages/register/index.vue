@@ -4,7 +4,9 @@ import type { FirebaseError } from 'firebase/app'
 
 const { $auth } = useNuxtApp()
 const { loginWithGoogle: authLoginWithGoogle } = useAuth()
+const { settings } = useUserSettings()
 const toast = useToast()
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const email = ref('')
 const password = ref('')
@@ -146,12 +148,19 @@ const loginWithGoogle = async () => {
 </script>
 
 <template>
-  <div class="h-dvh bg-[#003D7A] flex justify-center overflow-hidden">
+  <div
+    class="h-dvh flex justify-center overflow-hidden transition-colors"
+    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+  >
     <form class="w-full max-w-md text-center px-6 pt-20" @submit.prevent="registerWithEmail">
       <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
 
-      <h1 class="text-3xl font-bold text-white">Criar Conta</h1>
-      <p class="text-gray-300 mb-10">Preencha os dados para se cadastrar</p>
+      <h1 class="text-3xl font-bold" :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white'">
+        Criar Conta
+      </h1>
+      <p class="mb-10" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-gray-300'">
+        Preencha os dados para se cadastrar
+      </p>
 
       <UInput
         v-model="email"
@@ -206,7 +215,11 @@ const loginWithGoogle = async () => {
         Cadastrar
       </UButton>
 
-      <NuxtLink to="/" class="block text-sm text-primary hover:underline mb-6 text-white">
+      <NuxtLink
+        to="/"
+        class="block text-sm hover:underline mb-6"
+        :class="isLightTheme ? 'text-[#003D7A]' : 'text-white'"
+      >
         Já tenho uma conta
       </NuxtLink>
 
@@ -215,7 +228,12 @@ const loginWithGoogle = async () => {
         variant="outline"
         type="button"
         size="xl"
-        class="relative mb-3 bg-[#D8D8D8] transition-all duration-200 ease-in-out hover:bg-[#CFCFCF] active:bg-[#BEBEBE] focus:ring-0"
+        class="relative mb-3 transition-all duration-200 ease-in-out focus:ring-0"
+        :class="
+          isLightTheme
+            ? 'bg-white border-[#D8E7FF] hover:bg-[#F7FAFF] active:bg-[#E8F1FF]'
+            : 'bg-[#D8D8D8] hover:bg-[#CFCFCF] active:bg-[#BEBEBE]'
+        "
         @click="loginWithGoogle"
       >
         <span class="absolute left-8 flex items-center">
@@ -226,7 +244,9 @@ const loginWithGoogle = async () => {
           />
         </span>
 
-        <span class="mx-auto text-[#0063C7]"> Cadastrar com Google </span>
+        <span class="mx-auto" :class="isLightTheme ? 'text-[#003D7A]' : 'text-[#0063C7]'">
+          Cadastrar com Google
+        </span>
       </UButton>
     </form>
   </div>

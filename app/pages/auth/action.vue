@@ -3,6 +3,8 @@ import { applyActionCode } from 'firebase/auth'
 
 const { $auth } = useNuxtApp()
 const route = useRoute()
+const { settings } = useUserSettings()
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const loading = ref(true)
 const message = ref('Processando ação...')
@@ -61,9 +63,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="h-dvh bg-[#003D7A] flex items-center justify-center px-6">
+  <div
+    class="h-dvh flex items-center justify-center px-6 transition-colors"
+    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+  >
     <div class="text-center">
-      <p v-if="loading" class="text-white">Processando link...</p>
+      <p v-if="loading" :class="isLightTheme ? 'text-[#003D7A]' : 'text-white'">
+        Processando link...
+      </p>
       <p v-else :class="hasError ? 'text-red-300' : 'text-green-300'">{{ message }}</p>
     </div>
   </div>

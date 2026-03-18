@@ -6,6 +6,12 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true
   },
+  ui: {
+    tailwind: {
+      configPath: '~/tailwind.config.ts'
+    }
+  },
+
   app: {
     head: {
       link: [
@@ -43,5 +49,5 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
-  },
+  }
 })

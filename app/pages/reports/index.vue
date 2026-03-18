@@ -22,7 +22,9 @@ type Periodo = '7d' | '30d' | 'mes'
 
 const { user } = useAuth()
 const { listarAgendamentos } = useAgendamentos()
+const { settings } = useUserSettings()
 const { t } = useAppI18n()
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const periodoSelecionado = ref<Periodo>('30d')
 const carregando = ref(true)
@@ -192,12 +194,16 @@ const diaMaisCheio = computed(() => {
 </script>
 
 <template>
-  <div class="h-screen overflow-y-auto bg-[#003D7A] text-white p-5">
+  <div
+    class="h-screen overflow-y-auto p-5 transition-colors"
+    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+  >
     <header class="mb-7">
       <div class="grid grid-cols-3 items-center mb-4">
         <NuxtLink
           to="/dashboard"
-          class="justify-self-start p-2 rounded-xl hover:bg-white/10 transition"
+          class="justify-self-start p-2 rounded-xl transition"
+          :class="isLightTheme ? 'hover:bg-[#E8F1FF]' : 'hover:bg-white/10'"
           :aria-label="t('common.backToDashboard')"
         >
           <ArrowLeftIcon class="w-7 h-7" />
@@ -210,13 +216,16 @@ const diaMaisCheio = computed(() => {
 
       <div class="flex items-center gap-3">
         <span
-          class="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center"
+          class="w-10 h-10 rounded-xl border flex items-center justify-center"
+          :class="
+            isLightTheme ? 'bg-[#003D7A] border-white/20 text-white' : 'bg-white/15 border-white/20'
+          "
         >
           <ChartBarIcon class="w-5 h-5" />
         </span>
         <div>
           <h2 class="text-xl font-black tracking-wide">{{ t('reports.title') }}</h2>
-          <p class="text-xs text-white/70 uppercase tracking-[0.16em]">
+          <p class="text-xs uppercase tracking-[0.16em] font-black tracking-wide">
             {{ t('reports.subtitle') }}
           </p>
         </div>
@@ -226,11 +235,15 @@ const diaMaisCheio = computed(() => {
         <button
           v-for="opcao in opcoesPeriodo"
           :key="opcao.key"
-          class="px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-[0.16em] whitespace-nowrap transition"
+          class="px-4 py-2 rounded-xl border text-xs font-black uppercase tracking-[0.16em] whitespace-nowrap transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
           :class="
             periodoSelecionado === opcao.key
-              ? 'bg-[#00D3B8] text-[#003D7A] border-[#00D3B8]'
-              : 'bg-white/10 border-white/25 text-white'
+              ? isLightTheme
+                ? 'bg-[#00D3B8] text-[#003D7A] border-[#00D3B8] ring-2 ring-white/40 shadow-[0_6px_18px_rgba(0,211,184,0.35)]'
+                : 'bg-[#00D3B8] text-[#003D7A] border-[#00D3B8]'
+              : isLightTheme
+                ? 'bg-[#003D7A] border-white/20 text-white hover:bg-[#004E99] hover:border-white/35'
+                : 'bg-white/10 border-white/25 text-white'
           "
           @click="periodoSelecionado = opcao.key"
         >
@@ -241,35 +254,58 @@ const diaMaisCheio = computed(() => {
 
     <section
       v-if="carregando"
-      class="rounded-3xl border border-white/20 bg-white/8 p-6 text-center"
+      class="rounded-3xl border p-6 text-center"
+      :class="
+        isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
+      "
     >
       <p class="font-black uppercase tracking-[0.16em] text-sm">{{ t('reports.loading') }}</p>
     </section>
 
     <template v-else>
       <section class="grid grid-cols-2 gap-3 mb-6">
-        <article class="rounded-2xl bg-white/95 text-[#0B1F3A] p-4 shadow-sm">
-          <p class="text-[10px] uppercase tracking-[0.16em] font-black text-[#56709A]">
+        <article
+          class="rounded-2xl p-4 shadow-sm"
+          :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-white/95 text-[#0B1F3A]'"
+        >
+          <p
+            class="text-[10px] uppercase tracking-[0.16em] font-black"
+            :class="isLightTheme ? 'text-white/75' : 'text-[#56709A]'"
+          >
             {{ t('reports.card.bookings') }}
           </p>
           <p class="text-2xl font-black mt-1">{{ totalAgendamentos }}</p>
         </article>
 
-        <article class="rounded-2xl bg-[#00D3B8] text-[#003D7A] p-4 shadow-sm">
+        <article
+          class="rounded-2xl p-4 shadow-sm"
+          :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-[#00D3B8] text-[#003D7A]'"
+        >
           <p class="text-[10px] uppercase tracking-[0.16em] font-black">
             {{ t('reports.card.completedService') }}
           </p>
           <p class="text-2xl font-black mt-1">{{ totalFinalizados }}</p>
         </article>
 
-        <article class="rounded-2xl bg-white/12 border border-white/20 p-4 shadow-sm">
-          <p class="text-[10px] uppercase tracking-[0.16em] font-black text-white/75">
+        <article
+          class="rounded-2xl border p-4 shadow-sm"
+          :class="
+            isLightTheme ? 'bg-[#003D7A] border-white/20 text-white' : 'bg-white/12 border-white/20'
+          "
+        >
+          <p
+            class="text-[10px] uppercase tracking-[0.16em] font-black"
+            :class="isLightTheme ? 'text-white/75' : 'text-white/75'"
+          >
             {{ t('reports.card.unfinishedService') }}
           </p>
           <p class="text-2xl font-black mt-1">{{ totalNaoConcluidos }}</p>
         </article>
 
-        <article class="rounded-2xl bg-[#E8F1FF] text-[#3F5170] p-4 shadow-sm">
+        <article
+          class="rounded-2xl p-4 shadow-sm"
+          :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-[#E8F1FF] text-[#3F5170]'"
+        >
           <p class="text-[10px] uppercase tracking-[0.16em] font-black">
             {{ t('reports.card.materialReady') }}
           </p>
@@ -277,10 +313,18 @@ const diaMaisCheio = computed(() => {
         </article>
       </section>
 
-      <section class="rounded-3xl border border-white/20 bg-white/10 p-5 mb-6">
+      <section
+        class="rounded-3xl border p-5 mb-6"
+        :class="
+          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/10'
+        "
+      >
         <div class="flex items-start justify-between gap-3">
           <div>
-            <p class="text-[10px] uppercase tracking-[0.16em] font-black text-white/70">
+            <p
+              class="text-[10px] uppercase tracking-[0.16em] font-black"
+              :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
+            >
               {{ t('reports.completionRate') }}
             </p>
             <p class="text-3xl font-black mt-1">{{ taxaConclusao.toFixed(1) }}%</p>
@@ -292,7 +336,10 @@ const diaMaisCheio = computed(() => {
           </span>
         </div>
 
-        <div class="mt-4 h-3 rounded-full bg-white/15 overflow-hidden">
+        <div
+          class="mt-4 h-3 rounded-full overflow-hidden"
+          :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+        >
           <div
             class="h-full bg-gradient-to-r from-[#00D3B8] to-[#24E6CE]"
             :style="{ width: `${Math.min(100, taxaConclusao)}%` }"
@@ -300,14 +347,21 @@ const diaMaisCheio = computed(() => {
         </div>
       </section>
 
-      <section class="rounded-3xl border border-white/20 bg-white/8 p-5 mb-6">
+      <section
+        class="rounded-3xl border p-5 mb-6"
+        :class="
+          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
+        "
+      >
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-sm font-black uppercase tracking-[0.16em]">
             {{ t('reports.dailyEvolution') }}
           </h2>
-          <span class="text-[10px] text-white/70 uppercase tracking-[0.16em]">{{
-            t('reports.totalVsCompleted')
-          }}</span>
+          <span
+            class="text-[10px] uppercase tracking-[0.16em]"
+            :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
+            >{{ t('reports.totalVsCompleted') }}</span
+          >
         </div>
 
         <div class="overflow-x-auto no-scrollbar">
@@ -319,7 +373,8 @@ const diaMaisCheio = computed(() => {
             >
               <div class="h-24 flex items-end gap-[3px]">
                 <div
-                  class="w-3 rounded-md bg-white/35"
+                  class="w-3 rounded-md"
+                  :class="isLightTheme ? 'bg-white/35' : 'bg-white/35'"
                   :style="{ height: `${dia.alturaTotal}px` }"
                 />
                 <div
@@ -327,24 +382,39 @@ const diaMaisCheio = computed(() => {
                   :style="{ height: `${dia.alturaFinalizados}px` }"
                 />
               </div>
-              <span class="text-[10px] text-white/70 font-bold">{{ dia.label }}</span>
+              <span
+                class="text-[10px] font-bold"
+                :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
+                >{{ dia.label }}</span
+              >
             </div>
           </div>
         </div>
       </section>
 
-      <section class="rounded-3xl border border-white/20 bg-white/8 p-5 mb-7">
+      <section
+        class="rounded-3xl border p-5 mb-7"
+        :class="
+          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
+        "
+      >
         <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
           {{ t('reports.material') }}
         </h2>
 
         <div class="space-y-4 text-xs font-bold">
           <div>
-            <div class="flex justify-between text-white/80 mb-1">
+            <div
+              class="flex justify-between mb-1"
+              :class="isLightTheme ? 'text-white/80' : 'text-white/80'"
+            >
               <span>{{ t('reports.materialReady') }}</span
               ><span>{{ materialResumo.pronto }}</span>
             </div>
-            <div class="h-2 rounded-full bg-white/15 overflow-hidden">
+            <div
+              class="h-2 rounded-full overflow-hidden"
+              :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+            >
               <div
                 class="h-full bg-[#00D3B8]"
                 :style="{
@@ -355,11 +425,17 @@ const diaMaisCheio = computed(() => {
           </div>
 
           <div>
-            <div class="flex justify-between text-white/80 mb-1">
+            <div
+              class="flex justify-between mb-1"
+              :class="isLightTheme ? 'text-white/80' : 'text-white/80'"
+            >
               <span>{{ t('reports.noMaterial') }}</span
               ><span>{{ materialResumo.semMaterial }}</span>
             </div>
-            <div class="h-2 rounded-full bg-white/15 overflow-hidden">
+            <div
+              class="h-2 rounded-full overflow-hidden"
+              :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+            >
               <div
                 class="h-full bg-[#F7C65E]"
                 :style="{
@@ -370,11 +446,17 @@ const diaMaisCheio = computed(() => {
           </div>
 
           <div>
-            <div class="flex justify-between text-white/80 mb-1">
+            <div
+              class="flex justify-between mb-1"
+              :class="isLightTheme ? 'text-white/80' : 'text-white/80'"
+            >
               <span>{{ t('reports.notInformed') }}</span
               ><span>{{ materialResumo.naoInformado }}</span>
             </div>
-            <div class="h-2 rounded-full bg-white/15 overflow-hidden">
+            <div
+              class="h-2 rounded-full overflow-hidden"
+              :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+            >
               <div
                 class="h-full bg-white/45"
                 :style="{
@@ -386,14 +468,22 @@ const diaMaisCheio = computed(() => {
         </div>
       </section>
 
-      <section class="rounded-3xl border border-white/20 bg-white/8 p-5 mb-10">
+      <section
+        class="rounded-3xl border p-5 mb-10"
+        :class="
+          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
+        "
+      >
         <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
           {{ t('reports.quickInsights') }}
         </h2>
 
         <div class="space-y-3 text-sm font-semibold">
           <p class="flex items-start gap-2">
-            <CalendarDaysIcon class="w-4 h-4 mt-0.5 text-[#B5FFF6]" />
+            <CalendarDaysIcon
+              class="w-4 h-4 mt-0.5"
+              :class="isLightTheme ? 'text-[#B5FFF6]' : 'text-[#B5FFF6]'"
+            />
             <span>
               {{ t('reports.busyDay') }} <strong>{{ diaMaisCheio?.label || '--/--' }}</strong> ({
               diaMaisCheio?.total || 0 }} {{ t('reports.bookingsSuffix') }})
@@ -401,7 +491,10 @@ const diaMaisCheio = computed(() => {
           </p>
 
           <p class="flex items-start gap-2">
-            <CheckBadgeIcon class="w-4 h-4 mt-0.5 text-[#B5FFF6]" />
+            <CheckBadgeIcon
+              class="w-4 h-4 mt-0.5"
+              :class="isLightTheme ? 'text-[#B5FFF6]' : 'text-[#B5FFF6]'"
+            />
             <span>
               {{ t('reports.bestClient') }}
               <strong>{{ topClientes[0]?.cliente || t('reports.noData') }}</strong>
@@ -411,17 +504,24 @@ const diaMaisCheio = computed(() => {
         </div>
 
         <div class="mt-5" v-if="topClientes.length">
-          <p class="text-[10px] uppercase tracking-[0.16em] text-white/70 font-black mb-2">
+          <p
+            class="text-[10px] uppercase tracking-[0.16em] font-black mb-2"
+            :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
+          >
             {{ t('reports.topClients') }}
           </p>
           <div class="space-y-3">
             <div
               v-for="cliente in topClientes"
               :key="cliente.cliente"
-              class="bg-white/8 border border-white/15 rounded-xl p-3 flex items-center justify-between"
+              class="rounded-xl p-3 flex items-center justify-between border"
+              :class="isLightTheme ? 'bg-white/10 border-white/15' : 'bg-white/8 border-white/15'"
             >
               <span class="font-bold text-sm truncate pr-3">{{ cliente.cliente }}</span>
-              <span class="text-xs font-black uppercase tracking-[0.14em] text-[#B5FFF6]">
+              <span
+                class="text-xs font-black uppercase tracking-[0.14em]"
+                :class="isLightTheme ? 'text-[#B5FFF6]' : 'text-[#B5FFF6]'"
+              >
                 {{
                   t('reports.totalCompleted', {
                     total: cliente.total,

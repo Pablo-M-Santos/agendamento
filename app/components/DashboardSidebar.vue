@@ -18,8 +18,10 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const { user, logout } = useAuth()
+const { settings } = useUserSettings()
 const toast = useToast()
 const { t } = useAppI18n()
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const displayName = computed(() => {
   return user.value?.displayName || user.value?.email || t('profile.userFallback')
@@ -77,12 +79,14 @@ const links = computed(() => [
       >
         <aside
           v-if="props.modelValue"
-          class="relative w-80 max-w-[85vw] h-full bg-[#0B2F66] text-white p-6 flex flex-col pointer-events-auto"
+          class="relative w-80 max-w-[85vw] h-full p-6 flex flex-col pointer-events-auto transition-colors"
+          :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#0B2F66] text-white'"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3 min-w-0">
               <div
-                class="w-12 h-12 rounded-[50%] overflow-hidden bg-white/10 border border-white/15 flex items-center justify-center"
+                class="w-12 h-12 rounded-[50%] overflow-hidden border flex items-center justify-center"
+                :class="isLightTheme ? 'bg-white border-[#D8E7FF]' : 'bg-white/10 border-white/15'"
               >
                 <img
                   v-if="user?.photoURL"
@@ -92,11 +96,17 @@ const links = computed(() => [
                 />
                 <span v-else class="text-base font-black">{{ initials }}</span>
               </div>
-              <p class="text-sm font-bold truncate text-white">{{ displayName }}</p>
+              <p
+                class="text-sm font-bold truncate"
+                :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white'"
+              >
+                {{ displayName }}
+              </p>
             </div>
 
             <button
-              class="p-2 rounded-lg hover:bg-white/10 transition"
+              class="p-2 rounded-lg transition"
+              :class="isLightTheme ? 'hover:bg-[#E8F1FF]' : 'hover:bg-white/10'"
               :aria-label="t('sidebar.close')"
               @click="close"
             >
@@ -112,8 +122,12 @@ const links = computed(() => [
               class="flex items-center gap-3 px-4 py-3 rounded-xl transition"
               :class="
                 isActive(item.to)
-                  ? 'bg-white/90 text-[#0B2F66]'
-                  : 'text-white/85 hover:bg-white/10 hover:text-white'
+                  ? isLightTheme
+                    ? 'bg-[#003D7A] text-white'
+                    : 'bg-white/90 text-[#0B2F66]'
+                  : isLightTheme
+                    ? 'text-[#4A628A] hover:bg-[#E8F1FF] hover:text-[#0B1F3A]'
+                    : 'text-white/85 hover:bg-white/10 hover:text-white'
               "
               @click="close"
             >
@@ -122,9 +136,17 @@ const links = computed(() => [
             </NuxtLink>
           </nav>
 
-          <div class="mt-auto pt-6 border-t border-white/10">
+          <div
+            class="mt-auto pt-6 border-t"
+            :class="isLightTheme ? 'border-[#D8E7FF]' : 'border-white/10'"
+          >
             <button
-              class="w-full flex items-center justify-start gap-2 px-4 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition font-bold"
+              class="w-full flex items-center justify-start gap-2 px-4 py-3 rounded-xl transition font-bold"
+              :class="
+                isLightTheme
+                  ? 'bg-[#003D7A] text-white hover:bg-[#0B2F66]'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              "
               @click="handleLogout"
             >
               <ArrowLeftOnRectangleIcon class="w-5 h-5" />

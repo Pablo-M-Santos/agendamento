@@ -7,10 +7,12 @@ definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { user } = useAuth()
 const { listarAgendamentos } = useAgendamentos()
+const { settings } = useUserSettings()
 const { t } = useAppI18n()
 
 const agendamentos = ref<Agendamento[]>([])
 const isSidebarOpen = ref(false)
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const isGoogleLogin = computed(() => {
   return user.value?.providerData?.some((provider) => provider.providerId === 'google.com') ?? false
@@ -60,10 +62,14 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
 </script>
 
 <template>
-  <div class="h-screen bg-[#003D7A] p-5 overflow-hidden">
+  <div
+    class="h-screen p-5 overflow-hidden transition-colors"
+    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+  >
     <div class="relative mb-6 h-[56px] flex items-center justify-center">
       <button
-        class="absolute left-0 p-2 rounded-xl hover:bg-white/10 transition"
+        class="absolute left-0 p-2 rounded-xl transition"
+        :class="isLightTheme ? 'hover:bg-[#E8F1FF]' : 'hover:bg-white/10'"
         :aria-label="t('dashboard.openSidebar')"
         @click="isSidebarOpen = true"
       >
@@ -71,12 +77,18 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
       </button>
 
       <div class="text-center px-12">
-        <p class="text-base font-black text-white truncate">{{ saudacaoDashboard }}</p>
+        <p
+          class="text-base font-black truncate"
+          :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white'"
+        >
+          {{ saudacaoDashboard }}
+        </p>
       </div>
 
       <NuxtLink
         to="/profile"
-        class="absolute right-0 w-11 h-11 rounded-[50%] overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center hover:scale-105 transition"
+        class="absolute right-0 w-11 h-11 rounded-[50%] overflow-hidden border flex items-center justify-center hover:scale-105 transition"
+        :class="isLightTheme ? 'border-[#D8E7FF] bg-white' : 'border-white/20 bg-white/10'"
         :aria-label="t('dashboard.goProfile')"
       >
         <img
@@ -85,7 +97,13 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
           alt="Foto do usuário"
           class="w-full h-full object-cover"
         />
-        <span v-else class="text-sm font-black text-white">{{ inicialUsuario }}</span>
+        <span
+          v-else
+          class="text-sm font-black"
+          :class="isLightTheme ? 'text-[#003D7A]' : 'text-white'"
+        >
+          {{ inicialUsuario }}
+        </span>
       </NuxtLink>
     </div>
 
@@ -102,7 +120,9 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
               <CalendarDaysIcon class="w-5 h-5 text-white/95" />
             </span>
           </div>
-          <h3 class="font-black text-base tracking-wide">{{ t('dashboard.scheduleCard') }}</h3>
+          <h3 class="font-black text-base tracking-wide text-white">
+            {{ t('dashboard.scheduleCard') }}
+          </h3>
         </div>
       </NuxtLink>
 
@@ -116,15 +136,19 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
               <ChartBarIcon class="w-5 h-5 text-white/95" />
             </span>
           </div>
-          <h3 class="font-black text-base tracking-wide">{{ t('dashboard.reportsCard') }}</h3>
+          <h3 class="font-black text-base tracking-wide text-white">
+            {{ t('dashboard.reportsCard') }}
+          </h3>
         </div>
       </NuxtLink>
     </div>
 
     <section>
       <div class="flex items-center mb-4">
-        <h3 class="font-black text-white/90 text-sm">{{ t('dashboard.recentServices') }}</h3>
-        <div class="flex-1 h-[1px] bg-white/15 ml-4" />
+        <h3 class="font-black text-sm" :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white/90'">
+          {{ t('dashboard.recentServices') }}
+        </h3>
+        <div class="flex-1 h-[1px] ml-4" :class="isLightTheme ? 'bg-[#D8E7FF]' : 'bg-white/15'" />
       </div>
 
       <div v-if="ultimosServicos.length" class="space-y-3">
@@ -138,11 +162,13 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
               agendamento: item.id
             }
           }"
-          class="block bg-white/95 text-[#0B1F3A] p-4 rounded-2xl shadow-md active:scale-[0.99] transition"
+          class="block p-4 rounded-2xl shadow-md active:scale-[0.99] transition"
+          :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-white/95 text-[#0B1F3A]'"
         >
           <div class="flex items-center justify-between gap-3">
             <div
-              class="inline-flex items-center gap-2 bg-[#E8F1FF] text-[#003D7A] px-3 py-2 rounded-xl"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-xl"
+              :class="isLightTheme ? 'bg-white/15 text-white' : 'bg-[#E8F1FF] text-[#003D7A]'"
             >
               <span class="text-[10px] font-black uppercase tracking-[0.14em]">{{
                 t('schedule.time')
@@ -164,17 +190,27 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
             </span>
             <span
               v-else
-              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#E8F1FF] text-[#5B6B8A]"
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg"
+              :class="isLightTheme ? 'bg-white/15 text-white/80' : 'bg-[#E8F1FF] text-[#5B6B8A]'"
             >
               {{ t('schedule.noStatus') }}
             </span>
           </div>
 
-          <div class="mt-3 rounded-xl border border-[#D8E7FF] bg-[#F4F8FF] p-3">
-            <p class="text-[10px] text-[#5B6B8A] font-black uppercase tracking-[0.16em]">
+          <div
+            class="mt-3 rounded-xl border p-3"
+            :class="isLightTheme ? 'border-white/20 bg-white/10' : 'border-[#D8E7FF] bg-[#F4F8FF]'"
+          >
+            <p
+              class="text-[10px] font-black uppercase tracking-[0.16em]"
+              :class="isLightTheme ? 'text-white/70' : 'text-[#5B6B8A]'"
+            >
               {{ t('schedule.address') }}
             </p>
-            <p class="text-sm text-[#0B1F3A] font-bold mt-1 leading-relaxed">
+            <p
+              class="text-sm font-bold mt-1 leading-relaxed"
+              :class="isLightTheme ? 'text-white' : 'text-[#0B1F3A]'"
+            >
               {{ item.endereco || t('schedule.addressNotInformed') }}
               <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
             </p>
@@ -189,19 +225,24 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
             </span>
             <span
               v-else-if="item.servicoConcluido === false"
-              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#DDE7FA] text-[#3F5170]"
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg"
+              :class="isLightTheme ? 'bg-white/20 text-white' : 'bg-[#DDE7FA] text-[#3F5170]'"
             >
               {{ t('schedule.serviceOpen') }}
             </span>
             <span
               v-else
-              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#E8F1FF] text-[#5B6B8A]"
+              class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg"
+              :class="isLightTheme ? 'bg-white/15 text-white/80' : 'bg-[#E8F1FF] text-[#5B6B8A]'"
             >
               {{ t('schedule.serviceNotCompleted') }}
             </span>
           </div>
 
-          <div class="mt-3 text-[11px] text-[#5B6B8A] font-semibold text-right">
+          <div
+            class="mt-3 text-[11px] font-semibold text-right"
+            :class="isLightTheme ? 'text-white/70' : 'text-[#5B6B8A]'"
+          >
             {{ formatarData(item.data) }}
           </div>
         </NuxtLink>
@@ -209,7 +250,12 @@ const formatarDiaParaRota = (ts: Timestamp) => format(ts.toDate(), 'yyyy-MM-dd')
 
       <div
         v-else
-        class="bg-white/10 border border-white/15 rounded-2xl p-6 text-center text-white/80"
+        class="rounded-2xl p-6 text-center border"
+        :class="
+          isLightTheme
+            ? 'bg-white text-[#5B6B8A] border-[#D8E7FF]'
+            : 'bg-white/10 text-white/80 border-white/15'
+        "
       >
         {{ t('dashboard.noRecentServices') }}
       </div>

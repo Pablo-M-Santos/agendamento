@@ -8,6 +8,8 @@ import {
 const { $auth } = useNuxtApp()
 const route = useRoute()
 const toast = useToast()
+const { settings } = useUserSettings()
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const loading = ref(true)
 const submitting = ref(false)
@@ -74,14 +76,23 @@ const submit = async () => {
 </script>
 
 <template>
-  <div class="h-dvh bg-[#003D7A] flex justify-center overflow-hidden">
+  <div
+    class="h-dvh flex justify-center overflow-hidden transition-colors"
+    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+  >
     <div class="w-full max-w-md text-center px-6 pt-20">
       <img src="/logo.png" alt="Logo" class="w-20 mx-auto mb-4" />
 
-      <h1 class="text-3xl font-bold text-white">Definir senha</h1>
-      <p class="text-gray-300 mb-10">Finalize o acesso com email e senha</p>
+      <h1 class="text-3xl font-bold" :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white'">
+        Definir senha
+      </h1>
+      <p class="mb-10" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-gray-300'">
+        Finalize o acesso com email e senha
+      </p>
 
-      <div v-if="loading" class="text-white">Validando link...</div>
+      <div v-if="loading" :class="isLightTheme ? 'text-[#003D7A]' : 'text-white'">
+        Validando link...
+      </div>
 
       <div v-else-if="error" class="text-red-300">
         {{ error }}
@@ -90,7 +101,9 @@ const submit = async () => {
       <div v-else-if="success" class="text-green-300">Senha atualizada com sucesso!</div>
 
       <form v-else class="text-left" @submit.prevent="submit">
-        <p class="text-sm text-gray-300 mb-4">Conta: {{ email }}</p>
+        <p class="text-sm mb-4" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-gray-300'">
+          Conta: {{ email }}
+        </p>
 
         <UInput
           v-model="password"

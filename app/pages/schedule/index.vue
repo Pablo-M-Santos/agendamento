@@ -10,6 +10,7 @@ import type { FirebaseError } from 'firebase/app'
 definePageMeta({ middleware: 'auth' })
 
 const { user } = useAuth()
+const { settings } = useUserSettings()
 const route = useRoute()
 const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento } =
   useAgendamentos()
@@ -26,6 +27,7 @@ const focoAgendamentoId = ref<string | null>(null)
 const dataInicialPreferida = ref<Date | null>(null)
 const centralizacaoInicialFeita = ref(false)
 const centralizacaoInicialEmAndamento = ref(false)
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const diasCarrossel = computed(() => {
   const inicio = startOfMonth(dataSelecionada.value)
@@ -238,7 +240,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-screen bg-[#003D7A] p-5 overflow-hidden">
+  <div
+    class="h-screen p-5 overflow-hidden transition-colors"
+    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+  >
     <ScheduleHeader :data-selecionada="dataSelecionada" @add="abrirModal()" />
 
     <ScheduleDaysCarousel

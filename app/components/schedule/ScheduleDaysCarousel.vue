@@ -3,6 +3,8 @@ import { onBeforeUnmount, ref, watch } from 'vue'
 import { format, isSameDay } from 'date-fns'
 
 const { dateLocale } = useUserSettings()
+const { settings } = useUserSettings()
+const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const props = defineProps<{
   diasCarrossel: Date[]
@@ -86,8 +88,12 @@ onBeforeUnmount(() => {
         isSameDay(dia, dataSelecionada)
           ? 'bg-[#FBFBFB] text-white scale-110 shadow-md'
           : eHoje(dia)
-            ? 'border-2 border-white text-white font-bold'
-            : 'border-2 border-transparent text-white hover:bg-white/10'
+            ? isLightTheme
+              ? 'border-2 border-[#003D7A] text-[#003D7A] font-bold'
+              : 'border-2 border-white text-white font-bold'
+            : isLightTheme
+              ? 'border-2 border-transparent text-[#5B6B8A] hover:bg-[#E8F1FF]'
+              : 'border-2 border-transparent text-white hover:bg-white/10'
       ]"
       @click="handleClickDia(dia)"
     >
@@ -101,7 +107,11 @@ onBeforeUnmount(() => {
       <span
         :class="[
           'text-[16px] uppercase font-black tracking-widest mb-1',
-          isSameDay(dia, dataSelecionada) ? 'text-[#003D7A]' : 'text-white'
+          isSameDay(dia, dataSelecionada)
+            ? 'text-[#003D7A]'
+            : isLightTheme
+              ? 'text-[#5B6B8A]'
+              : 'text-white'
         ]"
       >
         {{ getDiaLetra(dia) }}
@@ -110,7 +120,11 @@ onBeforeUnmount(() => {
       <span
         :class="[
           'font-black text-xl',
-          isSameDay(dia, dataSelecionada) ? 'text-[#003D7A]' : 'text-white'
+          isSameDay(dia, dataSelecionada)
+            ? 'text-[#003D7A]'
+            : isLightTheme
+              ? 'text-[#0B1F3A]'
+              : 'text-white'
         ]"
       >
         {{ format(dia, 'd') }}
