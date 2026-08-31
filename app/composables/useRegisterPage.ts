@@ -1,9 +1,6 @@
-import type { FirebaseError } from 'firebase/app'
-import { createUserWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth'
 import { computed, reactive, ref } from 'vue'
 
 export const useRegisterPage = () => {
-  const { $auth } = useNuxtApp()
   const { loginWithGoogle: authLoginWithGoogle } = useAuth()
   const { settings } = useUserSettings()
   const toast = useToast()
@@ -59,18 +56,17 @@ export const useRegisterPage = () => {
     try {
       loading.value = true
 
-      const userCredential = await createUserWithEmailAndPassword(
-        $auth,
-        email.value.trim(),
-        password.value
-      )
-
-      await sendEmailVerification(userCredential.user)
-      await signOut($auth)
+      const response = await $fetch<{ ok: boolean; message: string; emailSent: boolean }>('/api/auth/register', {
+        method: 'POST',
+        body: {
+          email: email.value.trim(),
+          password: password.value
+        }
+      })
 
       toast.add({
         title: 'Cadastro realizado com sucesso!',
-        description: 'Verifique seu email',
+        description: response.message,
         color: 'success'
       })
 
@@ -79,23 +75,8 @@ export const useRegisterPage = () => {
 
       await navigateTo('/')
     } catch (error: unknown) {
-      const err = error as FirebaseError
-      let message = 'Nao foi possivel concluir seu cadastro. Tente novamente.'
-
-      switch (err?.code) {
-        case 'auth/email-already-in-use':
-          message = 'Este e-mail ja esta cadastrado. Faca login ou use outro e-mail.'
-          break
-        case 'auth/invalid-email':
-          message = 'Email invalido.'
-          break
-        case 'auth/weak-password':
-          message = 'Senha muito fraca. Use pelo menos 6 caracteres.'
-          break
-        case 'auth/too-many-requests':
-          message = 'Muitas tentativas. Tente novamente mais tarde.'
-          break
-      }
+      const err = error as { data?: { statusMessage?: string } }
+      const message = err.data?.statusMessage || 'Nao foi possivel concluir seu cadastro. Tente novamente.'
 
       toast.add({
         title: 'Erro no cadastro',

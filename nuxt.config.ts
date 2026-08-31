@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true
   },
+
   app: {
     head: {
       link: [
@@ -21,7 +22,22 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  colorMode: {
+    preference: 'dark',
+    fallback: 'dark'
+  },
+
   runtimeConfig: {
+    firebaseAdminProjectId: process.env.FIREBASE_ADMIN_PROJECT_ID || '',
+    firebaseAdminClientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL || '',
+    firebaseAdminPrivateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n') || '',
+    resendApiKey: process.env.RESEND_API_KEY || '',
+    resendFromEmail: process.env.RESEND_FROM_EMAIL || '',
+    mailProvider: process.env.MAIL_PROVIDER || 'mailpit',
+    mailHost: process.env.MAIL_HOST || 'localhost',
+    mailPort: Number(process.env.MAIL_PORT) || 1025,
+    mailUser: process.env.MAIL_USER || '',
+    mailPassword: process.env.MAIL_PASSWORD || '',
     public: {
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
       firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
@@ -40,7 +56,6 @@ export default defineNuxtConfig({
     '/perfil': { redirect: { to: '/profile', statusCode: 301 } },
     '/relatorios': { redirect: { to: '/reports', statusCode: 301 } }
   },
-
   compatibilityDate: '2025-01-15',
 
   eslint: {
@@ -50,5 +65,5 @@ export default defineNuxtConfig({
         braceStyle: '1tbs'
       }
     }
-  }
+  },
 })

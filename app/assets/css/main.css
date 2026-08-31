@@ -43,25 +43,6 @@ html.dark {
   --shadow-input-focus: 0 0 0 3px rgba(77, 166, 156, 0.25), 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
-html.light {
-  --color-bg-primary: #e6f2f0;
-  --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #b3d9d4;
-  --color-bg-surface: rgba(255, 255, 255, 0.9);
-  --color-text-primary: #001a17;
-  --color-text-secondary: #003733;
-  --color-text-tertiary: #005c55;
-  --color-border-light: #80bfb8;
-  --color-border-lighter: #b3d9d4;
-  --color-border-focus: #004540;
-  --color-accent-primary: #004540;
-  --color-accent-secondary: #003733;
-  --color-accent-tertiary: #268c80;
-  --color-accent-glow: rgba(0, 69, 64, 0.15);
-  --shadow-auth: 0 25px 50px -12px rgba(0, 26, 23, 0.2), 0 0 0 1px rgba(0, 26, 23, 0.08);
-  --shadow-input-focus: 0 0 0 3px rgba(0, 69, 64, 0.12), 0 4px 12px rgba(0, 26, 23, 0.1);
-}
-
 body {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);

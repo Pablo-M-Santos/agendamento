@@ -6,15 +6,13 @@ import { useUserSettings } from '~/composables/useUserSettings'
 definePageMeta({ middleware: 'auth' })
 
 const { user, logout } = useAuth()
-const { settings, settingsSaving, availableLanguages, availableThemes, saveLanguage, saveTheme } =
+const { settings, settingsSaving, availableLanguages, saveLanguage } =
   useUserSettings()
 const { t } = useAppI18n()
 
-const isLightTheme = computed(() => settings.value.theme === 'light')
-const activeSavingSection = ref<'language' | 'theme' | null>(null)
+const activeSavingSection = ref<'language' | null>(null)
 
 type LanguageValue = (typeof availableLanguages)[number]['value']
-type ThemeValue = (typeof availableThemes)[number]['value']
 
 const inicial = computed(() => {
   const nome = user.value?.displayName?.trim()
@@ -26,23 +24,11 @@ const userName = computed(() => user.value?.displayName || t('profile.userFallba
 const userEmail = computed(() => user.value?.email || '--')
 
 const languageOptions = computed(() => availableLanguages)
-const themeOptions = computed<Array<{ value: ThemeValue; label: string }>>(() => {
-  return availableThemes.map((option) => ({
-    value: option.value,
-    label: t(`profile.${option.value}`)
-  }))
-})
 
 const languageFeedback = computed(() => {
   return settingsSaving.value && activeSavingSection.value === 'language'
     ? t('profile.savingLanguage')
     : t('profile.languageSaved')
-})
-
-const themeFeedback = computed(() => {
-  return settingsSaving.value && activeSavingSection.value === 'theme'
-    ? t('profile.savingTheme')
-    : t('profile.themeSaved')
 })
 
 const provedorConta = computed(() => {
@@ -73,37 +59,18 @@ const handleSelectLanguage = async (language: LanguageValue) => {
   }
 }
 
-const handleSelectTheme = async (theme: ThemeValue) => {
-  if (settings.value.theme === theme) return
-  activeSavingSection.value = 'theme'
-  try {
-    await saveTheme(theme)
-  } finally {
-    activeSavingSection.value = null
-  }
-}
-
 const onLanguageSelect = (value: string) => {
   if (!availableLanguages.some((option) => option.value === value)) return
   void handleSelectLanguage(value as LanguageValue)
 }
-
-const onThemeSelect = (value: string) => {
-  if (!availableThemes.some((option) => option.value === value)) return
-  void handleSelectTheme(value as ThemeValue)
-}
 </script>
 
 <template>
-  <div
-    class="min-h-screen transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
-  >
-    <ProfilePageHeader :is-light-theme="isLightTheme" :title="t('profile.title')" @back="voltar" />
+  <div class="min-h-screen transition-colors bg-[#003D7A] text-white">
+    <ProfilePageHeader :title="t('profile.title')" @back="voltar" />
 
     <main class="px-6 py-10 max-w-2xl mx-auto">
       <ProfileUserCard
-        :is-light-theme="isLightTheme"
         :photo-url="user?.photoURL"
         :name="userName"
         :email="userEmail"
@@ -112,7 +79,6 @@ const onThemeSelect = (value: string) => {
 
       <div class="mt-10 grid gap-5">
         <ProfileSettingsCard
-          :is-light-theme="isLightTheme"
           :title="t('profile.language')"
           :options="languageOptions"
           :selected-value="settings.language"
@@ -121,19 +87,7 @@ const onThemeSelect = (value: string) => {
           @select="onLanguageSelect"
         />
 
-        <ProfileSettingsCard
-          :is-light-theme="isLightTheme"
-          :title="t('profile.theme')"
-          :options="themeOptions"
-          :selected-value="settings.theme"
-          :disabled="settingsSaving"
-          :feedback="themeFeedback"
-          columns-class="grid-cols-2"
-          @select="onThemeSelect"
-        />
-
         <ProfileAccountInfoCard
-          :is-light-theme="isLightTheme"
           :title="t('profile.about')"
           :provider-label="t('profile.loginProvider')"
           :provider-value="provedorConta"
