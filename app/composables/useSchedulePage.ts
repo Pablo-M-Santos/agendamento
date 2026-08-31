@@ -5,11 +5,9 @@ import type { FirebaseError } from 'firebase/app'
 import type { AgendamentoForm } from '~/types/agendamento'
 import { useAuth } from '~/composables/useAuth'
 import { useAgendamentos, type Agendamento } from '~/composables/useAgendamentos'
-import { useUserSettings } from '~/composables/useUserSettings'
 
 export const useSchedulePage = () => {
   const { user } = useAuth()
-  const { settings } = useUserSettings()
   const route = useRoute()
   const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento } =
     useAgendamentos()
@@ -27,8 +25,7 @@ export const useSchedulePage = () => {
   const centralizacaoInicialFeita = ref(false)
   const centralizacaoInicialEmAndamento = ref(false)
 
-  const isLightTheme = computed(() => settings.value.theme === 'light')
-
+  
   const diasCarrossel = computed(() => {
     const inicio = startOfMonth(dataSelecionada.value)
     const fim = endOfMonth(dataSelecionada.value)
@@ -246,7 +243,6 @@ export const useSchedulePage = () => {
     isDetalhesOpen,
     agendamentoDetalhes,
     isConfirmOpen,
-    isLightTheme,
     diasCarrossel,
     agendamentosFiltrados,
     agendamentoAlvoIdNoDia,

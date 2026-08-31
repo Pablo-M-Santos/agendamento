@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 
 const {
-  isLightTheme,
   email,
   password,
   loading,
@@ -25,7 +24,7 @@ const emailariaDescribedBy = computed(() =>
 </script>
 
 <template>
-  <AuthPageShell :is-light-theme="isLightTheme" title="Entrar" subtitle="Acesse sua conta">
+  <AuthPageShell title="Entrar" subtitle="Acesse sua conta">
     <form novalidate @submit.prevent="loginWithEmail">
       <div class="mb-3 sm:mb-4">
         <label

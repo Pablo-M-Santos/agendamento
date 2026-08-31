@@ -2,7 +2,6 @@
 import { computed } from 'vue'
 
 const {
-  isLightTheme,
   email,
   password,
   loading,
@@ -26,7 +25,6 @@ const emailariaDescribedBy = computed(() =>
 
 <template>
   <AuthPageShell
-    :is-light-theme="isLightTheme"
     title="Criar Conta"
     subtitle="Preencha os dados para se cadastrar"
   >

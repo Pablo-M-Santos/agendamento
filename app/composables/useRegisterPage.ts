@@ -2,10 +2,7 @@ import { computed, reactive, ref } from 'vue'
 
 export const useRegisterPage = () => {
   const { loginWithGoogle: authLoginWithGoogle } = useAuth()
-  const { settings } = useUserSettings()
   const toast = useToast()
-
-  const isLightTheme = computed(() => settings.value.theme === 'light')
   const email = ref('')
   const password = ref('')
   const loading = ref(false)
@@ -129,7 +126,6 @@ export const useRegisterPage = () => {
   }
 
   return {
-    isLightTheme,
     email,
     password,
     loading,

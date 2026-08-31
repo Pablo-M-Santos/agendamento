@@ -4,9 +4,7 @@ import { format } from 'date-fns'
 import type { AgendamentoForm } from '~/types/agendamento'
 
 const { dateLocale } = useUserSettings()
-const { settings } = useUserSettings()
 const { t, language } = useAppI18n()
-const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const props = defineProps<{
   modelValue: boolean
@@ -153,27 +151,21 @@ const handleSalvar = () => {
     <Transition name="fade">
       <div
         v-if="modelValue"
-        class="fixed inset-0 backdrop-blur-sm z-[60]"
-        :class="isLightTheme ? 'bg-[#0B1F3A]/35' : 'bg-[#0A2A52]/85'"
+         class="fixed inset-0 backdrop-blur-sm z-[60] bg-[#0A2A52]/85"
       />
     </Transition>
 
     <Transition name="zoom-in">
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-[70] transition-colors"
-        :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+         class="fixed inset-0 z-[70] transition-colors bg-[#003D7A] text-white"
       >
         <div class="h-full flex flex-col">
           <header
-            class="px-6 pt-6 pb-4 border-b flex items-center justify-between"
-            :class="isLightTheme ? 'border-[#D8E7FF]' : 'border-white/15'"
+             class="px-6 pt-6 pb-4 border-b flex items-center justify-between border-white/15"
           >
             <div>
-              <p
-                class="text-[11px] font-black uppercase tracking-[0.2em]"
-                :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-white/70'"
-              >
+              <p class="text-[11px] font-black uppercase tracking-[0.2em] text-white/70">
                 {{ t('schedule.title') }}
               </p>
               <h3 class="text-2xl font-black mt-1">
@@ -181,21 +173,16 @@ const handleSalvar = () => {
                   agendamentoInicial ? t('schedule.modalTitleEdit') : t('schedule.modalTitleCreate')
                 }}
               </h3>
-              <p class="text-sm mt-1" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-white/80'">
+         <p class="text-sm mt-1 text-white/80">
                 {{ format(dataSelecionadaNoPai, dataHeaderFormat, { locale: dateLocale }) }}
               </p>
-              <p class="text-xs mt-1" :class="isLightTheme ? 'text-[#7A8FB1]' : 'text-white/60'">
+         <p class="text-xs mt-1 text-white/60">
                 {{ t('schedule.fillMainFields') }}
               </p>
             </div>
 
             <button
-              class="w-11 h-11 rounded-xl border flex items-center justify-center transition"
-              :class="
-                isLightTheme
-                  ? 'border-white/25 bg-[#003D7A] text-white hover:bg-[#003872]'
-                  : 'border-white/25 bg-white/10 hover:bg-white/20'
-              "
+             class="w-11 h-11 rounded-xl border flex items-center justify-center transition border-white/25 bg-white/10 hover:bg-white/20"
               :aria-label="t('schedule.closeForm')"
               @click="emit('update:modelValue', false)"
             >
@@ -217,25 +204,18 @@ const handleSalvar = () => {
           </header>
 
           <div class="flex-1 overflow-y-auto px-6 py-6 no-scrollbar space-y-6">
-            <section
-              class="rounded-3xl border p-5 space-y-4"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-[#00D3B8]/40 bg-[#00D3B8]/10'
-              "
-            >
+             <section
+               class="rounded-3xl border p-5 space-y-4 border-[#00D3B8]/40 bg-[#00D3B8]/10"
+             >
               <div class="flex items-center justify-between">
-                <h4
-                  class="text-sm font-black uppercase tracking-wider"
-                  :class="isLightTheme ? 'text-white' : 'text-[#B5FFF6]'"
-                >
+                 <h4
+                   class="text-sm font-black uppercase tracking-wider text-[#B5FFF6]"
+                 >
                   {{ t('schedule.mainData') }}
                 </h4>
-                <span
-                  class="text-[10px] font-black uppercase tracking-[0.18em]"
-                  :class="isLightTheme ? 'text-white/80' : 'text-[#B5FFF6]'"
-                >
+                 <span
+                   class="text-[10px] font-black uppercase tracking-[0.18em] text-[#B5FFF6]"
+                 >
                   {{ t('schedule.required') }}
                 </span>
               </div>
@@ -248,12 +228,7 @@ const handleSalvar = () => {
                   v-model="cliente"
                   type="text"
                   :placeholder="t('schedule.clientName')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
+                   class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold bg-white/8 border-white/30 text-white placeholder:text-white/45"
                 />
               </div>
 
@@ -266,12 +241,7 @@ const handleSalvar = () => {
                   type="text"
                   inputmode="numeric"
                   :placeholder="t('schedule.houseNumber')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
+                   class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold bg-white/8 border-white/30 text-white placeholder:text-white/45"
                 />
               </div>
 
@@ -283,23 +253,13 @@ const handleSalvar = () => {
                   v-model="endereco"
                   type="text"
                   :placeholder="t('schedule.clientAddress')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
+                   class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold bg-white/8 border-white/30 text-white placeholder:text-white/45"
                 />
               </div>
             </section>
 
             <section
-              class="rounded-3xl border p-5"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
+              class="rounded-3xl border p-5 border-white/20 bg-white/8"
             >
               <label class="text-[10px] font-black uppercase tracking-[0.18em] block mb-3">
                 {{ t('schedule.serviceTime') }}
@@ -313,9 +273,7 @@ const handleSalvar = () => {
                     'px-5 py-3 rounded-xl font-bold text-sm flex-shrink-0 border transition-all',
                     horaSelecionada === hora
                       ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                      : isLightTheme
-                        ? 'bg-white/10 border-white/25 text-white'
-                        : 'bg-white/10 border-white/25 text-white'
+                      : 'bg-white/10 border-white/25 text-white'
                   ]"
                   @click="horaSelecionada = hora"
                 >
@@ -442,12 +400,7 @@ const handleSalvar = () => {
                   v-model="telefone"
                   type="tel"
                   :placeholder="t('schedule.phone')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
+                   class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold bg-white/8 border-white/30 text-white placeholder:text-white/45"
                 />
               </div>
 
@@ -459,12 +412,7 @@ const handleSalvar = () => {
                   v-model="referencia"
                   type="text"
                   :placeholder="t('schedule.reference')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
+                   class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold bg-white/8 border-white/30 text-white placeholder:text-white/45"
                 />
               </div>
 

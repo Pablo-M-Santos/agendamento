@@ -11,16 +11,13 @@ import {
 import type { Agendamento } from '~/composables/useAgendamentos'
 import { useAgendamentos } from '~/composables/useAgendamentos'
 import { useAuth } from '~/composables/useAuth'
-import { useUserSettings } from '~/composables/useUserSettings'
 
 export type ReportsPeriod = '7d' | '30d' | 'mes'
 
 export const useReportsPage = () => {
   const { user } = useAuth()
   const { listarAgendamentos } = useAgendamentos()
-  const { settings } = useUserSettings()
 
-  const isLightTheme = computed(() => settings.value.theme === 'light')
   const periodoSelecionado = ref<ReportsPeriod>('30d')
   const carregando = ref(true)
   const agendamentos = ref<Agendamento[]>([])
@@ -182,7 +179,6 @@ export const useReportsPage = () => {
   })
 
   return {
-    isLightTheme,
     periodoSelecionado,
     carregando,
     totalAgendamentos,

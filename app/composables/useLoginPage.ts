@@ -8,10 +8,7 @@ export const useLoginPage = () => {
     loginWithGoogle: authLoginWithGoogle,
     sendSetPasswordEmail: authSendSetPasswordEmail
   } = useAuth()
-  const { settings } = useUserSettings()
   const toast = useToast()
-
-  const isLightTheme = computed(() => settings.value.theme === 'light')
   const email = ref('')
   const password = ref('')
   const loading = ref(false)
@@ -173,7 +170,6 @@ export const useLoginPage = () => {
   }
 
   return {
-    isLightTheme,
     email,
     password,
     loading,

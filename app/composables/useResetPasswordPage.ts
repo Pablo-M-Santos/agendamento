@@ -9,9 +9,7 @@ export const useResetPasswordPage = () => {
   const { $auth } = useNuxtApp()
   const route = useRoute()
   const toast = useToast()
-  const { settings } = useUserSettings()
 
-  const isLightTheme = computed(() => settings.value.theme === 'light')
   const loading = ref(true)
   const submitting = ref(false)
   const email = ref('')
@@ -76,7 +74,6 @@ export const useResetPasswordPage = () => {
   }
 
   return {
-    isLightTheme,
     loading,
     submitting,
     email,
