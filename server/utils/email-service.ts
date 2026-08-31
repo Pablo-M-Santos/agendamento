@@ -1,5 +1,5 @@
 import { sendEmail } from './mailpit'
-import { sendVerificationEmail as sendResendVerificationEmail } from './resend'
+import { sendResendVerificationEmail } from './resend'
 
 export interface SendVerificationEmailParams {
   to: string

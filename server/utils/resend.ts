@@ -23,7 +23,7 @@ interface SendVerificationEmailParams {
   appUrl: string
 }
 
-export async function sendVerificationEmail({
+export async function sendResendVerificationEmail({
   to,
   verificationLink,
   appUrl
