@@ -181,6 +181,7 @@ export const useReportsPage = () => {
   return {
     periodoSelecionado,
     carregando,
+    agendamentos,
     totalAgendamentos,
     totalFinalizados,
     totalNaoConcluidos,
