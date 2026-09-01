@@ -3,7 +3,6 @@ import { format } from 'date-fns'
 import type { Agendamento } from '~/composables/useAgendamentos'
 
 defineProps<{
-  isLightTheme: boolean
   items: Agendamento[]
   labels: {
     recentServices: string
@@ -28,10 +27,10 @@ const formatarDiaParaRota = (data: Agendamento['data']) => format(data.toDate(),
 <template>
   <section class="pb-24 md:pb-6">
     <div class="flex items-center mb-4">
-      <h3 class="font-black text-sm" :class="isLightTheme ? 'text-[#0B1F3A]' : 'text-white/90'">
+      <h3 class="font-black text-sm text-white/90">
         {{ labels.recentServices }}
       </h3>
-      <div class="flex-1 h-[1px] ml-4" :class="isLightTheme ? 'bg-[#D8E7FF]' : 'bg-white/15'" />
+      <div class="flex-1 h-[1px] ml-4 bg-white/15" />
     </div>
 
     <div v-if="items.length" class="space-y-3">
@@ -45,13 +44,11 @@ const formatarDiaParaRota = (data: Agendamento['data']) => format(data.toDate(),
             agendamento: item.id
           }
         }"
-        class="block p-4 rounded-2xl shadow-md active:scale-[0.99] transition"
-        :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-white/95 text-[#0B1F3A]'"
+        class="block p-4 rounded-2xl shadow-md active:scale-[0.99] transition bg-white/10 border border-[rgba(255,255,255,0.08)]"
       >
         <div class="flex items-center justify-between gap-3">
           <div
-            class="inline-flex items-center gap-2 px-3 py-2 rounded-xl"
-            :class="isLightTheme ? 'bg-white/15 text-white' : 'bg-[#E8F1FF] text-[#003D7A]'"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#4da69c]/20 text-[#80bfb8]"
           >
             <span class="text-[10px] font-black uppercase tracking-[0.14em]">{{
               labels.time
@@ -61,39 +58,31 @@ const formatarDiaParaRota = (data: Agendamento['data']) => format(data.toDate(),
 
           <span
             v-if="item.materialPronto === true"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-400 text-[#003D7A]"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#4da69c] text-[#001a17]"
           >
             {{ labels.materialReady }}
           </span>
           <span
             v-else-if="item.materialPronto === false"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-300 text-[#4A2C00]"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-400 text-[#4A2C00]"
           >
             {{ labels.noMaterial }}
           </span>
           <span
             v-else
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg"
-            :class="isLightTheme ? 'bg-white/15 text-white/80' : 'bg-[#E8F1FF] text-[#5B6B8A]'"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
           >
             {{ labels.noStatus }}
           </span>
         </div>
 
         <div
-          class="mt-3 rounded-xl border p-3"
-          :class="isLightTheme ? 'border-white/20 bg-white/10' : 'border-[#D8E7FF] bg-[#F4F8FF]'"
+          class="mt-3 rounded-xl border border-[rgba(255,255,255,0.1)] bg-white/5 p-3"
         >
-          <p
-            class="text-[10px] font-black uppercase tracking-[0.16em]"
-            :class="isLightTheme ? 'text-white/70' : 'text-[#5B6B8A]'"
-          >
+          <p class="text-[10px] font-black uppercase tracking-[0.16em] text-[#80bfb8]">
             {{ labels.address }}
           </p>
-          <p
-            class="text-sm font-bold mt-1 leading-relaxed"
-            :class="isLightTheme ? 'text-white' : 'text-[#0B1F3A]'"
-          >
+          <p class="text-sm font-bold mt-1 leading-relaxed text-white">
             {{ item.endereco || labels.addressNotInformed }}
             <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
           </p>
@@ -102,30 +91,25 @@ const formatarDiaParaRota = (data: Agendamento['data']) => format(data.toDate(),
         <div class="mt-3 flex justify-end">
           <span
             v-if="item.servicoConcluido === true"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#00D3B8] text-[#003D7A]"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#4da69c] text-[#001a17]"
           >
             {{ labels.serviceCompleted }}
           </span>
           <span
             v-else-if="item.servicoConcluido === false"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg"
-            :class="isLightTheme ? 'bg-white/20 text-white' : 'bg-[#DDE7FA] text-[#3F5170]'"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/15 text-white"
           >
             {{ labels.serviceOpen }}
           </span>
           <span
             v-else
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg"
-            :class="isLightTheme ? 'bg-white/15 text-white/80' : 'bg-[#E8F1FF] text-[#5B6B8A]'"
+            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
           >
             {{ labels.serviceNotCompleted }}
           </span>
         </div>
 
-        <div
-          class="mt-3 text-[11px] font-semibold text-right"
-          :class="isLightTheme ? 'text-white/70' : 'text-[#5B6B8A]'"
-        >
+        <div class="mt-3 text-[11px] font-semibold text-right text-[#80bfb8]">
           {{ formatarData(item.data) }}
         </div>
       </NuxtLink>
@@ -133,12 +117,7 @@ const formatarDiaParaRota = (data: Agendamento['data']) => format(data.toDate(),
 
     <div
       v-else
-      class="rounded-2xl p-6 text-center border"
-      :class="
-        isLightTheme
-          ? 'bg-white text-[#5B6B8A] border-[#D8E7FF]'
-          : 'bg-white/10 text-white/80 border-white/15'
-      "
+      class="rounded-2xl p-6 text-center border border-[rgba(255,255,255,0.1)] bg-white/5 text-[#80bfb8]"
     >
       {{ labels.noRecentServices }}
     </div>

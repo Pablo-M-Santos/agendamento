@@ -3,7 +3,6 @@ import { Bars3Icon } from '@heroicons/vue/24/outline'
 import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  isLightTheme: boolean
   greeting: string
   photoUrl?: string | null
   userInitial: string
@@ -28,27 +27,22 @@ watch(
 <template>
   <div class="relative mb-6 h-[56px] flex items-center justify-center">
     <button
-      class="absolute left-0 p-2 rounded-xl transition"
-      :class="props.isLightTheme ? 'hover:bg-[#E8F1FF]' : 'hover:bg-white/10'"
+      class="absolute left-0 p-2 rounded-xl transition hover:bg-white/10"
       :aria-label="props.openSidebarLabel"
       @click="emit('openSidebar')"
     >
-      <Bars3Icon class="w-7 h-7" />
+      <Bars3Icon class="w-7 h-7 text-white" />
     </button>
 
     <div class="text-center px-12">
-      <p
-        class="text-base font-black truncate"
-        :class="props.isLightTheme ? 'text-[#0B1F3A]' : 'text-white'"
-      >
+      <p class="text-base font-black truncate text-white">
         {{ props.greeting }}
       </p>
     </div>
 
     <NuxtLink
       to="/profile"
-      class="absolute right-0 w-11 h-11 rounded-[50%] overflow-hidden border flex items-center justify-center hover:scale-105 transition"
-      :class="props.isLightTheme ? 'border-[#D8E7FF] bg-white' : 'border-white/20 bg-white/10'"
+      class="absolute right-0 w-11 h-11 rounded-[50%] overflow-hidden border border-[rgba(255,255,255,0.2)] bg-white/10 flex items-center justify-center hover:scale-105 transition"
       :aria-label="props.goProfileLabel"
     >
       <img
@@ -58,11 +52,7 @@ watch(
         class="w-full h-full object-cover"
         @error="avatarLoadError = true"
       />
-      <span
-        v-else
-        class="text-sm font-black"
-        :class="props.isLightTheme ? 'text-[#003D7A]' : 'text-white'"
-      >
+      <span v-else class="text-sm font-black text-[#80bfb8]">
         {{ props.userInitial }}
       </span>
     </NuxtLink>
