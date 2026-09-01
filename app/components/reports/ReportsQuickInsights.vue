@@ -2,7 +2,6 @@
 import { CalendarDaysIcon, CheckBadgeIcon } from '@heroicons/vue/24/outline'
 
 defineProps<{
-  isLightTheme: boolean
   title: string
   busyDayLabel: string
   bestClientLabel: string
@@ -18,8 +17,7 @@ defineProps<{
 
 <template>
   <section
-    class="rounded-3xl border p-5 mb-10"
-    :class="isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'"
+    class="rounded-3xl border p-5 mb-10 border-white/20 bg-white/8"
   >
     <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
       {{ title }}
@@ -54,8 +52,7 @@ defineProps<{
         <div
           v-for="cliente in topClients"
           :key="cliente.cliente"
-          class="rounded-xl p-3 flex items-center justify-between border"
-          :class="isLightTheme ? 'bg-white/10 border-white/15' : 'bg-white/8 border-white/15'"
+          class="rounded-xl p-3 flex items-center justify-between border bg-white/8 border-white/15"
         >
           <span class="font-bold text-sm truncate pr-3">{{ cliente.cliente }}</span>
           <span class="text-xs font-black uppercase tracking-[0.14em] text-[#B5FFF6]">

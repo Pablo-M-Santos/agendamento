@@ -1,6 +1,5 @@
 <script setup lang="ts">
 defineProps<{
-  isLightTheme: boolean
   bookingsLabel: string
   completedLabel: string
   unfinishedLabel: string
@@ -15,12 +14,10 @@ defineProps<{
 <template>
   <section class="grid grid-cols-2 gap-3 mb-6">
     <article
-      class="rounded-2xl p-4 shadow-sm"
-      :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-white/95 text-[#0B1F3A]'"
+      class="rounded-2xl p-4 shadow-sm bg-white/95 text-[#001a17]"
     >
       <p
-        class="text-[10px] uppercase tracking-[0.16em] font-black"
-        :class="isLightTheme ? 'text-white/75' : 'text-[#56709A]'"
+        class="text-[10px] uppercase tracking-[0.16em] font-black text-[#56709A]"
       >
         {{ bookingsLabel }}
       </p>
@@ -28,8 +25,7 @@ defineProps<{
     </article>
 
     <article
-      class="rounded-2xl p-4 shadow-sm"
-      :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-[#00D3B8] text-[#003D7A]'"
+      class="rounded-2xl p-4 shadow-sm bg-[#00D3B8] text-[#001a17]"
     >
       <p class="text-[10px] uppercase tracking-[0.16em] font-black">
         {{ completedLabel }}
@@ -38,10 +34,7 @@ defineProps<{
     </article>
 
     <article
-      class="rounded-2xl border p-4 shadow-sm"
-      :class="
-        isLightTheme ? 'bg-[#003D7A] border-white/20 text-white' : 'bg-white/12 border-white/20'
-      "
+      class="rounded-2xl border p-4 shadow-sm bg-white/12 border-white/20"
     >
       <p class="text-[10px] uppercase tracking-[0.16em] font-black text-white/75">
         {{ unfinishedLabel }}
@@ -50,8 +43,7 @@ defineProps<{
     </article>
 
     <article
-      class="rounded-2xl p-4 shadow-sm"
-      :class="isLightTheme ? 'bg-[#003D7A] text-white' : 'bg-[#E8F1FF] text-[#3F5170]'"
+      class="rounded-2xl p-4 shadow-sm bg-[#E8F1FF] text-[#3F5170]"
     >
       <p class="text-[10px] uppercase tracking-[0.16em] font-black">
         {{ materialReadyLabel }}
