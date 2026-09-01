@@ -3,12 +3,10 @@ definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { user } = useAuth()
 const { listarAgendamentos } = useAgendamentos()
-const { settings } = useUserSettings()
 const { t } = useAppI18n()
 
 const agendamentos = ref<Agendamento[]>([])
 const isSidebarOpen = ref(false)
-const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const isGoogleLogin = computed(() => {
   return user.value?.providerData?.some((provider) => provider.providerId === 'google.com') ?? false
@@ -69,12 +67,8 @@ const labelsRecentes = computed(() => ({
 </script>
 
 <template>
-  <div
-    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
-  >
+  <div class="h-full p-5 overflow-y-auto overflow-x-hidden bg-[#001a17] text-white">
     <DashboardTopBar
-      :is-light-theme="isLightTheme"
       :greeting="saudacaoDashboard"
       :photo-url="user?.photoURL"
       :user-initial="inicialUsuario"
@@ -91,7 +85,6 @@ const labelsRecentes = computed(() => ({
     />
 
     <DashboardRecentServicesSection
-      :is-light-theme="isLightTheme"
       :items="ultimosServicos"
       :labels="labelsRecentes"
     />

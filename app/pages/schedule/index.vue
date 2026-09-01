@@ -8,7 +8,6 @@ const {
   isDetalhesOpen,
   agendamentoDetalhes,
   isConfirmOpen,
-  isLightTheme,
   diasCarrossel,
   agendamentosFiltrados,
   agendamentoAlvoIdNoDia,
@@ -24,8 +23,7 @@ const {
 
 <template>
   <div
-    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors bg-[#001a17] text-white"
   >
     <ScheduleHeader :data-selecionada="dataSelecionada" @add="abrirModal()" />
 

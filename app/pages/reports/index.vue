@@ -7,7 +7,6 @@ definePageMeta({ middleware: 'auth', layout: 'app' })
 const { t } = useAppI18n()
 
 const {
-  isLightTheme,
   periodoSelecionado,
   carregando,
   totalAgendamentos,
@@ -35,11 +34,9 @@ const handlePeriodoSelect = (periodo: string) => {
 
 <template>
   <div
-    class="h-screen overflow-y-auto p-5 transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+    class="h-screen overflow-y-auto p-5 transition-colors bg-[#001a17] text-white"
   >
     <ReportsPageHeader
-      :is-light-theme="isLightTheme"
       :title="t('reports.title')"
       :subtitle="t('reports.subtitle')"
       :back-to-dashboard-label="t('common.backToDashboard')"
@@ -50,17 +47,13 @@ const handlePeriodoSelect = (periodo: string) => {
 
     <section
       v-if="carregando"
-      class="rounded-3xl border p-6 text-center"
-      :class="
-        isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
-      "
+      class="rounded-3xl border p-6 text-center border-white/20 bg-white/8"
     >
       <p class="font-black uppercase tracking-[0.16em] text-sm">{{ t('reports.loading') }}</p>
     </section>
 
     <template v-else>
       <ReportsSummaryCards
-        :is-light-theme="isLightTheme"
         :bookings-label="t('reports.card.bookings')"
         :completed-label="t('reports.card.completedService')"
         :unfinished-label="t('reports.card.unfinishedService')"
@@ -72,16 +65,12 @@ const handlePeriodoSelect = (periodo: string) => {
       />
 
       <section
-        class="rounded-3xl border p-5 mb-6"
-        :class="
-          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/10'
-        "
+        class="rounded-3xl border p-5 mb-6 border-white/20 bg-white/10"
       >
         <div class="flex items-start justify-between gap-3">
           <div>
             <p
-              class="text-[10px] uppercase tracking-[0.16em] font-black"
-              :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
+              class="text-[10px] uppercase tracking-[0.16em] font-black text-white/70"
             >
               {{ t('reports.completionRate') }}
             </p>
@@ -95,8 +84,7 @@ const handlePeriodoSelect = (periodo: string) => {
         </div>
 
         <div
-          class="mt-4 h-3 rounded-full overflow-hidden"
-          :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+          class="mt-4 h-3 rounded-full overflow-hidden bg-white/15"
         >
           <div
             class="h-full bg-gradient-to-r from-[#00D3B8] to-[#24E6CE]"
@@ -106,18 +94,14 @@ const handlePeriodoSelect = (periodo: string) => {
       </section>
 
       <section
-        class="rounded-3xl border p-5 mb-6"
-        :class="
-          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
-        "
+        class="rounded-3xl border p-5 mb-6 border-white/20 bg-white/8"
       >
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-sm font-black uppercase tracking-[0.16em]">
             {{ t('reports.dailyEvolution') }}
           </h2>
           <span
-            class="text-[10px] uppercase tracking-[0.16em]"
-            :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
+            class="text-[10px] uppercase tracking-[0.16em] text-white/70"
             >{{ t('reports.totalVsCompleted') }}</span
           >
         </div>
@@ -131,8 +115,7 @@ const handlePeriodoSelect = (periodo: string) => {
             >
               <div class="h-24 flex items-end gap-[3px]">
                 <div
-                  class="w-3 rounded-md"
-                  :class="isLightTheme ? 'bg-white/35' : 'bg-white/35'"
+                  class="w-3 rounded-md bg-white/35"
                   :style="{ height: `${dia.alturaTotal}px` }"
                 />
                 <div
@@ -141,8 +124,7 @@ const handlePeriodoSelect = (periodo: string) => {
                 />
               </div>
               <span
-                class="text-[10px] font-bold"
-                :class="isLightTheme ? 'text-white/70' : 'text-white/70'"
+                class="text-[10px] font-bold text-white/70"
                 >{{ dia.label }}</span
               >
             </div>
@@ -151,10 +133,7 @@ const handlePeriodoSelect = (periodo: string) => {
       </section>
 
       <section
-        class="rounded-3xl border p-5 mb-7"
-        :class="
-          isLightTheme ? 'border-white/20 bg-[#003D7A] text-white' : 'border-white/20 bg-white/8'
-        "
+        class="rounded-3xl border p-5 mb-7 border-white/20 bg-white/8"
       >
         <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
           {{ t('reports.material') }}
@@ -163,15 +142,13 @@ const handlePeriodoSelect = (periodo: string) => {
         <div class="space-y-4 text-xs font-bold">
           <div>
             <div
-              class="flex justify-between mb-1"
-              :class="isLightTheme ? 'text-white/80' : 'text-white/80'"
+              class="flex justify-between mb-1 text-white/80"
             >
               <span>{{ t('reports.materialReady') }}</span
               ><span>{{ materialResumo.pronto }}</span>
             </div>
             <div
-              class="h-2 rounded-full overflow-hidden"
-              :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+              class="h-2 rounded-full overflow-hidden bg-white/15"
             >
               <div
                 class="h-full bg-[#00D3B8]"
@@ -184,15 +161,13 @@ const handlePeriodoSelect = (periodo: string) => {
 
           <div>
             <div
-              class="flex justify-between mb-1"
-              :class="isLightTheme ? 'text-white/80' : 'text-white/80'"
+              class="flex justify-between mb-1 text-white/80"
             >
               <span>{{ t('reports.noMaterial') }}</span
               ><span>{{ materialResumo.semMaterial }}</span>
             </div>
             <div
-              class="h-2 rounded-full overflow-hidden"
-              :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+              class="h-2 rounded-full overflow-hidden bg-white/15"
             >
               <div
                 class="h-full bg-[#F7C65E]"
@@ -205,15 +180,13 @@ const handlePeriodoSelect = (periodo: string) => {
 
           <div>
             <div
-              class="flex justify-between mb-1"
-              :class="isLightTheme ? 'text-white/80' : 'text-white/80'"
+              class="flex justify-between mb-1 text-white/80"
             >
               <span>{{ t('reports.notInformed') }}</span
               ><span>{{ materialResumo.naoInformado }}</span>
             </div>
             <div
-              class="h-2 rounded-full overflow-hidden"
-              :class="isLightTheme ? 'bg-white/20' : 'bg-white/15'"
+              class="h-2 rounded-full overflow-hidden bg-white/15"
             >
               <div
                 class="h-full bg-white/45"
@@ -227,7 +200,6 @@ const handlePeriodoSelect = (periodo: string) => {
       </section>
 
       <ReportsQuickInsights
-        :is-light-theme="isLightTheme"
         :title="t('reports.quickInsights')"
         :busy-day-label="t('reports.busyDay')"
         :best-client-label="t('reports.bestClient')"

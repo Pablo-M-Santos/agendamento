@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const {
-  isLightTheme,
   loading,
   submitting,
   email,
@@ -17,11 +16,10 @@ const {
 
 <template>
   <AuthPageShell
-    :is-light-theme="isLightTheme"
     title="Definir senha"
     subtitle="Finalize o acesso com email e senha"
   >
-    <div v-if="loading" :class="isLightTheme ? 'text-[#003D7A]' : 'text-white'">
+    <div v-if="loading" class="text-white">
       Validando link...
     </div>
 
@@ -32,7 +30,7 @@ const {
     <div v-else-if="success" class="text-green-300">Senha atualizada com sucesso!</div>
 
     <form v-else class="text-left" @submit.prevent="submit">
-      <p class="text-sm mb-4" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-gray-300'">
+      <p class="text-sm mb-4 text-gray-300">
         Conta: {{ email }}
       </p>
 
