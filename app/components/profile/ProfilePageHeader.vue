@@ -1,6 +1,5 @@
 <script setup lang="ts">
 defineProps<{
-  isLightTheme: boolean
   title: string
 }>()
 
@@ -11,12 +10,10 @@ const emit = defineEmits<{
 
 <template>
   <header
-    class="sticky top-0 z-20 p-6 flex items-center gap-4 border-b backdrop-blur-sm"
-    :class="isLightTheme ? 'border-[#D8E7FF]' : 'border-white/10'"
+    class="sticky top-0 z-20 p-6 flex items-center gap-4 border-b backdrop-blur-sm border-white/10"
   >
     <button
-      class="p-2 rounded-full transition-colors active:scale-95"
-      :class="isLightTheme ? 'hover:bg-[#E8F1FF]' : 'hover:bg-white/10'"
+      class="p-2 rounded-full transition-colors active:scale-95 hover:bg-white/10"
       @click="emit('back')"
     >
       <svg

@@ -2,7 +2,6 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  isLightTheme: boolean
   photoUrl?: string | null
   name: string
   email?: string | null
@@ -21,21 +20,14 @@ watch(
 
 <template>
   <section
-    class="relative overflow-hidden flex flex-col items-center p-8 rounded-[2rem] border shadow-2xl transition-colors"
-    :class="isLightTheme ? 'bg-white border-[#D8E7FF]' : 'bg-white/10 border-white/10'"
+    class="relative overflow-hidden flex flex-col items-center p-8 rounded-[2rem] border shadow-2xl transition-colors bg-white/10 border-white/10"
   >
     <div
-      class="pointer-events-none absolute inset-0"
-      :class="
-        isLightTheme
-          ? 'bg-[radial-gradient(circle_at_top,_rgba(79,156,255,0.18),_transparent_55%)]'
-          : 'bg-[radial-gradient(circle_at_top,_rgba(181,255,246,0.15),_transparent_55%)]'
-      "
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(181,255,246,0.15),_transparent_55%)]"
     />
 
     <div
-      class="relative z-10 w-24 h-24 rounded-full border-4 border-[#00D3B8] flex items-center justify-center overflow-hidden mb-6"
-      :class="isLightTheme ? 'bg-[#E8F1FF]' : 'bg-[#0B2C54]'"
+      class="relative z-10 w-24 h-24 rounded-full border-4 border-[#00D3B8] flex items-center justify-center overflow-hidden mb-6 bg-[#0B2C54]"
     >
       <img
         v-if="photoUrl && !avatarLoadError"
@@ -46,8 +38,7 @@ watch(
       />
       <span
         v-else
-        class="text-4xl font-black"
-        :class="isLightTheme ? 'text-[#003D7A]' : 'text-white'"
+        class="text-4xl font-black text-white"
       >
         {{ initial }}
       </span>
@@ -58,8 +49,7 @@ watch(
         {{ name }}
       </h2>
       <p
-        class="max-w-[280px] mx-auto px-1 text-xs sm:text-sm font-semibold tracking-[0.08em] break-all"
-        :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-white/60'"
+        class="max-w-[280px] mx-auto px-1 text-xs sm:text-sm font-semibold tracking-[0.08em] break-all text-white/60"
       >
         {{ email || '--' }}
       </p>
