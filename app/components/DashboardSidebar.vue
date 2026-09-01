@@ -91,7 +91,7 @@ const links = computed(() => [
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3 min-w-0">
               <div
-                 class="w-12 h-12 rounded-[50%] overflow-hidden border flex items-center justify-center bg-white/10 border-[rgba(255,255,255,0.15)]"
+                 class="w-12 h-12 rounded-full overflow-hidden border-2 flex items-center justify-center bg-[#4da69c]/20 border-[#4da69c]/50 flex-shrink-0"
               >
                 <img
                   v-if="user?.photoURL && !avatarLoadError"
@@ -123,12 +123,12 @@ const links = computed(() => [
               v-for="item in links"
               :key="item.to"
               :to="item.to"
-           class="flex items-center gap-3 px-4 py-3 rounded-xl transition"
-           :class="
-             isActive(item.to)
-               ? 'bg-[#4da69c] text-[#001a17]'
-               : 'text-[#b3d9d4] hover:bg-white/10 hover:text-white'
-           "
+            class="flex items-center gap-3 px-4 py-3 rounded-xl transition"
+            :class="
+              isActive(item.to)
+                ? 'bg-white text-[#001a17]'
+                : 'text-[#b3d9d4] hover:bg-white/10 hover:text-white'
+            "
               @click="close"
             >
               <component :is="item.icon" class="w-5 h-5" />
