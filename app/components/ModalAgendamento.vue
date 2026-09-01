@@ -151,14 +151,14 @@ const handleSalvar = () => {
     <Transition name="fade">
       <div
         v-if="modelValue"
-         class="fixed inset-0 backdrop-blur-sm z-[60] bg-[#0A2A52]/85"
+         class="fixed inset-0 backdrop-blur-sm z-[60] bg-[#001a17]/85"
       />
     </Transition>
 
     <Transition name="zoom-in">
       <div
         v-if="modelValue"
-         class="fixed inset-0 z-[70] transition-colors bg-[#003D7A] text-white"
+         class="fixed inset-0 z-[70] transition-colors bg-[#002e29] text-white"
       >
         <div class="h-full flex flex-col">
           <header
@@ -272,7 +272,7 @@ const handleSalvar = () => {
                   :class="[
                     'px-5 py-3 rounded-xl font-bold text-sm flex-shrink-0 border transition-all',
                     horaSelecionada === hora
-                      ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
+                      ? 'bg-[#00D3B8] border-[#00D3B8] text-[#001a17]'
                       : 'bg-white/10 border-white/25 text-white'
                   ]"
                   @click="horaSelecionada = hora"
@@ -283,19 +283,14 @@ const handleSalvar = () => {
             </section>
 
             <section
-              class="rounded-3xl border p-5"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
+              class="rounded-3xl border p-5 border-white/20 bg-white/8"
             >
               <div class="flex items-center justify-between gap-4">
                 <div>
                   <p class="text-sm font-black uppercase tracking-wider">
                     {{ t('schedule.materialReadyQuestion') }}
                   </p>
-                  <p class="text-xs mt-1" :class="isLightTheme ? 'text-white/70' : 'text-white/70'">
+                  <p class="text-xs mt-1 text-white/70">
                     {{ t('schedule.materialReadyHint') }}
                   </p>
                 </div>
@@ -305,10 +300,8 @@ const handleSalvar = () => {
                     class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
                     :class="
                       materialPronto === true
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#001a17]'
+                        : 'bg-white/10 border-white/30 text-white'
                     "
                     @click="materialPronto = true"
                   >
@@ -318,10 +311,8 @@ const handleSalvar = () => {
                     class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
                     :class="
                       materialPronto === false
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#001a17]'
+                        : 'bg-white/10 border-white/30 text-white'
                     "
                     @click="materialPronto = false"
                   >
@@ -332,19 +323,14 @@ const handleSalvar = () => {
             </section>
 
             <section
-              class="rounded-3xl border p-5"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
+              class="rounded-3xl border p-5 border-white/20 bg-white/8"
             >
               <div class="flex items-center justify-between gap-4">
                 <div>
                   <p class="text-sm font-black uppercase tracking-wider">
                     {{ t('schedule.serviceStatusQuestion') }}
                   </p>
-                  <p class="text-xs mt-1" :class="isLightTheme ? 'text-white/70' : 'text-white/70'">
+                  <p class="text-xs mt-1 text-white/70">
                     {{ t('schedule.serviceStatusHint') }}
                   </p>
                 </div>
@@ -354,10 +340,8 @@ const handleSalvar = () => {
                     class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
                     :class="
                       servicoConcluido === true
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#001a17]'
+                        : 'bg-white/10 border-white/30 text-white'
                     "
                     @click="servicoConcluido = true"
                   >
@@ -367,10 +351,8 @@ const handleSalvar = () => {
                     class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
                     :class="
                       servicoConcluido === false
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
+                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#001a17]'
+                        : 'bg-white/10 border-white/30 text-white'
                     "
                     @click="servicoConcluido = false"
                   >
@@ -381,12 +363,7 @@ const handleSalvar = () => {
             </section>
 
             <section
-              class="rounded-3xl border p-5 space-y-4"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
+              class="rounded-3xl border p-5 space-y-4 border-white/20 bg-white/8"
             >
               <h4 class="text-sm font-black uppercase tracking-wider">
                 {{ t('schedule.optionalFields') }}
@@ -424,12 +401,7 @@ const handleSalvar = () => {
                   v-model="descricao"
                   rows="3"
                   :placeholder="t('schedule.serviceDetails')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold resize-none"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
+                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold resize-none bg-white/8 border-white/30 text-white placeholder:text-white/45"
                 />
               </div>
 
@@ -441,36 +413,25 @@ const handleSalvar = () => {
                   v-model="observacoes"
                   rows="2"
                   :placeholder="t('schedule.notes')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold resize-none"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
+                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold resize-none bg-white/8 border-white/30 text-white placeholder:text-white/45"
                 />
               </div>
             </section>
           </div>
 
           <footer
-            class="px-6 py-4 border-t"
-            :class="isLightTheme ? 'border-white/15 bg-[#003870]' : 'border-white/15 bg-[#003870]'"
+            class="px-6 py-4 border-t border-white/15 bg-[#002e29]"
           >
             <div class="grid grid-cols-2 gap-3">
               <button
-                class="py-4 rounded-2xl border font-black text-sm"
-                :class="
-                  isLightTheme
-                    ? 'border-white/25 bg-white/10 text-white'
-                    : 'border-white/25 bg-white/10 text-white'
-                "
+                class="py-4 rounded-2xl border font-black text-sm border-white/25 bg-white/10 text-white"
                 @click="emit('update:modelValue', false)"
               >
                 {{ t('schedule.cancel') }}
               </button>
 
               <button
-                class="py-4 rounded-2xl bg-[#00D3B8] text-[#003D7A] font-black text-sm shadow-xl active:scale-[0.99] transition-all"
+                class="py-4 rounded-2xl bg-[#00D3B8] text-[#001a17] font-black text-sm shadow-xl active:scale-[0.99] transition-all"
                 @click="handleSalvar"
               >
                 {{ agendamentoInicial ? t('schedule.saveChanges') : t('schedule.confirmService') }}

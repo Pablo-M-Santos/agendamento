@@ -70,7 +70,7 @@ const links = computed(() => [
       >
         <button
           v-if="props.modelValue"
-          class="absolute inset-0 bg-black/50 pointer-events-auto"
+          class="absolute inset-0 bg-black/60 pointer-events-auto"
           :aria-label="t('sidebar.closeMenu')"
           @click="close"
         />
@@ -86,12 +86,12 @@ const links = computed(() => [
       >
         <aside
           v-if="props.modelValue"
-          class="relative w-80 max-w-[85vw] h-full p-6 flex flex-col pointer-events-auto transition-colors bg-[#0B2F66] text-white"
+          class="relative w-80 max-w-[85vw] h-full p-6 flex flex-col pointer-events-auto bg-[#002e29] text-white"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3 min-w-0">
               <div
-                 class="w-12 h-12 rounded-[50%] overflow-hidden border flex items-center justify-center bg-white/10 border-white/15"
+                 class="w-12 h-12 rounded-[50%] overflow-hidden border flex items-center justify-center bg-white/10 border-[rgba(255,255,255,0.15)]"
               >
                 <img
                   v-if="user?.photoURL && !avatarLoadError"
@@ -100,7 +100,7 @@ const links = computed(() => [
                   class="w-full h-full object-cover"
                   @error="avatarLoadError = true"
                 />
-                <span v-else class="text-base font-black">{{ initials }}</span>
+                <span v-else class="text-base font-black text-[#80bfb8]">{{ initials }}</span>
               </div>
               <p
              class="text-sm font-bold truncate text-white"
@@ -118,7 +118,7 @@ const links = computed(() => [
             </button>
           </div>
 
-          <nav class="mt-15 space-y-2">
+          <nav class="mt-4 space-y-2">
             <NuxtLink
               v-for="item in links"
               :key="item.to"
@@ -126,8 +126,8 @@ const links = computed(() => [
            class="flex items-center gap-3 px-4 py-3 rounded-xl transition"
            :class="
              isActive(item.to)
-               ? 'bg-white/90 text-[#0B2F66]'
-               : 'text-white/85 hover:bg-white/10 hover:text-white'
+               ? 'bg-[#4da69c] text-[#001a17]'
+               : 'text-[#b3d9d4] hover:bg-white/10 hover:text-white'
            "
               @click="close"
             >
@@ -137,7 +137,7 @@ const links = computed(() => [
           </nav>
 
           <div
-             class="mt-auto pt-6 border-t border-white/10"
+             class="mt-auto pt-6 border-t border-[rgba(255,255,255,0.1)]"
           >
             <button
                class="w-full flex items-center justify-start gap-2 px-4 py-3 rounded-xl transition font-bold bg-white/10 text-white hover:bg-white/20"
