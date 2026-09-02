@@ -9,7 +9,7 @@ import { useAgendamentos, type Agendamento } from '~/composables/useAgendamentos
 export const useSchedulePage = () => {
   const { user } = useAuth()
   const route = useRoute()
-  const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento } =
+  const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento, atualizarStatus } =
     useAgendamentos()
 
   const agendamentos = ref<Agendamento[]>([])
@@ -117,6 +117,18 @@ export const useSchedulePage = () => {
   const abrirEdicaoPelosDetalhes = (item: Agendamento) => {
     isDetalhesOpen.value = false
     abrirModal(item)
+  }
+
+  const toggleServicoConcluido = async (item: Agendamento) => {
+    if (!item.id) return
+    const novoStatus = item.servicoConcluido === true ? false : true
+    try {
+      await atualizarStatus(item.id, { servicoConcluido: novoStatus })
+      await carregarAgendamentos()
+    } catch (error: unknown) {
+      const err = error as FirebaseError
+      console.error('Erro ao atualizar status:', err)
+    }
   }
 
   const handleSalvarAgendamento = async (dados: AgendamentoForm) => {
@@ -252,6 +264,7 @@ export const useSchedulePage = () => {
     abrirModal,
     abrirDetalhes,
     abrirEdicaoPelosDetalhes,
-    handleSalvarAgendamento
+    handleSalvarAgendamento,
+    toggleServicoConcluido
   }
 }

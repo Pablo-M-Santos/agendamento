@@ -131,6 +131,17 @@ export const useAgendamentos = () => {
     })
   }
 
+  const atualizarStatus = async (
+    id: string,
+    status: { servicoConcluido?: boolean | null; materialPronto?: boolean | null }
+  ) => {
+    if (!user.value?.uid) throw new Error('Usuario nao autenticado')
+
+    await updateDoc(doc($db, 'agendamentos', id), {
+      ...status
+    })
+  }
+
   const listarAgendamentos = async (): Promise<Agendamento[]> => {
     if (!user.value) return []
 
@@ -152,6 +163,7 @@ export const useAgendamentos = () => {
     criarAgendamento,
     listarAgendamentos,
     excluirAgendamento,
-    editarAgendamento
+    editarAgendamento,
+    atualizarStatus
   }
 }

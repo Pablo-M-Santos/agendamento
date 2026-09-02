@@ -84,16 +84,21 @@ onBeforeUnmount(() => {
       :class="[
         'relative flex flex-col items-center min-w-[65px] py-4 rounded-[10px] transition-all duration-300 snap-center',
         isSameDay(dia, dataSelecionada)
-          ? 'bg-[#FBFBFB] text-white scale-110 shadow-md'
+          ? 'bg-white text-[#001a17] scale-110 shadow-md'
           : eHoje(dia)
-            ? 'border-2 border-white text-white font-bold'
+            ? 'border-2 border-[#4da69c] text-[#4da69c] font-bold'
             : 'border-2 border-transparent text-white hover:bg-white/10'
       ]"
       @click="handleClickDia(dia)"
     >
       <div
         v-if="getQuantidadePorDia(dia) > 0"
-        class="absolute -top-3 bg-green-500 text-black text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md"
+        :class="[
+          'absolute -top-3 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md',
+          isSameDay(dia, dataSelecionada)
+            ? 'bg-[#4da69c] text-white'
+            : 'bg-white text-[#001a17]'
+        ]"
       >
         {{ getQuantidadePorDia(dia) }}
       </div>

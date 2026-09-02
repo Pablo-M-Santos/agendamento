@@ -7,23 +7,21 @@ const {
   agendamentoParaEditar,
   isDetalhesOpen,
   agendamentoDetalhes,
-  isConfirmOpen,
   diasCarrossel,
   agendamentosFiltrados,
   agendamentoAlvoIdNoDia,
   quantidadePorDia,
-  abrirModalConfirmacao,
-  confirmarExclusao,
   abrirModal,
   abrirDetalhes,
   abrirEdicaoPelosDetalhes,
-  handleSalvarAgendamento
+  handleSalvarAgendamento,
+  toggleServicoConcluido
 } = useSchedulePage()
 </script>
 
 <template>
   <div
-    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors bg-[#001a17] text-white"
+    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17] text-white"
   >
     <ScheduleHeader :data-selecionada="dataSelecionada" @add="abrirModal()" />
 
@@ -39,7 +37,7 @@ const {
       :highlighted-id="agendamentoAlvoIdNoDia"
       @details="abrirDetalhes"
       @edit="abrirModal"
-      @delete="abrirModalConfirmacao"
+      @toggle-completed="toggleServicoConcluido"
     />
 
     <ScheduleServiceDetailsModal
@@ -54,7 +52,5 @@ const {
       :data-selecionada-no-pai="dataSelecionada"
       @salvar="handleSalvarAgendamento"
     />
-
-    <ScheduleConfirmDeleteModal v-model="isConfirmOpen" @confirm="confirmarExclusao" />
   </div>
 </template>

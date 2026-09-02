@@ -14,41 +14,41 @@ defineProps<{
 <template>
   <section class="grid grid-cols-2 gap-3 mb-6">
     <article
-      class="rounded-2xl p-4 shadow-sm bg-white/95 text-[#001a17]"
+      class="rounded-2xl p-4 bg-[#003733]/50 border border-[#4da69c]/20"
     >
       <p
-        class="text-[10px] uppercase tracking-[0.16em] font-black text-[#56709A]"
+        class="text-[10px] uppercase tracking-[0.16em] font-black text-[#80bfb8]"
       >
         {{ bookingsLabel }}
       </p>
-      <p class="text-2xl font-black mt-1">{{ totalBookings }}</p>
+      <p class="text-2xl font-black mt-1 text-white">{{ totalBookings }}</p>
     </article>
 
     <article
-      class="rounded-2xl p-4 shadow-sm bg-[#00D3B8] text-[#001a17]"
+      class="rounded-2xl p-4 bg-emerald-500/20 border border-emerald-500/30"
     >
-      <p class="text-[10px] uppercase tracking-[0.16em] font-black">
+      <p class="text-[10px] uppercase tracking-[0.16em] font-black text-emerald-300">
         {{ completedLabel }}
       </p>
-      <p class="text-2xl font-black mt-1">{{ totalCompleted }}</p>
+      <p class="text-2xl font-black mt-1 text-white">{{ totalCompleted }}</p>
     </article>
 
     <article
-      class="rounded-2xl border p-4 shadow-sm bg-white/12 border-white/20"
+      class="rounded-2xl p-4 bg-sky-500/20 border border-sky-500/30"
     >
-      <p class="text-[10px] uppercase tracking-[0.16em] font-black text-white/75">
+      <p class="text-[10px] uppercase tracking-[0.16em] font-black text-sky-300">
         {{ unfinishedLabel }}
       </p>
-      <p class="text-2xl font-black mt-1">{{ totalUnfinished }}</p>
+      <p class="text-2xl font-black mt-1 text-white">{{ totalUnfinished }}</p>
     </article>
 
     <article
-      class="rounded-2xl p-4 shadow-sm bg-[#E8F1FF] text-[#3F5170]"
+      class="rounded-2xl p-4 bg-[#4da69c]/20 border border-[#4da69c]/30"
     >
-      <p class="text-[10px] uppercase tracking-[0.16em] font-black">
+      <p class="text-[10px] uppercase tracking-[0.16em] font-black text-[#80bfb8]">
         {{ materialReadyLabel }}
       </p>
-      <p class="text-2xl font-black mt-1">{{ totalMaterialReady }}</p>
+      <p class="text-2xl font-black mt-1 text-white">{{ totalMaterialReady }}</p>
     </article>
   </section>
 </template>

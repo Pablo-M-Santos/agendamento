@@ -66,7 +66,7 @@ const onLanguageSelect = (value: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen transition-colors bg-[#003D7A] text-white">
+  <div class="min-h-screen bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17] text-white">
     <ProfilePageHeader :title="t('profile.title')" @back="voltar" />
 
     <main class="px-6 py-10 max-w-2xl mx-auto">
@@ -96,7 +96,7 @@ const onLanguageSelect = (value: string) => {
         />
 
         <button
-          class="w-full py-5 rounded-2xl border-2 border-red-500/25 text-red-500 font-black uppercase tracking-[0.2em] text-xs active:scale-95 transition-all"
+          class="w-full py-5 rounded-2xl border-2 border-red-500/25 text-red-400 font-black uppercase tracking-[0.2em] text-xs active:scale-95 transition-all hover:bg-red-500/10"
           @click="logout"
         >
           {{ t('profile.logout') }}

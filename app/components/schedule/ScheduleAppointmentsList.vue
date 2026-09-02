@@ -12,8 +12,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'details' | 'edit', item: Agendamento): void
-  (e: 'delete', id: string): void
+  (e: 'details' | 'edit' | 'toggle-completed', item: Agendamento): void
 }>()
 
 const getHora = (ts: Timestamp | null | undefined): string =>
@@ -40,11 +39,11 @@ watch(
   <main class="px-4 mt-4 pb-24 md:pb-6">
     <div class="flex justify-between items-center mb-6">
       <h3
-        class="font-black uppercase text-xs tracking-[0.15em] text-[#F5F6FA]"
+        class="font-black uppercase text-xs tracking-[0.15em] text-white"
       >
         {{ t('schedule.servicesOfDay') }}
       </h3>
-      <div class="h-[1px] flex-1 ml-4 bg-white/5" />
+      <div class="h-[1px] flex-1 ml-4 bg-[#4da69c]/30" />
     </div>
 
     <div v-if="agendamentos.length > 0" class="space-y-4">
@@ -53,93 +52,87 @@ watch(
         :id="`agendamento-${item.id}`"
         :key="item.id"
         :class="[
-          'p-4 rounded-3xl border active:scale-[0.99] transition-all bg-[#131314]/45 hover:bg-[#131314]',
+          'rounded-2xl border transition-all bg-gradient-to-br from-[#003733]/80 to-[#002e29]/80',
           item.id === highlightedId
-            ? 'border-[#00D3B8] shadow-[0_0_0_2px_rgba(0,211,184,0.25)]'
-            : 'border-white/25'
+            ? 'border-[#4da69c] shadow-[0_0_0_2px_rgba(77,166,156,0.25)]'
+            : 'border-[#4da69c]/20'
         ]"
-        @click="emit('details', item)"
       >
-        <div class="flex items-center justify-between gap-3">
-          <div
-            class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-white text-[#001a17]"
-          >
-            <span class="text-[10px] font-black uppercase tracking-[0.14em]">{{
-              t('schedule.time')
-            }}</span>
-            <span class="text-sm font-black">{{ getHora(item.data) }}</span>
+        <div class="p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-bold text-white truncate">
+                {{ item.cliente }}
+              </p>
+              <p class="text-xs text-[#80bfb8] mt-0.5 truncate">
+                {{ item.endereco || t('schedule.addressNotInformed') }}
+                <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
+              </p>
+            </div>
+
+            <div class="flex flex-col items-end flex-shrink-0">
+              <span class="text-lg font-black text-[#4da69c]">{{ getHora(item.data) }}</span>
+            </div>
           </div>
 
-          <span
-            v-if="item.materialPronto === true"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-emerald-400 text-[#001a17]"
-          >
-            {{ t('schedule.materialReady') }}
-          </span>
-          <span
-            v-else-if="item.materialPronto === false"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-300 text-[#4A2C00]"
-          >
-            {{ t('schedule.noMaterial') }}
-          </span>
-          <span
-            v-else
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
-          >
-            {{ t('schedule.noStatus') }}
-          </span>
+          <div class="flex flex-wrap gap-2 mt-3">
+            <span
+              v-if="item.materialPronto === true"
+              class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-[#4da69c] text-white"
+            >
+              {{ t('schedule.materialReady') }}
+            </span>
+            <span
+              v-else-if="item.materialPronto === false"
+              class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-amber-500 text-white"
+            >
+              {{ t('schedule.noMaterial') }}
+            </span>
+
+            <span
+              v-if="item.servicoConcluido === true"
+              class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-emerald-500 text-white"
+            >
+              {{ t('schedule.serviceCompleted') }}
+            </span>
+            <span
+              v-else-if="item.servicoConcluido === false"
+              class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-sky-500 text-white"
+            >
+              {{ t('schedule.serviceOpen') }}
+            </span>
+            <span
+              v-else
+              class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-white/20 text-white"
+            >
+              {{ t('schedule.serviceNotCompleted') }}
+            </span>
+          </div>
         </div>
 
-        <div
-          class="mt-4 rounded-2xl border p-4 border-white/20 bg-white/5"
-        >
-          <p
-            class="text-[10px] font-black uppercase tracking-[0.16em] text-white/60"
-          >
-            {{ t('schedule.address') }}
-          </p>
-          <p
-            class="text-sm font-bold mt-1 leading-relaxed text-white"
-          >
-            {{ item.endereco || t('schedule.addressNotInformed') }}
-            <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
-          </p>
-        </div>
-
-        <div class="mt-3 flex items-center justify-end">
-          <span
-            v-if="item.servicoConcluido === true"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#00D3B8] text-[#001a17]"
-          >
-            {{ t('schedule.serviceCompleted') }}
-          </span>
-          <span
-            v-else-if="item.servicoConcluido === false"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/15 text-white"
-          >
-            {{ t('schedule.serviceOpen') }}
-          </span>
-          <span
-            v-else
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
-          >
-            {{ t('schedule.serviceNotCompleted') }}
-          </span>
-        </div>
-
-        <div class="mt-4 grid grid-cols-2 gap-2">
+        <div class="border-t border-[#4da69c]/20 p-3 flex gap-2">
           <button
-            class="py-2.5 rounded-xl font-black text-xs active:scale-95 transition-all bg-[#00D3B8]/25 text-white"
+            class="flex-1 py-2.5 rounded-xl font-black text-xs active:scale-95 transition-all bg-white/10 text-white border border-white/20"
+            @click.stop="emit('details', item)"
+          >
+            {{ t('schedule.view') }}
+          </button>
+
+          <button
+            class="flex-1 py-2.5 rounded-xl font-black text-xs active:scale-95 transition-all bg-white/10 text-white border border-white/20"
             @click.stop="emit('edit', item)"
           >
             {{ t('schedule.edit') }}
           </button>
 
           <button
-            class="bg-red-600/50 text-white py-2.5 rounded-xl font-black text-xs active:scale-95 transition-all"
-            @click.stop="emit('delete', item.id)"
+            class="flex-1 py-2.5 rounded-xl font-black text-xs active:scale-95 transition-all"
+            :class="item.servicoConcluido === true
+              ? 'bg-sky-500/20 text-white border border-sky-500/30'
+              : 'bg-emerald-500/20 text-white border border-emerald-500/30'"
+            @click.stop="emit('toggle-completed', item)"
           >
-            {{ t('schedule.delete') }}
+            {{ item.servicoConcluido === true ? t('schedule.reopen') : t('schedule.complete') }}
           </button>
         </div>
       </div>
@@ -147,11 +140,11 @@ watch(
 
     <div v-else class="flex flex-col items-center justify-center py-20">
       <div
-        class="w-16 h-16 border-2 border-dashed rounded-full mb-4 flex items-center justify-center border-white"
+        class="w-16 h-16 border-2 border-dashed rounded-full mb-4 flex items-center justify-center border-[#4da69c]/40"
       >
         <span class="text-2xl">📅</span>
       </div>
-      <p class="font-bold uppercase tracking-widest text-xs">
+      <p class="font-bold uppercase tracking-widest text-xs text-[#80bfb8]">
         {{ t('schedule.noServicesScheduled') }}
       </p>
     </div>

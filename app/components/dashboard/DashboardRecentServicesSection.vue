@@ -19,107 +19,93 @@ defineProps<{
   }
 }>()
 
-const formatarData = (data: Agendamento['data']) => format(data.toDate(), 'dd/MM/yyyy HH:mm')
+const emit = defineEmits<{
+  'view-item': [item: Agendamento]
+}>()
+
+const formatarData = (data: Agendamento['data']) => format(data.toDate(), 'dd/MM/yyyy')
 const formatarHora = (data: Agendamento['data']) => format(data.toDate(), 'HH:mm')
-const formatarDiaParaRota = (data: Agendamento['data']) => format(data.toDate(), 'yyyy-MM-dd')
 </script>
 
 <template>
   <section class="pb-24 md:pb-6">
     <div class="flex items-center mb-4">
-      <h3 class="font-black text-sm text-white/90">
+      <h3 class="font-black text-sm text-white">
         {{ labels.recentServices }}
       </h3>
-      <div class="flex-1 h-[1px] ml-4 bg-white/15" />
+      <div class="flex-1 h-[1px] ml-4 bg-[#4da69c]/30" />
     </div>
 
     <div v-if="items.length" class="space-y-3">
-      <NuxtLink
+      <article
         v-for="item in items"
         :key="item.id"
-        :to="{
-          path: '/schedule',
-          query: {
-            data: formatarDiaParaRota(item.data),
-            agendamento: item.id
-          }
-        }"
-        class="block p-4 rounded-2xl shadow-md active:scale-[0.99] transition bg-white/10 border border-[rgba(255,255,255,0.08)]"
+        class="rounded-2xl border border-[#4da69c]/20 bg-gradient-to-br from-[#003733]/80 to-[#002e29]/80 p-4 active:scale-[0.99] transition-all cursor-pointer"
+        @click="emit('view-item', item)"
       >
-        <div class="flex items-center justify-between gap-3">
-          <div
-            class="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#4da69c]/20 text-[#80bfb8]"
-          >
-            <span class="text-[10px] font-black uppercase tracking-[0.14em]">{{
-              labels.time
-            }}</span>
-            <span class="text-sm font-black">{{ formatarHora(item.data) }}</span>
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold text-white truncate">
+              {{ item.cliente }}
+            </p>
+            <p class="text-xs text-[#80bfb8] mt-0.5 truncate">
+              {{ item.endereco || labels.addressNotInformed }}
+              <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
+            </p>
           </div>
 
+          <div class="flex flex-col items-end flex-shrink-0">
+            <span class="text-lg font-black text-[#4da69c]">{{ formatarHora(item.data) }}</span>
+            <span class="text-[10px] text-white/50">{{ formatarData(item.data) }}</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mt-3">
           <span
             v-if="item.materialPronto === true"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#4da69c] text-[#001a17]"
+            class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-[#4da69c] text-white"
           >
             {{ labels.materialReady }}
           </span>
           <span
             v-else-if="item.materialPronto === false"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-amber-400 text-[#4A2C00]"
+            class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-amber-500 text-white"
           >
             {{ labels.noMaterial }}
           </span>
-          <span
-            v-else
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
-          >
-            {{ labels.noStatus }}
-          </span>
-        </div>
 
-        <div
-          class="mt-3 rounded-xl border border-[rgba(255,255,255,0.1)] bg-white/5 p-3"
-        >
-          <p class="text-[10px] font-black uppercase tracking-[0.16em] text-[#80bfb8]">
-            {{ labels.address }}
-          </p>
-          <p class="text-sm font-bold mt-1 leading-relaxed text-white">
-            {{ item.endereco || labels.addressNotInformed }}
-            <template v-if="item.numeroCasa">, Casa {{ item.numeroCasa }}</template>
-          </p>
-        </div>
-
-        <div class="mt-3 flex justify-end">
           <span
             v-if="item.servicoConcluido === true"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-[#4da69c] text-[#001a17]"
+            class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-emerald-500 text-white"
           >
             {{ labels.serviceCompleted }}
           </span>
           <span
             v-else-if="item.servicoConcluido === false"
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/15 text-white"
+            class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-sky-500 text-white"
           >
             {{ labels.serviceOpen }}
           </span>
           <span
             v-else
-            class="text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg bg-white/10 text-white/70"
+            class="text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-md bg-white/20 text-white"
           >
             {{ labels.serviceNotCompleted }}
           </span>
         </div>
-
-        <div class="mt-3 text-[11px] font-semibold text-right text-[#80bfb8]">
-          {{ formatarData(item.data) }}
-        </div>
-      </NuxtLink>
+      </article>
     </div>
 
     <div
       v-else
-      class="rounded-2xl p-6 text-center border border-[rgba(255,255,255,0.1)] bg-white/5 text-[#80bfb8]"
+      class="rounded-2xl p-8 text-center border border-[#4da69c]/20 bg-[#002e29]/50"
     >
-      {{ labels.noRecentServices }}
+      <div class="w-16 h-16 rounded-full bg-[#4da69c]/20 flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-[#80bfb8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <p class="text-[#80bfb8] font-medium">{{ labels.noRecentServices }}</p>
     </div>
   </section>
 </template>

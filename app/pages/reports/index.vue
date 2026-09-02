@@ -34,7 +34,7 @@ const handlePeriodoSelect = (periodo: string) => {
 
 <template>
   <div
-    class="h-screen overflow-y-auto p-5 transition-colors bg-[#001a17] text-white"
+    class="h-screen overflow-y-auto p-5 bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17] text-white"
   >
     <ReportsPageHeader
       :title="t('reports.title')"
@@ -47,9 +47,9 @@ const handlePeriodoSelect = (periodo: string) => {
 
     <section
       v-if="carregando"
-      class="rounded-3xl border p-6 text-center border-white/20 bg-white/8"
+      class="rounded-2xl border p-6 text-center border-[#4da69c]/20 bg-[#003733]/50"
     >
-      <p class="font-black uppercase tracking-[0.16em] text-sm">{{ t('reports.loading') }}</p>
+      <p class="font-black uppercase tracking-[0.16em] text-sm text-[#80bfb8]">{{ t('reports.loading') }}</p>
     </section>
 
     <template v-else>
@@ -65,43 +65,43 @@ const handlePeriodoSelect = (periodo: string) => {
       />
 
       <section
-        class="rounded-3xl border p-5 mb-6 border-white/20 bg-white/10"
+        class="rounded-2xl border p-5 mb-6 border-[#4da69c]/20 bg-[#003733]/50"
       >
         <div class="flex items-start justify-between gap-3">
           <div>
             <p
-              class="text-[10px] uppercase tracking-[0.16em] font-black text-white/70"
+              class="text-[10px] uppercase tracking-[0.16em] font-black text-[#80bfb8]"
             >
               {{ t('reports.completionRate') }}
             </p>
-            <p class="text-3xl font-black mt-1">{{ taxaConclusao.toFixed(1) }}%</p>
+            <p class="text-3xl font-black mt-1 text-white">{{ taxaConclusao.toFixed(1) }}%</p>
           </div>
           <span
-            class="w-10 h-10 rounded-xl bg-[#00D3B8]/25 border border-[#00D3B8]/40 flex items-center justify-center"
+            class="w-10 h-10 rounded-xl bg-[#4da69c]/20 border border-[#4da69c]/30 flex items-center justify-center"
           >
-            <CheckBadgeIcon class="w-5 h-5 text-[#B5FFF6]" />
+            <CheckBadgeIcon class="w-5 h-5 text-[#80bfb8]" />
           </span>
         </div>
 
         <div
-          class="mt-4 h-3 rounded-full overflow-hidden bg-white/15"
+          class="mt-4 h-3 rounded-full overflow-hidden bg-[#002e29]"
         >
           <div
-            class="h-full bg-gradient-to-r from-[#00D3B8] to-[#24E6CE]"
+            class="h-full bg-gradient-to-r from-[#4da69c] to-[#80bfb8]"
             :style="{ width: `${Math.min(100, taxaConclusao)}%` }"
           />
         </div>
       </section>
 
       <section
-        class="rounded-3xl border p-5 mb-6 border-white/20 bg-white/8"
+        class="rounded-2xl border p-5 mb-6 border-[#4da69c]/20 bg-[#003733]/50"
       >
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-black uppercase tracking-[0.16em]">
+          <h2 class="text-sm font-black uppercase tracking-[0.16em] text-white">
             {{ t('reports.dailyEvolution') }}
           </h2>
           <span
-            class="text-[10px] uppercase tracking-[0.16em] text-white/70"
+            class="text-[10px] uppercase tracking-[0.16em] text-[#80bfb8]"
             >{{ t('reports.totalVsCompleted') }}</span
           >
         </div>
@@ -115,16 +115,16 @@ const handlePeriodoSelect = (periodo: string) => {
             >
               <div class="h-24 flex items-end gap-[3px]">
                 <div
-                  class="w-3 rounded-md bg-white/35"
+                  class="w-3 rounded-md bg-white/20"
                   :style="{ height: `${dia.alturaTotal}px` }"
                 />
                 <div
-                  class="w-3 rounded-md bg-[#00D3B8]"
+                  class="w-3 rounded-md bg-[#4da69c]"
                   :style="{ height: `${dia.alturaFinalizados}px` }"
                 />
               </div>
               <span
-                class="text-[10px] font-bold text-white/70"
+                class="text-[10px] font-bold text-[#80bfb8]"
                 >{{ dia.label }}</span
               >
             </div>
@@ -133,9 +133,9 @@ const handlePeriodoSelect = (periodo: string) => {
       </section>
 
       <section
-        class="rounded-3xl border p-5 mb-7 border-white/20 bg-white/8"
+        class="rounded-2xl border p-5 mb-7 border-[#4da69c]/20 bg-[#003733]/50"
       >
-        <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4">
+        <h2 class="text-sm font-black uppercase tracking-[0.16em] mb-4 text-white">
           {{ t('reports.material') }}
         </h2>
 
@@ -148,10 +148,10 @@ const handlePeriodoSelect = (periodo: string) => {
               ><span>{{ materialResumo.pronto }}</span>
             </div>
             <div
-              class="h-2 rounded-full overflow-hidden bg-white/15"
+              class="h-2 rounded-full overflow-hidden bg-[#002e29]"
             >
               <div
-                class="h-full bg-[#00D3B8]"
+                class="h-full bg-[#4da69c]"
                 :style="{
                   width: `${totalAgendamentos ? (materialResumo.pronto / totalAgendamentos) * 100 : 0}%`
                 }"
@@ -167,10 +167,10 @@ const handlePeriodoSelect = (periodo: string) => {
               ><span>{{ materialResumo.semMaterial }}</span>
             </div>
             <div
-              class="h-2 rounded-full overflow-hidden bg-white/15"
+              class="h-2 rounded-full overflow-hidden bg-[#002e29]"
             >
               <div
-                class="h-full bg-[#F7C65E]"
+                class="h-full bg-amber-500"
                 :style="{
                   width: `${totalAgendamentos ? (materialResumo.semMaterial / totalAgendamentos) * 100 : 0}%`
                 }"
@@ -186,10 +186,10 @@ const handlePeriodoSelect = (periodo: string) => {
               ><span>{{ materialResumo.naoInformado }}</span>
             </div>
             <div
-              class="h-2 rounded-full overflow-hidden bg-white/15"
+              class="h-2 rounded-full overflow-hidden bg-[#002e29]"
             >
               <div
-                class="h-full bg-white/45"
+                class="h-full bg-white/30"
                 :style="{
                   width: `${totalAgendamentos ? (materialResumo.naoInformado / totalAgendamentos) * 100 : 0}%`
                 }"

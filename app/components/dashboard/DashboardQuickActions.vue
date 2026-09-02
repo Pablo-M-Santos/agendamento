@@ -15,8 +15,8 @@ defineProps<{
     >
       <div class="relative h-full flex flex-col justify-between">
         <div class="flex justify-end">
-          <span class="p-2 rounded-full bg-white/15">
-            <CalendarDaysIcon class="w-5 h-5 text-white/95" />
+          <span class="p-2 rounded-full bg-white/20">
+            <CalendarDaysIcon class="w-5 h-5 text-white" />
           </span>
         </div>
         <h3 class="font-black text-sm sm:text-base tracking-wide text-white">
@@ -27,11 +27,11 @@ defineProps<{
 
     <NuxtLink
       to="/reports"
-      class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 w-full h-[90px] sm:h-[103px] bg-gradient-to-br from-[#003733] to-[#002e29] border border-[rgba(255,255,255,0.1)] shadow-xl active:scale-95 transition"
+      class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 w-full h-[90px] sm:h-[103px] bg-gradient-to-br from-[#003733] to-[#002e29] border border-[#4da69c]/20 shadow-xl active:scale-95 transition"
     >
       <div class="relative h-full flex flex-col justify-between">
         <div class="flex justify-end">
-          <span class="p-2 rounded-full bg-[#4da69c]/20">
+          <span class="p-2 rounded-full bg-white/10">
             <ChartBarIcon class="w-5 h-5 text-[#80bfb8]" />
           </span>
         </div>

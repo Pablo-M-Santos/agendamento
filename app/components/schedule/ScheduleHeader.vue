@@ -44,7 +44,7 @@ const emit = defineEmits<{
       </h2>
 
       <button
-        class="px-5 py-2.5 rounded-xl text-sm font-black active:scale-95 transition-all bg-[#FBFBFB] text-black shadow-[0_10px_25px_rgba(250,72,5,0.25)]"
+        class="px-5 py-2.5 rounded-xl text-sm font-black active:scale-95 transition-all bg-white text-[#001a17] shadow-[0_10px_25px_rgba(255,255,255,0.15)]"
         @click="emit('add')"
       >
         {{ t('schedule.register') }}

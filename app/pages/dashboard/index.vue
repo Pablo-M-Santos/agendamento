@@ -2,11 +2,13 @@
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { user } = useAuth()
-const { listarAgendamentos } = useAgendamentos()
+const { listarAgendamentos, atualizarStatus } = useAgendamentos()
 const { t } = useAppI18n()
 
 const agendamentos = ref<Agendamento[]>([])
 const isSidebarOpen = ref(false)
+const selectedAgendamento = ref<Agendamento | null>(null)
+const isDetailsModalOpen = ref(false)
 
 const isGoogleLogin = computed(() => {
   return user.value?.providerData?.some((provider) => provider.providerId === 'google.com') ?? false
@@ -64,10 +66,27 @@ const labelsRecentes = computed(() => ({
   serviceOpen: t('schedule.serviceOpen'),
   serviceNotCompleted: t('schedule.serviceNotCompleted')
 }))
+
+const handleViewItem = (item: Agendamento) => {
+  selectedAgendamento.value = item
+  isDetailsModalOpen.value = true
+}
+
+const toggleServicoConcluido = async (item: Agendamento) => {
+  if (!item.id) return
+  const novoStatus = item.servicoConcluido === true ? false : true
+  await atualizarStatus(item.id, { servicoConcluido: novoStatus })
+  await carregar()
+}
+
+const handleToggleStatus = async (item: Agendamento) => {
+  await toggleServicoConcluido(item)
+  isDetailsModalOpen.value = false
+}
 </script>
 
 <template>
-  <div class="h-full p-5 overflow-y-auto overflow-x-hidden bg-[#001a17] text-white">
+  <div class="h-full p-5 overflow-y-auto overflow-x-hidden text-white bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17]">
     <DashboardTopBar
       :greeting="saudacaoDashboard"
       :photo-url="user?.photoURL"
@@ -87,6 +106,13 @@ const labelsRecentes = computed(() => ({
     <DashboardRecentServicesSection
       :items="ultimosServicos"
       :labels="labelsRecentes"
+      @view-item="handleViewItem"
+    />
+
+    <ScheduleServiceDetailsModal
+      v-model="isDetailsModalOpen"
+      :agendamento="selectedAgendamento"
+      @toggle-status="handleToggleStatus"
     />
   </div>
 </template>
