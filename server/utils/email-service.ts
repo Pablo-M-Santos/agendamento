@@ -1,5 +1,6 @@
 import { sendEmail } from './mailpit'
 import { sendResendVerificationEmail } from './resend'
+import { sendGmailVerificationEmail } from './gmail'
 
 export interface SendVerificationEmailParams {
   to: string
@@ -89,19 +90,50 @@ export async function sendVerificationEmail({
   appUrl
 }: SendVerificationEmailParams): Promise<{ success: boolean; error?: string }> {
   const config = useRuntimeConfig()
+  const provider = config.mailProvider
 
-  if (config.mailProvider === 'resend') {
-    return sendResendVerificationEmail({ to, verificationLink, appUrl })
+  console.log(`[Email] Tentativa de envio para: ${to}`)
+  console.log(`[Email] Provedor configurado: ${provider}`)
+
+  if (provider === 'resend') {
+    console.log('[Email] Usando Resend como provedor')
+    const result = await sendResendVerificationEmail({ to, verificationLink, appUrl })
+    if (!result.success) {
+      console.error(`[Email] Resend erro: ${result.error}`)
+    }
+    return result
   }
 
+  if (provider === 'gmail') {
+    console.log('[Email] Usando Gmail como provedor')
+    const result = await sendGmailVerificationEmail({ to, verificationLink, appUrl })
+    if (!result.success) {
+      console.error(`[Email] Gmail erro: ${result.error}`)
+    }
+    return result
+  }
+
+  if (provider !== 'mailpit') {
+    const errorMsg = `Provedor de e-mail inválido: ${provider}. Use 'mailpit', 'resend' ou 'gmail'.`
+    console.error(`[Email] ${errorMsg}`)
+    return { success: false, error: errorMsg }
+  }
+
+  console.log('[Email] Usando Mailpit como provedor')
   const fromEmail = config.resendFromEmail || 'noreply@agendamento.app'
   const from = `${FROM_NAME} <${fromEmail}>`
   const html = getVerificationEmailHtml(verificationLink, appUrl)
 
-  return sendEmail({
+  const result = await sendEmail({
     to,
     subject: VERIFICATION_EMAIL_SUBJECT,
     html,
     from
   })
+
+  if (!result.success) {
+    console.error(`[Email] Mailpit erro: ${result.error}`)
+  }
+
+  return result
 }

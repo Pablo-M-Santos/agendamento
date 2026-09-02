@@ -1,21 +1,23 @@
-import { useRuntimeConfig } from 'nuxt/app'
-import { Resend } from 'resend'
+import nodemailer from 'nodemailer'
 
-let resendInstance: Resend | null = null
+let transporter: nodemailer.Transporter | null = null
 
-function getResendInstance(): Resend {
-  if (resendInstance) {
-    return resendInstance
+function getTransporter(): nodemailer.Transporter {
+  if (transporter) {
+    return transporter
   }
 
   const config = useRuntimeConfig()
 
-  if (!config.resendApiKey) {
-    throw new Error('Resend: API key não configurada')
-  }
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: config.gmailUser,
+      pass: config.gmailAppPassword
+    }
+  })
 
-  resendInstance = new Resend(config.resendApiKey)
-  return resendInstance
+  return transporter
 }
 
 interface SendVerificationEmailParams {
@@ -24,24 +26,24 @@ interface SendVerificationEmailParams {
   appUrl: string
 }
 
-export async function sendResendVerificationEmail({
+export async function sendGmailVerificationEmail({
   to,
   verificationLink,
   appUrl
 }: SendVerificationEmailParams): Promise<{ success: boolean; error?: string }> {
   try {
-    const resend = getResendInstance()
     const config = useRuntimeConfig()
+    const mailer = getTransporter()
 
-    const fromEmail = config.resendFromEmail || 'noreply@agendamento.app'
     const fromName = 'Agendamento'
+    const fromEmail = config.gmailUser
 
-    console.log(`[Resend] Enviando e-mail para: ${to}`)
-    console.log(`[Resend] Remetente: ${fromName} <${fromEmail}>`)
+    console.log(`[Gmail] Enviando e-mail para: ${to}`)
+    console.log(`[Gmail] Remetente: ${fromName} <${fromEmail}>`)
 
-    const result = await resend.emails.send({
+    await mailer.sendMail({
       from: `${fromName} <${fromEmail}>`,
-      to: [to],
+      to,
       subject: 'Confirme seu e-mail — Agendamento',
       html: `
         <!DOCTYPE html>
@@ -104,7 +106,7 @@ export async function sendResendVerificationEmail({
             </tr>
             <tr>
               <td style="padding-top: 24px;">
-                <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #62c0b5; text-align: center;">
+                <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #62c0b5; text-align: center">
                   © 2026 Agendamento. Todos os direitos reservados.
                 </p>
               </td>
@@ -115,19 +117,11 @@ export async function sendResendVerificationEmail({
       `
     })
 
-    console.log(`[Resend] E-mail enviado com sucesso. ID: ${result.data?.id}`)
+    console.log('[Gmail] E-mail enviado com sucesso')
     return { success: true }
   } catch (error: unknown) {
-    const err = error as { message?: string; statusCode?: number }
-    console.error('[Resend] Erro ao enviar e-mail:', err.message)
-    console.error('[Resend] Status code:', err.statusCode)
-
-    if (err.message?.includes('only send test emails to')) {
-      console.error('[Resend] SOLUÇÃO: O domínio onboarding@resend.dev só permite enviar e-mails para o proprietário da conta Resend.')
-      console.error('[Resend] Para desenvolvimento local, use MAIL_PROVIDER=mailpit')
-      console.error('[Resend] Para produção, configure um domínio verificado no Resend.')
-    }
-
+    const err = error as { message?: string }
+    console.error('[Gmail] Erro ao enviar e-mail:', err.message)
     return { success: false, error: err.message }
   }
 }

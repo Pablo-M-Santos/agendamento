@@ -38,6 +38,8 @@ export default defineNuxtConfig({
     mailPort: Number(process.env.MAIL_PORT) || 1025,
     mailUser: process.env.MAIL_USER || '',
     mailPassword: process.env.MAIL_PASSWORD || '',
+    gmailUser: process.env.GMAIL_USER || '',
+    gmailAppPassword: process.env.GMAIL_APP_PASSWORD || '',
     public: {
       appUrl: process.env.NUXT_PUBLIC_APP_URL || 'http://localhost:3000',
       firebaseApiKey: process.env.NUXT_PUBLIC_FIREBASE_API_KEY || '',
