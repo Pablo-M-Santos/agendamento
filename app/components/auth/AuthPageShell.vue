@@ -35,22 +35,22 @@ defineProps<{
 <style scoped>
 .auth-bg-dark {
   background:
-    radial-gradient(ellipse at top left, rgba(54, 170, 160, 0.2) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom right, rgba(21, 149, 139, 0.12) 0%, transparent 50%),
-    var(--color-bg-primary);
+    radial-gradient(ellipse at top left, rgba(79, 209, 197, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(44, 110, 103, 0.06) 0%, transparent 50%),
+    linear-gradient(135deg, #0F1420 0%, #141A28 50%, #0F1420 100%);
 }
 
 .auth-logo-container {
-  background: linear-gradient(135deg, var(--color-bg-surface) 0%, var(--color-bg-tertiary) 100%);
-  border: 1px solid var(--color-border-lighter);
+  background: linear-gradient(135deg, #1E2A3D 0%, #262E42 100%);
+  border: 1px solid #262E42;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .auth-bg-dark {
-    background: var(--color-bg-primary);
+    background: #141A28;
   }
 }
 </style>
