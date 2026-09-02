@@ -20,10 +20,10 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="p-5 rounded-3xl border transition-colors border-white/15 bg-white/10"
+    class="p-5 rounded-3xl border transition-colors border-[#262E42] bg-[#1A2132]"
   >
     <h3
-      class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-white/80"
+      class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-[#8A93A6]"
     >
       {{ title }}
     </h3>
@@ -37,8 +37,8 @@ const emit = defineEmits<{
         :aria-pressed="selectedValue === option.value"
         :class="
           selectedValue === option.value
-            ? 'bg-white border-white text-[#001a17]'
-            : 'bg-white/10 border-white/20 text-white'
+            ? 'bg-[#1B4F4A] border-[#2C6E67] text-[#EAFBF6]'
+            : 'bg-[#1E2A3D] border-[#262E42] text-[#EDEFF4]'
         "
         @click="emit('select', option.value)"
       >
@@ -46,7 +46,7 @@ const emit = defineEmits<{
       </button>
     </div>
 
-    <p class="text-xs mt-3 text-white/70">
+    <p class="text-xs mt-3 text-[#6E7789]">
       {{ feedback }}
     </p>
   </section>

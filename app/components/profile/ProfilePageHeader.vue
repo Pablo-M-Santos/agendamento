@@ -10,10 +10,10 @@ const emit = defineEmits<{
 
 <template>
   <header
-    class="sticky top-0 z-20 p-6 flex items-center gap-4 border-b backdrop-blur-sm border-white/10"
+    class="sticky top-0 z-20 px-5 sm:px-8 lg:px-12 py-4 sm:py-6 flex items-center gap-4 border-b backdrop-blur-sm border-[#262E42] bg-[#141A28]/80"
   >
     <button
-      class="p-2 rounded-full transition-colors active:scale-95 hover:bg-white/10"
+      class="p-2 rounded-full transition-colors active:scale-95 hover:bg-white/5"
       @click="emit('back')"
     >
       <svg

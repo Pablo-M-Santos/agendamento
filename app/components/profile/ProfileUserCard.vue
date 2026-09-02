@@ -20,14 +20,14 @@ watch(
 
 <template>
   <section
-    class="relative overflow-hidden flex flex-col items-center p-8 rounded-[2rem] border shadow-2xl transition-colors bg-white/10 border-white/10"
+    class="relative overflow-hidden flex flex-col items-center p-8 rounded-[2rem] border shadow-2xl transition-colors bg-[#1A2132] border-[#262E42]"
   >
     <div
-      class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(181,255,246,0.15),_transparent_55%)]"
+      class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,209,197,0.08),_transparent_55%)]"
     />
 
     <div
-      class="relative z-10 w-24 h-24 rounded-full border-4 border-[#00D3B8] flex items-center justify-center overflow-hidden mb-6 bg-[#0B2C54]"
+      class="relative z-10 w-24 h-24 rounded-full border-4 border-[#4FD1C5] flex items-center justify-center overflow-hidden mb-6 bg-[#1E2A3D]"
     >
       <img
         v-if="photoUrl && !avatarLoadError"
@@ -38,7 +38,7 @@ watch(
       />
       <span
         v-else
-        class="text-4xl font-black text-white"
+        class="text-4xl font-black text-[#EDEFF4]"
       >
         {{ initial }}
       </span>
@@ -49,7 +49,7 @@ watch(
         {{ name }}
       </h2>
       <p
-        class="max-w-[280px] mx-auto px-1 text-xs sm:text-sm font-semibold tracking-[0.08em] break-all text-white/60"
+        class="max-w-[280px] mx-auto px-1 text-xs sm:text-sm font-semibold tracking-[0.08em] break-all text-[#8A93A6]"
       >
         {{ email || '--' }}
       </p>

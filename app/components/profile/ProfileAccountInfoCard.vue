@@ -10,29 +10,29 @@ defineProps<{
 
 <template>
   <section
-    class="p-5 rounded-3xl border transition-colors border-white/15 bg-white/10"
+    class="p-5 rounded-3xl border transition-colors border-[#262E42] bg-[#1A2132]"
   >
     <h3
-      class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-white/80"
+      class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-[#8A93A6]"
     >
       {{ title }}
     </h3>
 
     <div class="space-y-3 text-sm">
       <div class="flex items-center justify-between gap-3">
-        <span class="text-white/70">
+        <span class="text-[#6E7789]">
           {{ providerLabel }}
         </span>
-        <span class="font-bold text-white">
+        <span class="font-bold text-[#EDEFF4]">
           {{ providerValue }}
         </span>
       </div>
 
       <div class="flex items-center justify-between gap-3">
-        <span class="text-white/70">
+        <span class="text-[#6E7789]">
           {{ uidLabel }}
         </span>
-        <span class="font-bold text-white">
+        <span class="font-bold text-[#EDEFF4]">
           {{ uidValue }}
         </span>
       </div>
