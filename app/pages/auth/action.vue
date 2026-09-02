@@ -11,15 +11,6 @@ const hasError = ref(false)
 const mode = computed(() => String(route.query.mode || ''))
 const oobCode = computed(() => String(route.query.oobCode || ''))
 
-const redirectToResetPassword = async () => {
-  await navigateTo({
-    path: '/reset-password',
-    query: {
-      oobCode: oobCode.value
-    }
-  })
-}
-
 const verifyEmailAction = async () => {
   await applyActionCode($auth, oobCode.value)
 
@@ -39,13 +30,15 @@ onMounted(async () => {
   }
 
   try {
-    if (mode.value === 'resetPassword') {
-      await redirectToResetPassword()
+    if (mode.value === 'verifyEmail') {
+      await verifyEmailAction()
       return
     }
 
-    if (mode.value === 'verifyEmail') {
-      await verifyEmailAction()
+    if (mode.value === 'resetPassword') {
+      hasError.value = true
+      message.value = 'Ação não suportada.'
+      loading.value = false
       return
     }
 

@@ -4,7 +4,6 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   fetchSignInMethodsForEmail,
-  sendPasswordResetEmail,
   GoogleAuthProvider,
   signOut
 } from 'firebase/auth'
@@ -28,7 +27,6 @@ type AuthResult = {
 
 export const useAuth = () => {
   const { $auth } = useNuxtApp()
-  const config = useRuntimeConfig()
 
   const user = useState<User | null>('user', () => null)
   const loading = useState<boolean>('loading', () => true)
@@ -207,26 +205,6 @@ export const useAuth = () => {
     }
   }
 
-  const sendSetPasswordEmail = async (email: string): Promise<AuthResult> => {
-    const appUrl = String(config.public.appUrl || '').replace(/\/$/, '')
-
-    try {
-      await sendPasswordResetEmail($auth, email.trim(), {
-        url: `${appUrl}/reset-password`
-      })
-
-      return {
-        ok: true
-      }
-    } catch (error: unknown) {
-      const err = error as FirebaseError
-      return {
-        ok: false,
-        code: err?.code || 'auth/unknown'
-      }
-    }
-  }
-
   const logout = async () => {
     clearStoredSession()
     await signOut($auth)
@@ -241,7 +219,6 @@ export const useAuth = () => {
     getSignInMethodsByEmail,
     loginWithEmail,
     loginWithGoogle,
-    sendSetPasswordEmail,
     logout
   }
 }
