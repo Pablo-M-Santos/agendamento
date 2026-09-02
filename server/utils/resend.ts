@@ -1,4 +1,3 @@
-import { useRuntimeConfig } from 'nuxt/app'
 import { Resend } from 'resend'
 
 let resendInstance: Resend | null = null
