@@ -12,43 +12,43 @@ defineProps<{
 </script>
 
 <template>
-  <section class="grid grid-cols-2 gap-3 mb-6">
-    <article
-      class="rounded-2xl p-4 bg-[#003733]/50 border border-[#4da69c]/20"
-    >
-      <p
-        class="text-[10px] uppercase tracking-[0.16em] font-black text-[#80bfb8]"
+    <section class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+      <article
+        class="rounded-2xl p-4 bg-[#1A2132] border border-[#262E42]"
       >
-        {{ bookingsLabel }}
-      </p>
-      <p class="text-2xl font-black mt-1 text-white">{{ totalBookings }}</p>
-    </article>
+        <p
+          class="text-[10px] uppercase tracking-[0.16em] font-black text-[#8A93A6]"
+        >
+          {{ bookingsLabel }}
+        </p>
+        <p class="text-2xl font-black mt-1 text-[#EDEFF4]">{{ totalBookings }}</p>
+      </article>
 
-    <article
-      class="rounded-2xl p-4 bg-emerald-500/20 border border-emerald-500/30"
-    >
-      <p class="text-[10px] uppercase tracking-[0.16em] font-black text-emerald-300">
-        {{ completedLabel }}
-      </p>
-      <p class="text-2xl font-black mt-1 text-white">{{ totalCompleted }}</p>
-    </article>
+      <article
+        class="rounded-2xl p-4 bg-[#1B4F4A]/20 border border-[#2C6E67]/30"
+      >
+        <p class="text-[10px] uppercase tracking-[0.16em] font-black text-[#7FE0CC]">
+          {{ completedLabel }}
+        </p>
+        <p class="text-2xl font-black mt-1 text-[#EDEFF4]">{{ totalCompleted }}</p>
+      </article>
 
-    <article
-      class="rounded-2xl p-4 bg-sky-500/20 border border-sky-500/30"
-    >
-      <p class="text-[10px] uppercase tracking-[0.16em] font-black text-sky-300">
-        {{ unfinishedLabel }}
-      </p>
-      <p class="text-2xl font-black mt-1 text-white">{{ totalUnfinished }}</p>
-    </article>
+      <article
+        class="rounded-2xl p-4 bg-[#233350]/30 border border-[#33517F]/30"
+      >
+        <p class="text-[10px] uppercase tracking-[0.16em] font-black text-[#9FC1F5]">
+          {{ unfinishedLabel }}
+        </p>
+        <p class="text-2xl font-black mt-1 text-[#EDEFF4]">{{ totalUnfinished }}</p>
+      </article>
 
-    <article
-      class="rounded-2xl p-4 bg-[#4da69c]/20 border border-[#4da69c]/30"
-    >
-      <p class="text-[10px] uppercase tracking-[0.16em] font-black text-[#80bfb8]">
-        {{ materialReadyLabel }}
-      </p>
-      <p class="text-2xl font-black mt-1 text-white">{{ totalMaterialReady }}</p>
-    </article>
-  </section>
+      <article
+        class="rounded-2xl p-4 bg-[#1B4F4A]/20 border border-[#2C6E67]/30"
+      >
+        <p class="text-[10px] uppercase tracking-[0.16em] font-black text-[#7FE0CC]">
+          {{ materialReadyLabel }}
+        </p>
+        <p class="text-2xl font-black mt-1 text-[#EDEFF4]">{{ totalMaterialReady }}</p>
+      </article>
+    </section>
 </template>
