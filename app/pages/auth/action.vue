@@ -55,10 +55,10 @@ onMounted(async () => {
 
 <template>
   <div
-    class="h-dvh flex items-center justify-center px-6 transition-colors bg-[#001a17] text-white"
+    class="h-dvh flex items-center justify-center px-6 transition-colors bg-[#141A28] text-[#EDEFF4]"
   >
     <div class="text-center">
-      <p v-if="loading" class="text-white">
+      <p v-if="loading" class="text-[#EDEFF4]">
         Processando link...
       </p>
       <p v-else :class="hasError ? 'text-red-300' : 'text-green-300'">{{ message }}</p>

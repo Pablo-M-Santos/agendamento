@@ -21,36 +21,38 @@ const {
 
 <template>
   <div
-    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17] text-white"
+    class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden transition-colors bg-[#141A28] text-[#EDEFF4]"
   >
-    <ScheduleHeader :data-selecionada="dataSelecionada" @add="abrirModal()" />
+    <div class="max-w-7xl mx-auto">
+      <ScheduleHeader :data-selecionada="dataSelecionada" @add="abrirModal()" />
 
-    <ScheduleDaysCarousel
-      :dias-carrossel="diasCarrossel"
-      :data-selecionada="dataSelecionada"
-      :quantidade-por-dia="quantidadePorDia"
-      @update:data-selecionada="dataSelecionada = $event"
-    />
+      <ScheduleDaysCarousel
+        :dias-carrossel="diasCarrossel"
+        :data-selecionada="dataSelecionada"
+        :quantidade-por-dia="quantidadePorDia"
+        @update:data-selecionada="dataSelecionada = $event"
+      />
 
-    <ScheduleAppointmentsList
-      :agendamentos="agendamentosFiltrados"
-      :highlighted-id="agendamentoAlvoIdNoDia"
-      @details="abrirDetalhes"
-      @edit="abrirModal"
-      @toggle-completed="toggleServicoConcluido"
-    />
+      <ScheduleAppointmentsList
+        :agendamentos="agendamentosFiltrados"
+        :highlighted-id="agendamentoAlvoIdNoDia"
+        @details="abrirDetalhes"
+        @edit="abrirModal"
+        @toggle-completed="toggleServicoConcluido"
+      />
 
-    <ScheduleServiceDetailsModal
-      v-model="isDetalhesOpen"
-      :agendamento="agendamentoDetalhes"
-      @edit="abrirEdicaoPelosDetalhes"
-    />
+      <ScheduleServiceDetailsModal
+        v-model="isDetalhesOpen"
+        :agendamento="agendamentoDetalhes"
+        @edit="abrirEdicaoPelosDetalhes"
+      />
 
-    <ModalAgendamento
-      v-model="isModalOpen"
-      :agendamento-inicial="agendamentoParaEditar"
-      :data-selecionada-no-pai="dataSelecionada"
-      @salvar="handleSalvarAgendamento"
-    />
+      <ModalAgendamento
+        v-model="isModalOpen"
+        :agendamento-inicial="agendamentoParaEditar"
+        :data-selecionada-no-pai="dataSelecionada"
+        @salvar="handleSalvarAgendamento"
+      />
+    </div>
   </div>
 </template>

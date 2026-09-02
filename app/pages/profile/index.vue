@@ -66,10 +66,10 @@ const onLanguageSelect = (value: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17] text-white">
+  <div class="min-h-screen bg-[#141A28] text-[#EDEFF4]">
     <ProfilePageHeader :title="t('profile.title')" @back="voltar" />
 
-    <main class="px-6 py-10 max-w-2xl mx-auto">
+    <main class="px-5 sm:px-8 lg:px-12 py-6 sm:py-10 max-w-2xl mx-auto">
       <ProfileUserCard
         :photo-url="user?.photoURL"
         :name="userName"

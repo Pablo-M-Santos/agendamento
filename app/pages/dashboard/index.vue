@@ -86,33 +86,35 @@ const handleToggleStatus = async (item: Agendamento) => {
 </script>
 
 <template>
-  <div class="h-full p-5 overflow-y-auto overflow-x-hidden text-white bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17]">
-    <DashboardTopBar
-      :greeting="saudacaoDashboard"
-      :photo-url="user?.photoURL"
-      :user-initial="inicialUsuario"
-      :open-sidebar-label="t('dashboard.openSidebar')"
-      :go-profile-label="t('dashboard.goProfile')"
-      @open-sidebar="isSidebarOpen = true"
-    />
+  <div class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]">
+    <div class="max-w-7xl mx-auto">
+      <DashboardTopBar
+        :greeting="saudacaoDashboard"
+        :photo-url="user?.photoURL"
+        :user-initial="inicialUsuario"
+        :open-sidebar-label="t('dashboard.openSidebar')"
+        :go-profile-label="t('dashboard.goProfile')"
+        @open-sidebar="isSidebarOpen = true"
+      />
 
-    <DashboardSidebar v-model="isSidebarOpen" />
+      <DashboardSidebar v-model="isSidebarOpen" />
 
-    <DashboardQuickActions
-      :schedule-label="t('dashboard.scheduleCard')"
-      :reports-label="t('dashboard.reportsCard')"
-    />
+      <DashboardQuickActions
+        :schedule-label="t('dashboard.scheduleCard')"
+        :reports-label="t('dashboard.reportsCard')"
+      />
 
-    <DashboardRecentServicesSection
-      :items="ultimosServicos"
-      :labels="labelsRecentes"
-      @view-item="handleViewItem"
-    />
+      <DashboardRecentServicesSection
+        :items="ultimosServicos"
+        :labels="labelsRecentes"
+        @view-item="handleViewItem"
+      />
 
-    <ScheduleServiceDetailsModal
-      v-model="isDetailsModalOpen"
-      :agendamento="selectedAgendamento"
-      @toggle-status="handleToggleStatus"
-    />
+      <ScheduleServiceDetailsModal
+        v-model="isDetailsModalOpen"
+        :agendamento="selectedAgendamento"
+        @toggle-status="handleToggleStatus"
+      />
+    </div>
   </div>
 </template>
