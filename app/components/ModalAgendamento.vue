@@ -33,6 +33,7 @@ const numeroCasa = ref('')
 const endereco = ref('')
 const descricao = ref('')
 const materialPronto = ref<boolean | null>(null)
+const servicoConcluido = ref<boolean>(false)
 const telefone = ref('')
 const referencia = ref('')
 const observacoes = ref('')
@@ -82,6 +83,7 @@ watch(
         endereco.value = props.agendamentoInicial.endereco || ''
         descricao.value = props.agendamentoInicial.descricao || ''
         materialPronto.value = props.agendamentoInicial.materialPronto ?? null
+        servicoConcluido.value = props.agendamentoInicial.servicoConcluido ?? false
         telefone.value = props.agendamentoInicial.telefone || ''
         referencia.value = props.agendamentoInicial.referencia || ''
         observacoes.value = props.agendamentoInicial.observacoes || ''
@@ -94,6 +96,7 @@ watch(
         endereco.value = ''
         descricao.value = ''
         materialPronto.value = null
+        servicoConcluido.value = false
         telefone.value = ''
         referencia.value = ''
         observacoes.value = ''
@@ -130,6 +133,7 @@ const handleSalvar = () => {
     endereco: endereco.value.trim(),
     descricao: descricao.value.trim(),
     materialPronto: materialPronto.value,
+    servicoConcluido: servicoConcluido.value,
     telefone: telefone.value.trim(),
     referencia: referencia.value.trim(),
     observacoes: observacoes.value.trim(),
