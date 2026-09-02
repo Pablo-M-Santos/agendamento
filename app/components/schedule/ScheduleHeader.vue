@@ -21,14 +21,14 @@ const emit = defineEmits<{
     <div class="grid grid-cols-3 items-center">
       <NuxtLink
         to="/dashboard"
-        class="justify-self-start p-2 rounded-xl transition hover:bg-white/10"
+        class="justify-self-start p-2 rounded-xl transition hover:bg-white/5"
         :aria-label="t('common.backToDashboard')"
       >
         <ArrowLeftIcon class="w-7 h-7" />
       </NuxtLink>
 
       <h1
-        class="text-base font-black text-center text-white"
+        class="text-base font-black text-center text-[#EDEFF4]"
       >
         {{ t('schedule.title') }}
       </h1>
@@ -38,13 +38,13 @@ const emit = defineEmits<{
 
     <div class="mt-4 flex items-center justify-between gap-4">
       <h2
-        class="text-base font-black truncate text-white"
+        class="text-base font-black truncate text-[#EDEFF4]"
       >
         {{ format(dataSelecionada, 'MMMM, yyyy', { locale: dateLocale }) }}
       </h2>
 
       <button
-        class="px-5 py-2.5 rounded-xl text-sm font-black active:scale-95 transition-all bg-white text-[#001a17] shadow-[0_10px_25px_rgba(255,255,255,0.15)]"
+        class="px-5 py-2.5 rounded-xl text-sm font-black active:scale-95 transition-all bg-[#1B4F4A] text-[#EAFBF6] shadow-[0_10px_25px_rgba(27,79,74,0.3)]"
         @click="emit('add')"
       >
         {{ t('schedule.register') }}
