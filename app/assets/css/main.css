@@ -16,31 +16,31 @@
   --color-green-900: #002e29;
   --color-green-950: #001a17;
 
-  --color-auth-action: #004540;
-  --color-auth-action-hover: #003733;
-  --color-auth-action-active: #002e29;
+  --color-auth-action: #1B4F4A;
+  --color-auth-action-hover: #2C6E67;
+  --color-auth-action-active: #16403C;
   --color-auth-error: #dc2626;
   --color-auth-error-bg: rgba(220, 38, 38, 0.15);
 }
 
 :root,
 html.dark {
-  --color-bg-primary: #001a17;
-  --color-bg-secondary: #002e29;
-  --color-bg-tertiary: #003733;
-  --color-bg-surface: rgba(0, 46, 41, 0.8);
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #b3d9d4;
-  --color-text-tertiary: #80bfb8;
-  --color-border-light: rgba(255, 255, 255, 0.1);
-  --color-border-lighter: rgba(255, 255, 255, 0.05);
-  --color-border-focus: #4da69c;
-  --color-accent-primary: #4da69c;
-  --color-accent-secondary: #80bfb8;
-  --color-accent-tertiary: #268c80;
-  --color-accent-glow: rgba(77, 166, 156, 0.3);
+  --color-bg-primary: #141A28;
+  --color-bg-secondary: #1A2132;
+  --color-bg-tertiary: #262E42;
+  --color-bg-surface: #1E2A3D;
+  --color-text-primary: #EDEFF4;
+  --color-text-secondary: #8A93A6;
+  --color-text-tertiary: #6E7789;
+  --color-border-light: #262E42;
+  --color-border-lighter: rgba(255, 255, 255, 0.06);
+  --color-border-focus: #4FD1C5;
+  --color-accent-primary: #4FD1C5;
+  --color-accent-secondary: #7FE0CC;
+  --color-accent-tertiary: #2C6E67;
+  --color-accent-glow: rgba(79, 209, 197, 0.25);
   --shadow-auth: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.03);
-  --shadow-input-focus: 0 0 0 3px rgba(77, 166, 156, 0.25), 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-input-focus: 0 0 0 3px rgba(79, 209, 197, 0.2), 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 body {
