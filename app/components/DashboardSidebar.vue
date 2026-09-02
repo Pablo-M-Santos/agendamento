@@ -86,12 +86,12 @@ const links = computed(() => [
       >
         <aside
           v-if="props.modelValue"
-          class="relative w-80 max-w-[85vw] h-full p-6 flex flex-col pointer-events-auto bg-[#002e29] text-white"
+          class="relative w-80 max-w-[85vw] h-full p-6 flex flex-col pointer-events-auto bg-[#141A28] text-[#EDEFF4]"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3 min-w-0">
               <div
-                 class="w-12 h-12 rounded-full overflow-hidden border-2 flex items-center justify-center bg-[#4da69c]/20 border-[#4da69c]/50 flex-shrink-0"
+                 class="w-12 h-12 rounded-full overflow-hidden border-2 flex items-center justify-center bg-[#1E2A3D] border-[#262E42] flex-shrink-0"
               >
                 <img
                   v-if="user?.photoURL && !avatarLoadError"
@@ -100,17 +100,17 @@ const links = computed(() => [
                   class="w-full h-full object-cover"
                   @error="avatarLoadError = true"
                 />
-                <span v-else class="text-base font-black text-[#80bfb8]">{{ initials }}</span>
+                <span v-else class="text-base font-black text-[#4FD1C5]">{{ initials }}</span>
               </div>
               <p
-             class="text-sm font-bold truncate text-white"
+             class="text-sm font-bold truncate text-[#EDEFF4]"
               >
                 {{ displayName }}
               </p>
             </div>
 
             <button
-               class="p-2 rounded-lg transition hover:bg-white/10"
+               class="p-2 rounded-lg transition hover:bg-white/5 text-[#8A93A6]"
               :aria-label="t('sidebar.close')"
               @click="close"
             >
@@ -126,8 +126,8 @@ const links = computed(() => [
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition"
             :class="
               isActive(item.to)
-                ? 'bg-white text-[#001a17]'
-                : 'text-[#b3d9d4] hover:bg-white/10 hover:text-white'
+                ? 'bg-[#1B4F4A] text-[#EAFBF6]'
+                : 'text-[#8A93A6] hover:bg-[#1E2A3D] hover:text-[#EDEFF4]'
             "
               @click="close"
             >
@@ -137,10 +137,10 @@ const links = computed(() => [
           </nav>
 
           <div
-             class="mt-auto pt-6 border-t border-[rgba(255,255,255,0.1)]"
+             class="mt-auto pt-6 border-t border-[#262E42]"
           >
             <button
-               class="w-full flex items-center justify-start gap-2 px-4 py-3 rounded-xl transition font-bold bg-white/10 text-white hover:bg-white/20"
+               class="w-full flex items-center justify-start gap-2 px-4 py-3 rounded-xl transition font-bold bg-[#1E2A3D] text-[#EDEFF4] hover:bg-[#262E42]"
               @click="handleLogout"
             >
               <ArrowLeftOnRectangleIcon class="w-5 h-5" />

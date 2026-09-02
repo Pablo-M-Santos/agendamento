@@ -8,15 +8,15 @@ const isActive = (path) => route.path === path
 </script>
 
 <template>
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 px-6 py-3 flex justify-between items-center border-t bg-[#002e29] border-[rgba(255,255,255,0.1)]">
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 px-6 py-3 flex justify-between items-center border-t bg-[#141A28] border-[#262E42]">
     <!-- Dashboard -->
     <NuxtLink
       to="/dashboard"
       class="flex flex-col items-center text-xs font-medium transition"
       :class="
         isActive('/dashboard')
-          ? 'text-[#4da69c]'
-          : 'text-[#80bfb8]/70'
+          ? 'text-[#4FD1C5]'
+          : 'text-[#8A93A6]'
       "
     >
       <HomeIcon class="w-6 h-6 mb-1" />
@@ -29,8 +29,8 @@ const isActive = (path) => route.path === path
       class="flex flex-col items-center text-xs font-medium transition"
       :class="
         isActive('/schedule')
-          ? 'text-[#4da69c]'
-          : 'text-[#80bfb8]/70'
+          ? 'text-[#4FD1C5]'
+          : 'text-[#8A93A6]'
       "
     >
       <CalendarDaysIcon class="w-6 h-6 mb-1" />
@@ -43,8 +43,8 @@ const isActive = (path) => route.path === path
       class="flex flex-col items-center text-xs font-medium transition"
       :class="
         isActive('/profile')
-          ? 'text-[#4da69c]'
-          : 'text-[#80bfb8]/70'
+          ? 'text-[#4FD1C5]'
+          : 'text-[#8A93A6]'
       "
     >
       <UserIcon class="w-6 h-6 mb-1" />

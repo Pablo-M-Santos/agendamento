@@ -153,7 +153,7 @@ const fechar = () => emit('update:modelValue', false)
     <Transition name="fade">
       <div
         v-if="modelValue"
-        class="fixed inset-0 backdrop-blur-sm z-[60] bg-[#001a17]/85"
+        class="fixed inset-0 backdrop-blur-sm z-[60] bg-[#0F1420]/70"
         @click="fechar"
       />
     </Transition>
@@ -161,13 +161,13 @@ const fechar = () => emit('update:modelValue', false)
     <Transition name="slide-up">
       <div
         v-if="modelValue"
-        class="fixed inset-0 z-[70] overflow-y-auto bg-gradient-to-br from-[#002e29] via-[#001a17] to-[#001a17] text-white"
+        class="fixed inset-0 z-[70] overflow-y-auto bg-[#141A28] text-[#EDEFF4]"
       >
-        <div class="min-h-full flex flex-col">
+        <div class="min-h-full flex flex-col max-w-2xl mx-auto">
           <div class="px-6 pt-6 pb-4">
             <div class="flex items-start justify-between">
               <div>
-                <p class="text-[11px] font-black uppercase tracking-[0.2em] text-[#80bfb8]">
+                <p class="text-[11px] font-black uppercase tracking-[0.2em] text-[#8A93A6]">
                   {{ t('schedule.title') }}
                 </p>
                 <h3 class="text-2xl font-black mt-1">
@@ -175,13 +175,13 @@ const fechar = () => emit('update:modelValue', false)
                     agendamentoInicial ? t('schedule.modalTitleEdit') : t('schedule.modalTitleCreate')
                   }}
                 </h3>
-                <p class="text-sm mt-1 text-white/70">
+                <p class="text-sm mt-1 text-[#8A93A6]">
                   {{ format(dataSelecionadaNoPai, dataHeaderFormat, { locale: dateLocale }) }}
                 </p>
               </div>
 
-              <button
-                class="w-11 h-11 rounded-xl border flex items-center justify-center transition border-[#4da69c]/30 bg-[#4da69c]/10 hover:bg-[#4da69c]/20"
+                <button
+                  class="w-11 h-11 rounded-xl border flex items-center justify-center transition border-[#262E42] bg-[#1E2A3D] hover:bg-[#262E42]"
                 :aria-label="t('schedule.closeForm')"
                 @click="fechar"
               >
@@ -205,31 +205,31 @@ const fechar = () => emit('update:modelValue', false)
 
           <div class="flex-1 px-6 py-4 space-y-5">
             <section
-              class="rounded-2xl border p-4 space-y-4 border-[#4da69c]/30 bg-[#003733]/50"
+              class="rounded-2xl border p-4 space-y-4 border-[#262E42] bg-[#1A2132]"
             >
               <div class="flex items-center justify-between">
-                <h4 class="text-sm font-black uppercase tracking-wider text-[#80bfb8]">
+                <h4 class="text-sm font-black uppercase tracking-wider text-[#8A93A6]">
                   {{ t('schedule.mainData') }}
                 </h4>
-                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#4da69c]">
+                <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#4FD1C5]">
                   {{ t('schedule.required') }}
                 </span>
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-white/70">
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
                   {{ t('schedule.clientName') }}
                 </label>
                 <input
                   v-model="cliente"
                   type="text"
                   :placeholder="t('schedule.clientName')"
-                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4da69c] outline-none transition-all font-semibold bg-[#002e29]/80 border-[#4da69c]/30 text-white placeholder:text-white/40"
+                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
                 />
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-white/70">
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
                   {{ t('schedule.houseNumber') }}
                 </label>
                 <input
@@ -237,27 +237,27 @@ const fechar = () => emit('update:modelValue', false)
                   type="text"
                   inputmode="numeric"
                   :placeholder="t('schedule.houseNumber')"
-                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4da69c] outline-none transition-all font-semibold bg-[#002e29]/80 border-[#4da69c]/30 text-white placeholder:text-white/40"
+                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
                 />
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-white/70">
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
                   {{ t('schedule.clientAddress') }}
                 </label>
                 <input
                   v-model="endereco"
                   type="text"
                   :placeholder="t('schedule.clientAddress')"
-                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4da69c] outline-none transition-all font-semibold bg-[#002e29]/80 border-[#4da69c]/30 text-white placeholder:text-white/40"
+                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
                 />
               </div>
             </section>
 
             <section
-              class="rounded-2xl border p-4 border-[#4da69c]/20 bg-[#002e29]/50"
+              class="rounded-2xl border p-4 border-[#262E42] bg-[#1A2132]"
             >
-              <label class="text-[10px] font-black uppercase tracking-[0.18em] block mb-3 text-white/70">
+              <label class="text-[10px] font-black uppercase tracking-[0.18em] block mb-3 text-[#6E7789]">
                 {{ t('schedule.serviceTime') }}
               </label>
               <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[160px] overflow-y-auto no-scrollbar">
@@ -268,8 +268,8 @@ const fechar = () => emit('update:modelValue', false)
                   :class="[
                     'px-2 py-2 rounded-lg font-bold text-xs border transition-all',
                     horaSelecionada === hora
-                      ? 'bg-white text-[#001a17] border-white'
-                      : 'bg-[#003733]/50 border-[#4da69c]/20 text-white hover:bg-[#003733]'
+                      ? 'bg-[#1B4F4A] text-[#EAFBF6] border-[#2C6E67]'
+                      : 'bg-[#141A28] border-[#262E42] text-[#EDEFF4] hover:bg-[#1E2A3D]'
                   ]"
                   @click="horaSelecionada = hora"
                 >
@@ -279,14 +279,14 @@ const fechar = () => emit('update:modelValue', false)
             </section>
 
             <section
-              class="rounded-2xl border p-4 border-[#4da69c]/20 bg-[#002e29]/50"
+              class="rounded-2xl border p-4 border-[#262E42] bg-[#1A2132]"
             >
               <div class="flex items-center justify-between gap-4">
                 <div>
-                  <p class="text-sm font-black uppercase tracking-wider text-white">
+                  <p class="text-sm font-black uppercase tracking-wider text-[#EDEFF4]">
                     {{ t('schedule.materialReadyQuestion') }}
                   </p>
-                  <p class="text-xs mt-1 text-white/60">
+                  <p class="text-xs mt-1 text-[#6E7789]">
                     {{ t('schedule.materialReadyHint') }}
                   </p>
                 </div>
@@ -296,8 +296,8 @@ const fechar = () => emit('update:modelValue', false)
                     class="min-w-[56px] px-3 py-2 rounded-xl border font-black text-sm transition"
                     :class="
                       materialPronto === true
-                        ? 'bg-white text-[#001a17] border-white'
-                        : 'bg-[#003733]/50 border-[#4da69c]/20 text-white'
+                        ? 'bg-[#1B4F4A] text-[#EAFBF6] border-[#2C6E67]'
+                        : 'bg-[#141A28] border-[#262E42] text-[#EDEFF4]'
                     "
                     @click="materialPronto = true"
                   >
@@ -307,8 +307,8 @@ const fechar = () => emit('update:modelValue', false)
                     class="min-w-[56px] px-3 py-2 rounded-xl border font-black text-sm transition"
                     :class="
                       materialPronto === false
-                        ? 'bg-amber-500 text-white border-amber-500'
-                        : 'bg-[#003733]/50 border-[#4da69c]/20 text-white'
+                        ? 'bg-[#233350] text-[#9FC1F5] border-[#33517F]'
+                        : 'bg-[#141A28] border-[#262E42] text-[#EDEFF4]'
                     "
                     @click="materialPronto = false"
                   >
@@ -319,73 +319,73 @@ const fechar = () => emit('update:modelValue', false)
             </section>
 
             <section
-              class="rounded-2xl border p-4 space-y-4 border-[#4da69c]/20 bg-[#002e29]/50"
+              class="rounded-2xl border p-4 space-y-4 border-[#262E42] bg-[#1A2132]"
             >
-              <h4 class="text-sm font-black uppercase tracking-wider text-[#80bfb8]">
+              <h4 class="text-sm font-black uppercase tracking-wider text-[#8A93A6]">
                 {{ t('schedule.optionalFields') }}
               </h4>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-white/70">{{
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
                   t('schedule.phone')
                 }}</label>
                 <input
                   v-model="telefone"
                   type="tel"
                   :placeholder="t('schedule.phone')"
-                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4da69c] outline-none transition-all font-semibold bg-[#002e29]/80 border-[#4da69c]/30 text-white placeholder:text-white/40"
+                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
                 />
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-white/70">{{
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
                   t('schedule.reference')
                 }}</label>
                 <input
                   v-model="referencia"
                   type="text"
                   :placeholder="t('schedule.reference')"
-                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4da69c] outline-none transition-all font-semibold bg-[#002e29]/80 border-[#4da69c]/30 text-white placeholder:text-white/40"
+                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
                 />
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-white/70">
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
                   {{ t('schedule.serviceDetails') }}
                 </label>
                 <textarea
                   v-model="descricao"
                   rows="3"
                   :placeholder="t('schedule.serviceDetails')"
-                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4da69c] outline-none transition-all font-semibold resize-none bg-[#002e29]/80 border-[#4da69c]/30 text-white placeholder:text-white/40"
+                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold resize-none bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
                 />
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-white/70">{{
+                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
                   t('schedule.notes')
                 }}</label>
                 <textarea
                   v-model="observacoes"
                   rows="2"
                   :placeholder="t('schedule.notes')"
-                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4da69c] outline-none transition-all font-semibold resize-none bg-[#002e29]/80 border-[#4da69c]/30 text-white placeholder:text-white/40"
+                  class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold resize-none bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
                 />
               </div>
             </section>
           </div>
 
-          <div class="px-6 py-4 border-t border-[#4da69c]/20 bg-[#001a17]/80">
+          <div class="px-6 py-4 border-t border-[#262E42] bg-[#0F1420]">
             <div class="grid grid-cols-2 gap-3">
               <button
-                class="py-3.5 rounded-xl border font-black text-sm border-white/20 bg-white/10 text-white"
+                class="py-3.5 rounded-xl border font-black text-sm border-[#262E42] bg-[#1E2A3D] text-[#EDEFF4]"
                 @click="fechar"
               >
                 {{ t('schedule.cancel') }}
               </button>
 
               <button
-                class="py-3.5 rounded-xl bg-white text-[#001a17] font-black text-sm shadow-xl active:scale-[0.99] transition-all"
+                class="py-3.5 rounded-xl bg-[#1B4F4A] text-[#EAFBF6] font-black text-sm shadow-xl active:scale-[0.99] transition-all"
                 @click="handleSalvar"
               >
                 {{ agendamentoInicial ? t('schedule.saveChanges') : t('schedule.confirmService') }}
