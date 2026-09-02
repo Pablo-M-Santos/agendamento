@@ -117,5 +117,22 @@ export const enUS = {
   'reports.noData': 'No data',
   'reports.servicesSuffix': 'services',
   'reports.topClients': 'Top clients',
-  'reports.totalCompleted': '{total} total / {completed} completed'
+  'reports.totalCompleted': '{total} total / {completed} completed',
+  'reports.filter.all': 'All',
+  'reports.filter.completed': 'Completed',
+  'reports.filter.open': 'Open',
+  'reports.filter.late': 'Late',
+  'reports.export.pdf': 'Export PDF',
+  'reports.export.generating': 'Generating PDF...',
+  'reports.export.success': 'PDF exported successfully',
+  'reports.export.shared': 'PDF ready to share',
+  'reports.export.error': 'Error exporting PDF',
+  'reports.export.empty': 'No data to export in this period',
+  'reports.charts.statusDistribution': 'Status distribution',
+  'reports.charts.completionTrend': 'Completion trend',
+  'reports.charts.heatmap': 'Bookings by day and hour',
+  'reports.insights.title': 'Actionable insights',
+  'reports.insights.upcoming': 'Upcoming',
+  'reports.insights.late': 'Late',
+  'reports.topAddresses': 'Top addresses'
 }

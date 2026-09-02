@@ -117,5 +117,22 @@ export const ptBR = {
   'reports.noData': 'Sem dados',
   'reports.servicesSuffix': 'servicos',
   'reports.topClients': 'Top clientes',
-  'reports.totalCompleted': '{total} total / {completed} finalizados'
+  'reports.totalCompleted': '{total} total / {completed} finalizados',
+  'reports.filter.all': 'Todos',
+  'reports.filter.completed': 'Concluidos',
+  'reports.filter.open': 'Em aberto',
+  'reports.filter.late': 'Atrasados',
+  'reports.export.pdf': 'Exportar PDF',
+  'reports.export.generating': 'Gerando PDF...',
+  'reports.export.success': 'PDF exportado com sucesso',
+  'reports.export.shared': 'PDF pronto para compartilhar',
+  'reports.export.error': 'Erro ao exportar PDF',
+  'reports.export.empty': 'Nenhum dado para exportar no periodo',
+  'reports.charts.statusDistribution': 'Distribuicao por status',
+  'reports.charts.completionTrend': 'Tendencia de conclusao',
+  'reports.charts.heatmap': 'Atendimentos por dia e horario',
+  'reports.insights.title': 'Insights acionaveis',
+  'reports.insights.upcoming': 'Proximos',
+  'reports.insights.late': 'Atrasados',
+  'reports.topAddresses': 'Top enderecos'
 }
