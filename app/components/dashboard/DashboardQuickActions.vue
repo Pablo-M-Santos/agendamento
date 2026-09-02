@@ -8,18 +8,18 @@ defineProps<{
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-10">
+  <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
     <NuxtLink
       to="/schedule"
-      class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 w-full h-[90px] sm:h-[103px] bg-gradient-to-br from-[#4da69c] to-[#268c80] shadow-xl active:scale-95 transition"
+      class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 w-full h-[90px] sm:h-[103px] bg-[#1B4F4A] shadow-xl shadow-[#1B4F4A]/20 active:scale-95 transition"
     >
       <div class="relative h-full flex flex-col justify-between">
         <div class="flex justify-end">
-          <span class="p-2 rounded-full bg-white/20">
-            <CalendarDaysIcon class="w-5 h-5 text-white" />
+          <span class="p-2 rounded-full bg-[#2C6E67]">
+            <CalendarDaysIcon class="w-5 h-5 text-[#DFF7F0]" />
           </span>
         </div>
-        <h3 class="font-black text-sm sm:text-base tracking-wide text-white">
+        <h3 class="font-black text-sm sm:text-base tracking-wide text-[#EAFBF6]">
           {{ scheduleLabel }}
         </h3>
       </div>
@@ -27,15 +27,15 @@ defineProps<{
 
     <NuxtLink
       to="/reports"
-      class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 w-full h-[90px] sm:h-[103px] bg-gradient-to-br from-[#003733] to-[#002e29] border border-[#4da69c]/20 shadow-xl active:scale-95 transition"
+      class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 w-full h-[90px] sm:h-[103px] bg-[#233350] shadow-xl shadow-[#233350]/20 active:scale-95 transition"
     >
       <div class="relative h-full flex flex-col justify-between">
         <div class="flex justify-end">
-          <span class="p-2 rounded-full bg-white/10">
-            <ChartBarIcon class="w-5 h-5 text-[#80bfb8]" />
+          <span class="p-2 rounded-full bg-[#33517F]">
+            <ChartBarIcon class="w-5 h-5 text-[#E3EBFB]" />
           </span>
         </div>
-        <h3 class="font-black text-sm sm:text-base tracking-wide text-white">
+        <h3 class="font-black text-sm sm:text-base tracking-wide text-[#EAF0FB]">
           {{ reportsLabel }}
         </h3>
       </div>
