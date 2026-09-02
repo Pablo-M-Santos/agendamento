@@ -1,6 +1,11 @@
 import { watch } from 'vue'
 
 export default defineNuxtRouteMiddleware(async () => {
+
+  if (import.meta.server) {
+    return
+  }
+
   const { user, loading } = useAuth()
 
   if (loading.value) {
