@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import DashboardStatsCards from '~/components/dashboard/DashboardStatsCards.vue'
+import DashboardQuickLinks from '~/components/dashboard/DashboardQuickLinks.vue'
 
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
@@ -89,10 +91,23 @@ const handleToggleStatus = async (item: Agendamento) => {
   await toggleServicoConcluido(item)
   isDetailsModalOpen.value = false
 }
+
+const statsTotal = computed(() => agendamentos.value.length)
+const statsCompleted = computed(() => agendamentos.value.filter((a) => a.servicoConcluido === true).length)
+const statsOpen = computed(() => agendamentos.value.filter((a) => a.servicoConcluido !== true).length)
+const hoje = new Date()
+hoje.setHours(0, 0, 0, 0)
+const statsLate = computed(() =>
+  agendamentos.value.filter((a) => {
+    const data = a.data.toDate()
+    data.setHours(0, 0, 0, 0)
+    return data < hoje && a.servicoConcluido !== true
+  }).length
+)
 </script>
 
 <template>
-  <div class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]" :class="{ 'lg:pl-80': isSidebarOpen }">
+  <div class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]" :class="{ 'lg:pl-[22rem]': isSidebarOpen }">
       <DashboardTopBar
         :greeting="saudacaoDashboard"
         :photo-url="user?.photoURL"
@@ -105,9 +120,20 @@ const handleToggleStatus = async (item: Agendamento) => {
 
       <DashboardSidebar v-model="isSidebarOpen" />
 
-      <DashboardQuickActions
+      <DashboardStatsCards
+        title="Resumo"
+        :total="statsTotal"
+        :completed="statsCompleted"
+        :open="statsOpen"
+        :late="statsLate"
+      />
+
+      <DashboardQuickLinks
+        title="Acesso rapido"
         :schedule-label="t('dashboard.scheduleCard')"
         :reports-label="t('dashboard.reportsCard')"
+        :notifications-label="t('dashboard.notificationsCard')"
+        :history-label="t('dashboard.historyCard')"
       />
 
       <DashboardRecentServicesSection

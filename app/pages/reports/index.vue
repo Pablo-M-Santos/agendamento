@@ -132,7 +132,7 @@ const handleExportarPdf = async () => {
 <template>
   <div
     class="h-screen overflow-y-auto px-5 sm:px-8 lg:px-12 py-5 sm:py-8 bg-[#141A28] text-[#EDEFF4]"
-    :class="{ 'lg:pl-80': isSidebarOpen }"
+    :class="{ 'lg:pl-[22rem]': isSidebarOpen }"
   >
       <DashboardTopBar
         :greeting="saudacaoRelatorios"
