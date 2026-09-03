@@ -2,6 +2,8 @@
 import { CheckBadgeIcon } from '@heroicons/vue/24/outline'
 import { format } from 'date-fns'
 import type { ReportsPeriod, StatusFilter } from '~/composables/useReportsPage'
+import DashboardTopBar from '~/components/dashboard/DashboardTopBar.vue'
+import DashboardSidebar from '~/components/DashboardSidebar.vue'
 
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
@@ -9,6 +11,20 @@ const { t } = useAppI18n()
 const toast = useToast()
 const { user } = useAuth()
 const { gerarPdfRelatorio, compartilharOuBaixarPdf } = useReportPdf()
+
+const isSidebarOpen = ref(false)
+
+onMounted(() => {
+  isSidebarOpen.value = window.matchMedia('(min-width: 1024px)').matches
+})
+
+const saudacaoRelatorios = computed(() => t('reports.title'))
+
+const inicialUsuario = computed(() => {
+  const nome = user.value?.displayName?.trim()
+  if (nome) return nome.charAt(0).toUpperCase()
+  return user.value?.email?.charAt(0).toUpperCase() || 'U'
+})
 
 const {
   periodoSelecionado,
@@ -116,12 +132,23 @@ const handleExportarPdf = async () => {
 <template>
   <div
     class="h-screen overflow-y-auto px-5 sm:px-8 lg:px-12 py-5 sm:py-8 bg-[#141A28] text-[#EDEFF4]"
+    :class="{ 'lg:pl-80': isSidebarOpen }"
   >
-    <div class="max-w-7xl mx-auto">
+      <DashboardTopBar
+        :greeting="saudacaoRelatorios"
+        :photo-url="user?.photoURL"
+        :user-initial="inicialUsuario"
+        :open-sidebar-label="t('dashboard.openSidebar')"
+        :go-profile-label="t('dashboard.goProfile')"
+        :sidebar-open="isSidebarOpen"
+        @open-sidebar="isSidebarOpen = !isSidebarOpen"
+      />
+
+      <DashboardSidebar v-model="isSidebarOpen" />
+
       <ReportsPageHeader
         :title="t('reports.title')"
         :subtitle="t('reports.subtitle')"
-        :back-to-dashboard-label="t('common.backToDashboard')"
         :period-options="opcoesPeriodo"
         :selected-period="periodoSelecionado"
         @select-period="handlePeriodoSelect"
@@ -422,6 +449,5 @@ const handleExportarPdf = async () => {
           </div>
         </div>
       </template>
-    </div>
   </div>
 </template>

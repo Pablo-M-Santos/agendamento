@@ -8,6 +8,7 @@ const props = defineProps<{
   userInitial: string
   openSidebarLabel: string
   goProfileLabel: string
+  sidebarOpen?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -25,8 +26,9 @@ watch(
 </script>
 
 <template>
-  <div class="relative mb-6 lg:mb-10 h-[56px] flex items-center justify-center">
+  <div class="relative mb-6 lg:mb-10 h-[56px] flex items-center justify-center z-50">
     <button
+      v-if="!props.sidebarOpen"
       class="absolute left-0 p-2 rounded-xl transition hover:bg-white/5"
       :aria-label="props.openSidebarLabel"
       @click="emit('openSidebar')"

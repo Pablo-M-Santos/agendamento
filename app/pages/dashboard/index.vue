@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { user } = useAuth()
@@ -9,6 +11,10 @@ const agendamentos = ref<Agendamento[]>([])
 const isSidebarOpen = ref(false)
 const selectedAgendamento = ref<Agendamento | null>(null)
 const isDetailsModalOpen = ref(false)
+
+onMounted(() => {
+  isSidebarOpen.value = window.matchMedia('(min-width: 1024px)').matches
+})
 
 const isGoogleLogin = computed(() => {
   return user.value?.providerData?.some((provider) => provider.providerId === 'google.com') ?? false
@@ -86,15 +92,15 @@ const handleToggleStatus = async (item: Agendamento) => {
 </script>
 
 <template>
-  <div class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]">
-    <div class="max-w-7xl mx-auto">
+  <div class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]" :class="{ 'lg:pl-80': isSidebarOpen }">
       <DashboardTopBar
         :greeting="saudacaoDashboard"
         :photo-url="user?.photoURL"
         :user-initial="inicialUsuario"
         :open-sidebar-label="t('dashboard.openSidebar')"
         :go-profile-label="t('dashboard.goProfile')"
-        @open-sidebar="isSidebarOpen = true"
+        :sidebar-open="isSidebarOpen"
+        @open-sidebar="isSidebarOpen = !isSidebarOpen"
       />
 
       <DashboardSidebar v-model="isSidebarOpen" />
@@ -115,6 +121,5 @@ const handleToggleStatus = async (item: Agendamento) => {
         :agendamento="selectedAgendamento"
         @toggle-status="handleToggleStatus"
       />
-    </div>
   </div>
 </template>
