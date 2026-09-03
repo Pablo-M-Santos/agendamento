@@ -134,5 +134,16 @@ export const esES = {
   'reports.insights.title': 'Insights accionables',
   'reports.insights.upcoming': 'Proximos',
   'reports.insights.late': 'Atrasados',
+  'dashboard.topBar.appointmentsToday': 'Agendamientos del dia',
+  'dashboard.topBar.notifications': 'Notificaciones',
+  'dashboard.topBar.noNotifications': 'Sin notificaciones',
+  'dashboard.stats.appointmentsToday': 'Agendamientos hoy',
+  'dashboard.stats.notifications': 'Notificaciones',
+  'dashboard.moduleCards.summary': 'Resumen del dia',
+  'dashboard.moduleCards.notifications': 'Notificaciones',
+  'dashboard.moduleCards.history': 'Historial',
+  'dashboard.upcomingAppointments': 'Proximos agendamientos',
+  'dashboard.noUpcomingAppointments': 'Ningun agendamiento futuro.',
+  'dashboard.topBar.unreadNotifications': 'notificaciones no leidas',
   'reports.topAddresses': 'Top direcciones'
 }

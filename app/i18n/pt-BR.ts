@@ -134,5 +134,16 @@ export const ptBR = {
   'reports.insights.title': 'Insights acionaveis',
   'reports.insights.upcoming': 'Proximos',
   'reports.insights.late': 'Atrasados',
+  'dashboard.topBar.appointmentsToday': 'Agendamentos do dia',
+  'dashboard.topBar.notifications': 'Notificacoes',
+  'dashboard.topBar.noNotifications': 'Sem notificacoes',
+  'dashboard.stats.appointmentsToday': 'Agendamentos hoje',
+  'dashboard.stats.notifications': 'Notificacoes',
+  'dashboard.moduleCards.summary': 'Resumo do dia',
+  'dashboard.moduleCards.notifications': 'Notificacoes',
+  'dashboard.moduleCards.history': 'Historico',
+  'dashboard.upcomingAppointments': 'Proximos agendamentos',
+  'dashboard.noUpcomingAppointments': 'Nenhum agendamento futuro.',
+  'dashboard.topBar.unreadNotifications': 'notificacoes nao lidas',
   'reports.topAddresses': 'Top enderecos'
 }

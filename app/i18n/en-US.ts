@@ -134,5 +134,16 @@ export const enUS = {
   'reports.insights.title': 'Actionable insights',
   'reports.insights.upcoming': 'Upcoming',
   'reports.insights.late': 'Late',
+  'dashboard.topBar.appointmentsToday': "Today's appointments",
+  'dashboard.topBar.notifications': 'Notifications',
+  'dashboard.topBar.noNotifications': 'No notifications',
+  'dashboard.stats.appointmentsToday': 'Appointments today',
+  'dashboard.stats.notifications': 'Notifications',
+  'dashboard.moduleCards.summary': 'Daily summary',
+  'dashboard.moduleCards.notifications': 'Notifications',
+  'dashboard.moduleCards.history': 'History',
+  'dashboard.upcomingAppointments': 'Upcoming appointments',
+  'dashboard.noUpcomingAppointments': 'No upcoming appointments.',
+  'dashboard.topBar.unreadNotifications': 'unread notifications',
   'reports.topAddresses': 'Top addresses'
 }
