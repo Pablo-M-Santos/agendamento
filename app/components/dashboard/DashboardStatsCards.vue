@@ -53,11 +53,11 @@ const { t } = useAppI18n()
       </div>
 
       <div class="flex items-center gap-3 sm:gap-4">
-        <span class="p-2 sm:p-3 rounded-xl bg-[#3D2A2A]">
-          <ClockIcon class="w-5 h-5 sm:w-6 sm:h-6 text-[#F5A89C]" />
+        <span class="p-2 sm:p-3 rounded-xl bg-[#1A3F4A]">
+          <ClockIcon class="w-5 h-5 sm:w-6 sm:h-6 text-[#7FE0E8]" />
         </span>
         <div>
-          <p class="text-xl sm:text-2xl font-black text-[#F5A89C]">{{ late }}</p>
+          <p class="text-xl sm:text-2xl font-black text-[#7FE0E8]">{{ late }}</p>
           <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">Atrasados</p>
         </div>
       </div>

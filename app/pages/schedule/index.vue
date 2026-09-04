@@ -81,6 +81,7 @@ const inicialUsuario = computed(() => {
         v-model="isDetalhesOpen"
         :agendamento="agendamentoDetalhes"
         @edit="abrirEdicaoPelosDetalhes"
+        @toggle-status="toggleServicoConcluido"
       />
 
       <ModalAgendamento

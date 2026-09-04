@@ -19,7 +19,7 @@ const emit = defineEmits<{
   >
     <div class="flex items-center justify-between gap-4">
       <h2
-        class="text-base font-black truncate text-[#EDEFF4]"
+        class="text-lg sm:text-xl font-black truncate text-[#EDEFF4]"
       >
         {{ format(dataSelecionada, 'MMMM, yyyy', { locale: dateLocale }) }}
       </h2>

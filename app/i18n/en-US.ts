@@ -81,6 +81,8 @@ export const enUS = {
   'sidebar.dashboard': 'Dashboard',
   'sidebar.schedule': 'Schedule',
   'sidebar.reports': 'Reports',
+  'sidebar.notifications': 'Notifications',
+  'sidebar.history': 'History',
   'sidebar.profile': 'Profile',
   'sidebar.logout': 'Logout',
   'sidebar.logoutDoneTitle': 'Logged out',

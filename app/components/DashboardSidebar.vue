@@ -3,6 +3,8 @@ import {
   HomeIcon,
   CalendarDaysIcon,
   ChartBarIcon,
+  BellIcon,
+  ClockIcon,
   UserIcon,
   ArrowLeftOnRectangleIcon,
   XMarkIcon
@@ -66,6 +68,8 @@ const handleLogout = async () => {
 const links = computed(() => [
   { to: '/dashboard', label: t('sidebar.dashboard'), icon: HomeIcon },
   { to: '/schedule', label: t('sidebar.schedule'), icon: CalendarDaysIcon },
+  { to: '/notifications', label: t('sidebar.notifications'), icon: BellIcon },
+  { to: '/history', label: t('sidebar.history'), icon: ClockIcon },
   { to: '/reports', label: t('sidebar.reports'), icon: ChartBarIcon },
   { to: '/profile', label: t('sidebar.profile'), icon: UserIcon }
 ])

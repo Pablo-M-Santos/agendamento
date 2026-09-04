@@ -81,6 +81,8 @@ export const ptBR = {
   'sidebar.dashboard': 'Dashboard',
   'sidebar.schedule': 'Agenda',
   'sidebar.reports': 'Relatorios',
+  'sidebar.notifications': 'Notificacoes',
+  'sidebar.history': 'Historico',
   'sidebar.profile': 'Perfil',
   'sidebar.logout': 'Logout',
   'sidebar.logoutDoneTitle': 'Logout realizado',
