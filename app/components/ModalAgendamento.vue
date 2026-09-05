@@ -2,7 +2,7 @@
 import { ref, watch, computed, nextTick } from 'vue'
 import { format } from 'date-fns'
 import type { AgendamentoForm } from '~/types/agendamento'
-import { formatarTelefone } from '~/utils/formatarTelefone'
+import { formatarValor, parseValor, valorValido } from '~/utils/formatarValor'
 
 const { dateLocale } = useUserSettings()
 const { t, language } = useAppI18n()
@@ -13,37 +13,21 @@ const props = defineProps<{
   dataSelecionadaNoPai: Date
 }>()
 
-type AgendamentoPayload = {
-  id?: string
-  cliente: string
-  numeroCasa: string
-  endereco: string
-  descricao: string
-  materialPronto?: boolean | null
-  servicoConcluido?: boolean | null
-  telefone?: string
-  referencia?: string
-  observacoes?: string
-  data: string
-}
-
-const emit = defineEmits(['update:modelValue', 'salvar'])
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'salvar', dados: AgendamentoForm): void
+}>()
 
 const cliente = ref('')
 const numeroCasa = ref('')
 const endereco = ref('')
-const descricao = ref('')
+const valor = ref('')
 const materialPronto = ref<boolean | null>(null)
 const servicoConcluido = ref<boolean>(false)
-const telefone = ref('')
-
-const onTelefoneInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  telefone.value = formatarTelefone(target.value)
-}
-const referencia = ref('')
 const observacoes = ref('')
 const horaSelecionada = ref('09:00')
+
+const erros = ref<Record<string, string>>({})
 
 const horarios = computed(() => {
   const lista = []
@@ -77,21 +61,53 @@ const pegarHorarioMaisProximo = () => {
   return horaFinal
 }
 
+const onClienteInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  cliente.value = target.value.replace(/[0-9]/g, '')
+  erros.value.cliente = ''
+}
+
+const onNumeroCasaInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  numeroCasa.value = target.value.replace(/\D/g, '')
+  erros.value.numeroCasa = ''
+}
+
+  const onValorInput = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    valor.value = target.value.replace(/[^\d,]/g, '')
+    erros.value.valor = ''
+  }
+
+  const onValorBlur = () => {
+    if (valor.value.trim()) {
+      valor.value = formatarValor(parseValor(valor.value))
+    }
+  }
+
+const onEnderecoInput = () => {
+  erros.value.endereco = ''
+}
+
+const onObservacoesInput = () => {
+  erros.value.observacoes = ''
+}
+
 watch(
   () => props.modelValue,
   async (isOpen) => {
     if (isOpen) {
+      erros.value = {}
+
       if (props.agendamentoInicial) {
         const dataDoc = new Date(props.agendamentoInicial.data)
 
-        cliente.value = props.agendamentoInicial.cliente
-        numeroCasa.value = props.agendamentoInicial.numeroCasa || ''
+        cliente.value = (props.agendamentoInicial.cliente || '').replace(/[0-9]/g, '')
+        numeroCasa.value = (props.agendamentoInicial.numeroCasa || '').replace(/\D/g, '')
         endereco.value = props.agendamentoInicial.endereco || ''
-        descricao.value = props.agendamentoInicial.descricao || ''
+        valor.value = formatarValor(props.agendamentoInicial.valor)
         materialPronto.value = props.agendamentoInicial.materialPronto ?? null
         servicoConcluido.value = props.agendamentoInicial.servicoConcluido ?? false
-        telefone.value = formatarTelefone(props.agendamentoInicial.telefone || '')
-        referencia.value = props.agendamentoInicial.referencia || ''
         observacoes.value = props.agendamentoInicial.observacoes || ''
         horaSelecionada.value = Number.isNaN(dataDoc.getTime())
           ? pegarHorarioMaisProximo()
@@ -100,11 +116,9 @@ watch(
         cliente.value = ''
         numeroCasa.value = ''
         endereco.value = ''
-        descricao.value = ''
+        valor.value = ''
         materialPronto.value = null
         servicoConcluido.value = false
-        telefone.value = ''
-        referencia.value = ''
         observacoes.value = ''
 
         horaSelecionada.value = pegarHorarioMaisProximo()
@@ -124,32 +138,53 @@ watch(
   }
 )
 
-const handleSalvar = () => {
-  if (!cliente.value.trim()) return alert(t('schedule.validation.clientRequired'))
-  if (!numeroCasa.value.trim()) return alert(t('schedule.validation.houseRequired'))
-  if (!endereco.value.trim()) return alert(t('schedule.validation.addressRequired'))
+  const validarFormulario = (): boolean => {
+    erros.value = {}
 
-  const dataFinal = new Date(props.dataSelecionadaNoPai)
-  const [h, m] = horaSelecionada.value.split(':')
-  dataFinal.setHours(Number(h), Number(m), 0)
+    if (!cliente.value.trim()) {
+      erros.value.cliente = t('schedule.validation.clientRequired')
+    }
 
-  const dados: AgendamentoPayload = {
-    cliente: cliente.value.trim(),
-    numeroCasa: numeroCasa.value.trim(),
-    endereco: endereco.value.trim(),
-    descricao: descricao.value.trim(),
-    materialPronto: materialPronto.value,
-    servicoConcluido: servicoConcluido.value,
-    telefone: telefone.value.trim(),
-    referencia: referencia.value.trim(),
-    observacoes: observacoes.value.trim(),
-    data: format(dataFinal, "yyyy-MM-dd'T'HH:mm")
+    if (!numeroCasa.value.trim()) {
+      erros.value.numeroCasa = t('schedule.validation.houseRequired')
+    }
+
+    if (!endereco.value.trim()) {
+      erros.value.endereco = t('schedule.validation.addressRequired')
+    }
+
+    if (valor.value.trim() && !valorValido(valor.value)) {
+      erros.value.valor = t('schedule.validation.valueInvalid')
+    }
+
+    return Object.keys(erros.value).length === 0
   }
 
-  if (props.agendamentoInicial?.id) dados.id = props.agendamentoInicial.id
+  const handleSalvar = () => {
+    if (!validarFormulario()) return
 
-  emit('salvar', dados)
-}
+    const dataFinal = new Date(props.dataSelecionadaNoPai)
+    const [h, m] = horaSelecionada.value.split(':')
+    dataFinal.setHours(Number(h), Number(m), 0)
+
+    const valorTexto = valor.value.trim()
+    const valorNumerico = valorTexto ? parseValor(valorTexto) : undefined
+
+    const dados: AgendamentoForm = {
+      cliente: cliente.value.trim(),
+      numeroCasa: numeroCasa.value.trim(),
+      endereco: endereco.value.trim(),
+      valor: valorNumerico,
+      materialPronto: materialPronto.value,
+      servicoConcluido: servicoConcluido.value,
+      observacoes: observacoes.value.trim(),
+      data: format(dataFinal, "yyyy-MM-dd'T'HH:mm")
+    }
+
+    if (props.agendamentoInicial?.id) dados.id = props.agendamentoInicial.id
+
+    emit('salvar', dados)
+  }
 
 const fechar = () => emit('update:modelValue', false)
 </script>
@@ -226,11 +261,16 @@ const fechar = () => emit('update:modelValue', false)
                       {{ t('schedule.clientName') }}
                     </label>
                     <input
-                      v-model="cliente"
+                      :value="cliente"
                       type="text"
                       :placeholder="t('schedule.clientName')"
-                      class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      :class="erros.cliente ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                      @input="onClienteInput"
                     />
+                    <p v-if="erros.cliente" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                      {{ erros.cliente }}
+                    </p>
                   </div>
 
                   <div class="sm:hidden space-y-3">
@@ -242,20 +282,30 @@ const fechar = () => emit('update:modelValue', false)
                         v-model="endereco"
                         type="text"
                         :placeholder="t('schedule.clientAddress')"
-                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.endereco ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onEnderecoInput"
                       />
+                      <p v-if="erros.endereco" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.endereco }}
+                      </p>
                     </div>
                     <div>
                       <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
                         {{ t('schedule.houseNumber') }}
                       </label>
                       <input
-                        v-model="numeroCasa"
+                        :value="numeroCasa"
                         type="text"
                         inputmode="numeric"
                         :placeholder="t('schedule.houseNumber')"
-                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.numeroCasa ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onNumeroCasaInput"
                       />
+                      <p v-if="erros.numeroCasa" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.numeroCasa }}
+                      </p>
                     </div>
                   </div>
 
@@ -265,12 +315,17 @@ const fechar = () => emit('update:modelValue', false)
                         {{ t('schedule.houseNumber') }}
                       </label>
                       <input
-                        v-model="numeroCasa"
+                        :value="numeroCasa"
                         type="text"
                         inputmode="numeric"
                         :placeholder="t('schedule.houseNumber')"
-                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.numeroCasa ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onNumeroCasaInput"
                       />
+                      <p v-if="erros.numeroCasa" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.numeroCasa }}
+                      </p>
                     </div>
                     <div class="sm:col-span-2">
                       <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
@@ -280,9 +335,36 @@ const fechar = () => emit('update:modelValue', false)
                         v-model="endereco"
                         type="text"
                         :placeholder="t('schedule.clientAddress')"
-                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.endereco ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onEnderecoInput"
+                      />
+                      <p v-if="erros.endereco" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.endereco }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                      {{ t('schedule.serviceValue') }}
+                    </label>
+                    <div class="relative mt-1">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-[#8A93A6]">R$</span>
+                      <input
+                        :value="valor"
+                        type="text"
+                        inputmode="decimal"
+                        :placeholder="t('schedule.serviceValue')"
+                        class="w-full pl-10 pr-3 py-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.valor ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onValorInput"
+                        @blur="onValorBlur"
                       />
                     </div>
+                    <p v-if="erros.valor" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                      {{ erros.valor }}
+                    </p>
                   </div>
                 </section>
 
@@ -302,6 +384,7 @@ const fechar = () => emit('update:modelValue', false)
                       v-for="hora in horarios"
                       :id="'hora-' + hora"
                       :key="hora"
+                      type="button"
                       :class="[
                         'px-2 py-2 rounded-lg font-bold text-xs border transition-all',
                         horaSelecionada === hora
@@ -330,6 +413,7 @@ const fechar = () => emit('update:modelValue', false)
 
                     <div class="flex gap-2 flex-shrink-0">
                       <button
+                        type="button"
                         class="min-w-[56px] px-3 py-2 rounded-xl border font-black text-sm transition"
                         :class="
                           materialPronto === true
@@ -341,6 +425,7 @@ const fechar = () => emit('update:modelValue', false)
                         {{ t('schedule.yes') }}
                       </button>
                       <button
+                        type="button"
                         class="min-w-[56px] px-3 py-2 rounded-xl border font-black text-sm transition"
                         :class="
                           materialPronto === false
@@ -362,55 +447,22 @@ const fechar = () => emit('update:modelValue', false)
                     {{ t('schedule.optionalFields') }}
                   </h4>
 
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
-                        t('schedule.phone')
-                      }}</label>
-                      <input
-                        type="tel"
-                        :placeholder="t('schedule.phone')"
-                        :value="telefone"
-                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
-                        @input="onTelefoneInput"
-                      />
-                    </div>
-
-                    <div>
-                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
-                        t('schedule.reference')
-                      }}</label>
-                      <input
-                        v-model="referencia"
-                        type="text"
-                        :placeholder="t('schedule.reference')"
-                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
-                      {{ t('schedule.serviceDetails') }}
-                    </label>
-                    <textarea
-                      v-model="descricao"
-                      rows="3"
-                      :placeholder="t('schedule.serviceDetails')"
-                      class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold resize-none bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
-                    />
-                  </div>
-
                   <div>
                     <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
                       t('schedule.notes')
                     }}</label>
                     <textarea
                       v-model="observacoes"
-                      rows="2"
+                      rows="3"
                       :placeholder="t('schedule.notes')"
-                      class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold resize-none bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold resize-none bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      :class="erros.observacoes ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                      maxlength="500"
+                      @input="onObservacoesInput"
                     />
+                    <p class="text-[10px] mt-1 ml-1 text-[#6E7789]">
+                      {{ observacoes.length }}/500
+                    </p>
                   </div>
                 </section>
               </div>
@@ -419,12 +471,14 @@ const fechar = () => emit('update:modelValue', false)
             <div class="p-5 sm:p-6 pt-5 sm:pt-6 border-t border-[#262E42] bg-[#0F1420]/50 space-y-3 flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
               <div class="grid grid-cols-2 gap-3">
                 <button
+                  type="button"
                   class="py-3.5 rounded-xl border font-black text-sm border-[#262E42] bg-[#1E2A3D] text-[#EDEFF4] hover:bg-[#262E42] hover:border-[#8A93A6]/30 transition-all active:scale-[0.99]"
                   @click="fechar"
                 >
                   {{ t('schedule.cancel') }}
                 </button>
                 <button
+                  type="button"
                   class="py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.99] shadow-lg bg-[#1B4F4A] text-[#EAFBF6] border border-[#2C6E67] shadow-[#1B4F4A]/30 hover:bg-[#23655F]"
                   @click="handleSalvar"
                 >

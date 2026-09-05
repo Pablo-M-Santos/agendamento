@@ -77,8 +77,8 @@ watch(
           </div>
         </div>
 
-        <div v-if="item.descricao" class="text-xs text-[#8A93A6] mb-3 line-clamp-2">
-          {{ item.descricao }}
+        <div v-if="item.observacoes" class="text-xs text-[#8A93A6] mb-3 line-clamp-2">
+          {{ item.observacoes }}
         </div>
 
         <div class="flex flex-wrap gap-2">

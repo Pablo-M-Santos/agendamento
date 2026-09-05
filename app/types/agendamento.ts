@@ -5,11 +5,9 @@ export interface Agendamento {
   cliente: string
   numeroCasa: string
   endereco: string
-  descricao: string
+  valor?: number
   materialPronto?: boolean | null
   servicoConcluido?: boolean | null
-  telefone?: string
-  referencia?: string
   observacoes?: string
   userId: string
   createdAt: Timestamp
@@ -21,11 +19,9 @@ export type AgendamentoForm = {
   cliente: string
   numeroCasa: string
   endereco: string
-  descricao: string
+  valor?: number
   materialPronto?: boolean | null
   servicoConcluido?: boolean | null
-  telefone?: string
-  referencia?: string
   observacoes?: string
   data: string
 }

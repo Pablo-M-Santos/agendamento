@@ -2,7 +2,7 @@
 import { format } from 'date-fns'
 import { onMounted, onUnmounted, watch } from 'vue'
 import type { Agendamento } from '~/composables/useAgendamentos'
-import { formatarTelefone } from '~/utils/formatarTelefone'
+import { formatarValor } from '~/utils/formatarValor'
 
 const { t } = useAppI18n()
 
@@ -113,43 +113,35 @@ onUnmounted(() => {
 
             <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5 sm:py-6">
               <div class="space-y-3 sm:flex sm:flex-col sm:justify-center sm:min-h-full">
-                <div :class="agendamento.descricao ? 'grid grid-cols-1 sm:grid-cols-2 gap-3' : 'grid grid-cols-1 gap-3'">
-                  <article
-                    :class="agendamento.descricao ? '' : 'sm:col-span-1'"
-                    class="rounded-2xl border border-[#262E42] bg-[#1A2132] p-4"
-                  >
-                    <div class="flex items-center gap-2 mb-2">
-                      <svg class="w-3.5 h-3.5 text-[#4FD1C5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.413 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      <p class="text-[10px] uppercase tracking-[0.18em] font-black text-[#4FD1C5]">
-                        {{ t('schedule.address') }}
-                      </p>
-                    </div>
-                    <p class="text-sm leading-relaxed text-[#EDEFF4]">
-                      {{ agendamento.endereco || t('schedule.notInformed') }}
-                      <template v-if="agendamento.numeroCasa">, Casa {{ agendamento.numeroCasa }}</template>
+                <article class="rounded-2xl border border-[#262E42] bg-[#1A2132] p-4">
+                  <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-3.5 h-3.5 text-[#4FD1C5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.413 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <p class="text-[10px] uppercase tracking-[0.18em] font-black text-[#4FD1C5]">
+                      {{ t('schedule.address') }}
                     </p>
-                  </article>
+                  </div>
+                  <p class="text-sm leading-relaxed text-[#EDEFF4]">
+                    {{ agendamento.endereco || t('schedule.notInformed') }}
+                    <template v-if="agendamento.numeroCasa">, Casa {{ agendamento.numeroCasa }}</template>
+                  </p>
+                </article>
 
-                  <article
-                    v-if="agendamento.descricao"
-                    class="rounded-2xl border border-[#262E42] bg-[#1A2132] p-4"
-                  >
-                    <div class="flex items-center gap-2 mb-2">
-                      <svg class="w-3.5 h-3.5 text-[#4FD1C5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
-                      <p class="text-[10px] uppercase tracking-[0.18em] font-black text-[#4FD1C5]">
-                        {{ t('schedule.service') }}
-                      </p>
-                    </div>
-                    <p class="text-sm leading-relaxed text-[#EDEFF4]">
-                      {{ agendamento.descricao }}
+                <article v-if="agendamento.valor" class="rounded-2xl border border-[#262E42] bg-[#1A2132] p-4">
+                  <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-3.5 h-3.5 text-[#4FD1C5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="text-[10px] uppercase tracking-[0.18em] font-black text-[#4FD1C5]">
+                      {{ t('schedule.serviceValue') }}
                     </p>
-                  </article>
-                </div>
+                  </div>
+                  <p class="text-base sm:text-lg font-black text-[#7FE0CC]">
+                    R$ {{ formatarValor(agendamento.valor) }}
+                  </p>
+                </article>
 
                 <article class="rounded-2xl border border-[#262E42] bg-[#1A2132] p-4">
                   <div class="flex items-center gap-2 mb-3">
@@ -202,31 +194,20 @@ onUnmounted(() => {
                 </article>
 
                 <article
-                  v-if="agendamento.telefone || agendamento.referencia || agendamento.observacoes"
+                  v-if="agendamento.observacoes"
                   class="rounded-2xl border border-[#262E42] bg-[#1A2132] p-4"
                 >
-                  <div class="flex items-center gap-2 mb-3">
+                  <div class="flex items-center gap-2 mb-2">
                     <svg class="w-3.5 h-3.5 text-[#4FD1C5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p class="text-[10px] uppercase tracking-[0.18em] font-black text-[#4FD1C5]">
-                      {{ t('schedule.extras') }}
+                      {{ t('schedule.notes') }}
                     </p>
                   </div>
-                  <ul class="space-y-2.5 text-sm">
-                    <li v-if="agendamento.telefone" class="flex items-start gap-3">
-                      <span class="text-[#4FD1C5] font-bold min-w-[70px] uppercase text-[10px] tracking-[0.15em] pt-0.5">{{ t('schedule.phone') }}:</span>
-                      <span class="font-semibold text-[#EDEFF4] leading-relaxed">{{ formatarTelefone(agendamento.telefone) }}</span>
-                    </li>
-                    <li v-if="agendamento.referencia" class="flex items-start gap-3">
-                      <span class="text-[#4FD1C5] font-bold min-w-[70px] uppercase text-[10px] tracking-[0.15em] pt-0.5">{{ t('schedule.reference') }}:</span>
-                      <span class="font-semibold text-[#EDEFF4] leading-relaxed">{{ agendamento.referencia }}</span>
-                    </li>
-                    <li v-if="agendamento.observacoes" class="flex items-start gap-3">
-                      <span class="text-[#4FD1C5] font-bold min-w-[70px] uppercase text-[10px] tracking-[0.15em] pt-0.5">{{ t('schedule.notes') }}:</span>
-                      <span class="font-semibold text-[#EDEFF4] leading-relaxed">{{ agendamento.observacoes }}</span>
-                    </li>
-                  </ul>
+                  <p class="text-sm leading-relaxed text-[#EDEFF4] whitespace-pre-wrap">
+                    {{ agendamento.observacoes }}
+                  </p>
                 </article>
               </div>
             </div>
@@ -234,6 +215,7 @@ onUnmounted(() => {
             <footer class="p-4 sm:p-6 pt-4 border-t border-[#262E42] bg-[#0F1420]/60 pb-[calc(1rem+env(safe-area-inset-bottom))] flex-none">
               <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <button
+                  type="button"
                   class="w-full sm:flex-1 sm:order-2 py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.99] shadow-lg"
                   :class="agendamento.servicoConcluido === true
                     ? 'bg-[#4A3D2A] text-[#F5C89C] border border-[#6E5A3A] shadow-[#4A3D2A]/40 hover:bg-[#5C4A33]'
@@ -243,6 +225,7 @@ onUnmounted(() => {
                   {{ agendamento.servicoConcluido === true ? t('schedule.reopen') : t('schedule.complete') }}
                 </button>
                 <button
+                  type="button"
                   class="w-full sm:flex-1 sm:order-1 py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.99] bg-[#233350] text-[#9FC1F5] border border-[#33517F] hover:bg-[#2A3D52] shadow-lg shadow-[#233350]/30"
                   @click="editar"
                 >

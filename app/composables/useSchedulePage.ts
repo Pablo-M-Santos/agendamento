@@ -11,6 +11,8 @@ export const useSchedulePage = () => {
   const route = useRoute()
   const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento, atualizarStatus } =
     useAgendamentos()
+  const toast = useToast()
+  const { t } = useAppI18n()
 
   const agendamentos = ref<Agendamento[]>([])
   const dataSelecionada = ref(new Date())
@@ -129,9 +131,14 @@ export const useSchedulePage = () => {
       if (atualizado && agendamentoDetalhes.value?.id === item.id) {
         agendamentoDetalhes.value = atualizado
       }
-    } catch (error: unknown) {
-      const err = error as FirebaseError
-      console.error('Erro ao atualizar status:', err)
+      toast.add({
+        title: novoStatus ? t('schedule.toast.completed') : t('schedule.toast.reopened'),
+        color: 'success'
+      })
+    } catch (err: unknown) {
+      const e = err as FirebaseError
+      console.error('Erro ao atualizar status:', e)
+      toast.add({ title: t('schedule.toast.statusError'), color: 'error' })
     }
   }
 
@@ -139,8 +146,10 @@ export const useSchedulePage = () => {
     try {
       if (dados.id) {
         await editarAgendamento(dados.id, dados)
+        toast.add({ title: t('schedule.toast.updated'), color: 'success' })
       } else {
         await criarAgendamento(dados)
+        toast.add({ title: t('schedule.toast.created'), color: 'success' })
       }
 
       isModalOpen.value = false
@@ -151,10 +160,10 @@ export const useSchedulePage = () => {
           agendamentoDetalhes.value = atualizado
         }
       }
-    } catch (error: unknown) {
-      const err = error as FirebaseError
-      console.error('Erro ao salvar agendamento:', err)
-      alert(err?.message || 'Nao foi possivel salvar o agendamento.')
+    } catch (err: unknown) {
+      const e = err as FirebaseError
+      console.error('Erro ao salvar agendamento:', e)
+      toast.add({ title: t('schedule.toast.saveError'), color: 'error' })
     }
   }
 
