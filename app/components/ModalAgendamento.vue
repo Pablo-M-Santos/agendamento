@@ -2,6 +2,7 @@
 import { ref, watch, computed, nextTick } from 'vue'
 import { format } from 'date-fns'
 import type { AgendamentoForm } from '~/types/agendamento'
+import { formatarTelefone } from '~/utils/formatarTelefone'
 
 const { dateLocale } = useUserSettings()
 const { t, language } = useAppI18n()
@@ -35,6 +36,11 @@ const descricao = ref('')
 const materialPronto = ref<boolean | null>(null)
 const servicoConcluido = ref<boolean>(false)
 const telefone = ref('')
+
+const onTelefoneInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  telefone.value = formatarTelefone(target.value)
+}
 const referencia = ref('')
 const observacoes = ref('')
 const horaSelecionada = ref('09:00')
@@ -84,7 +90,7 @@ watch(
         descricao.value = props.agendamentoInicial.descricao || ''
         materialPronto.value = props.agendamentoInicial.materialPronto ?? null
         servicoConcluido.value = props.agendamentoInicial.servicoConcluido ?? false
-        telefone.value = props.agendamentoInicial.telefone || ''
+        telefone.value = formatarTelefone(props.agendamentoInicial.telefone || '')
         referencia.value = props.agendamentoInicial.referencia || ''
         observacoes.value = props.agendamentoInicial.observacoes || ''
         horaSelecionada.value = Number.isNaN(dataDoc.getTime())
@@ -159,11 +165,11 @@ const fechar = () => emit('update:modelValue', false)
         <Transition name="scale">
           <div
             v-if="modelValue"
-            class="relative w-full max-w-2xl max-h-[100vh] sm:max-h-[85vh] rounded-none sm:rounded-3xl border border-[#262E42] bg-[#141A28] text-[#EDEFF4] shadow-2xl shadow-black/50 z-[101] flex flex-col"
+            class="relative w-full h-full sm:max-w-2xl sm:max-h-[85vh] sm:h-auto rounded-none sm:rounded-3xl border border-[#262E42] bg-[#141A28] text-[#EDEFF4] shadow-2xl shadow-black/50 z-[101] flex flex-col overflow-hidden"
             @click.stop
           >
-            <div class="p-5 sm:p-6 pt-8 sm:pt-6 flex-none">
-              <div class="flex items-start justify-between gap-3 mb-5">
+            <div class="p-5 sm:p-6 pt-8 sm:pt-6 flex-none border-b border-[#262E42]/50">
+              <div class="flex items-start justify-between gap-3">
                 <div class="flex-1 min-w-0">
                   <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#8A93A6]">
                     {{ t('schedule.title') }}
@@ -199,10 +205,12 @@ const fechar = () => emit('update:modelValue', false)
                   </svg>
                 </button>
               </div>
+            </div>
 
-               <div class="space-y-5 flex-1 overflow-y-auto">
+            <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5 sm:py-6">
+              <div class="space-y-4">
                 <section
-                  class="rounded-2xl border p-4 space-y-4 border-[#262E42] bg-[#1A2132]"
+                  class="rounded-2xl border p-4 sm:p-5 space-y-4 border-[#262E42] bg-[#1A2132]"
                 >
                   <div class="flex items-center justify-between">
                     <h4 class="text-sm font-black uppercase tracking-wider text-[#8A93A6]">
@@ -225,38 +233,70 @@ const fechar = () => emit('update:modelValue', false)
                     />
                   </div>
 
-                  <div>
-                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
-                      {{ t('schedule.houseNumber') }}
-                    </label>
-                    <input
-                      v-model="numeroCasa"
-                      type="text"
-                      inputmode="numeric"
-                      :placeholder="t('schedule.houseNumber')"
-                      class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
-                    />
+                  <div class="sm:hidden space-y-3">
+                    <div>
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.clientAddress') }}
+                      </label>
+                      <input
+                        v-model="endereco"
+                        type="text"
+                        :placeholder="t('schedule.clientAddress')"
+                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      />
+                    </div>
+                    <div>
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.houseNumber') }}
+                      </label>
+                      <input
+                        v-model="numeroCasa"
+                        type="text"
+                        inputmode="numeric"
+                        :placeholder="t('schedule.houseNumber')"
+                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      />
+                    </div>
                   </div>
 
-                  <div>
-                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
-                      {{ t('schedule.clientAddress') }}
-                    </label>
-                    <input
-                      v-model="endereco"
-                      type="text"
-                      :placeholder="t('schedule.clientAddress')"
-                      class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
-                    />
+                  <div class="hidden sm:grid sm:grid-cols-3 sm:gap-3">
+                    <div class="sm:col-span-1">
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.houseNumber') }}
+                      </label>
+                      <input
+                        v-model="numeroCasa"
+                        type="text"
+                        inputmode="numeric"
+                        :placeholder="t('schedule.houseNumber')"
+                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      />
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.clientAddress') }}
+                      </label>
+                      <input
+                        v-model="endereco"
+                        type="text"
+                        :placeholder="t('schedule.clientAddress')"
+                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      />
+                    </div>
                   </div>
                 </section>
 
                 <section
-                  class="rounded-2xl border p-4 border-[#262E42] bg-[#1A2132]"
+                  class="rounded-2xl border p-4 sm:p-5 border-[#262E42] bg-[#1A2132]"
                 >
-                  <label class="text-[10px] font-black uppercase tracking-[0.18em] block mb-3 text-[#6E7789]">
-                    {{ t('schedule.serviceTime') }}
-                  </label>
+                  <div class="flex items-center justify-between mb-3">
+                    <label class="text-[10px] font-black uppercase tracking-[0.18em] text-[#6E7789]">
+                      {{ t('schedule.serviceTime') }}
+                    </label>
+                    <span class="text-[10px] font-black text-[#4FD1C5]">
+                      {{ horaSelecionada }}
+                    </span>
+                  </div>
                   <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[160px] overflow-y-auto no-scrollbar">
                     <button
                       v-for="hora in horarios"
@@ -276,10 +316,10 @@ const fechar = () => emit('update:modelValue', false)
                 </section>
 
                 <section
-                  class="rounded-2xl border p-4 border-[#262E42] bg-[#1A2132]"
+                  class="rounded-2xl border p-4 sm:p-5 border-[#262E42] bg-[#1A2132]"
                 >
                   <div class="flex items-center justify-between gap-4">
-                    <div>
+                    <div class="flex-1">
                       <p class="text-sm font-black uppercase tracking-wider text-[#EDEFF4]">
                         {{ t('schedule.materialReadyQuestion') }}
                       </p>
@@ -288,7 +328,7 @@ const fechar = () => emit('update:modelValue', false)
                       </p>
                     </div>
 
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 flex-shrink-0">
                       <button
                         class="min-w-[56px] px-3 py-2 rounded-xl border font-black text-sm transition"
                         :class="
@@ -316,34 +356,37 @@ const fechar = () => emit('update:modelValue', false)
                 </section>
 
                 <section
-                  class="rounded-2xl border p-4 space-y-4 border-[#262E42] bg-[#1A2132]"
+                  class="rounded-2xl border p-4 sm:p-5 space-y-4 border-[#262E42] bg-[#1A2132]"
                 >
                   <h4 class="text-sm font-black uppercase tracking-wider text-[#8A93A6]">
                     {{ t('schedule.optionalFields') }}
                   </h4>
 
-                  <div>
-                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
-                      t('schedule.phone')
-                    }}</label>
-                    <input
-                      v-model="telefone"
-                      type="tel"
-                      :placeholder="t('schedule.phone')"
-                      class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
-                    />
-                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
+                        t('schedule.phone')
+                      }}</label>
+                      <input
+                        type="tel"
+                        :placeholder="t('schedule.phone')"
+                        :value="telefone"
+                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        @input="onTelefoneInput"
+                      />
+                    </div>
 
-                  <div>
-                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
-                      t('schedule.reference')
-                    }}</label>
-                    <input
-                      v-model="referencia"
-                      type="text"
-                      :placeholder="t('schedule.reference')"
-                      class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
-                    />
+                    <div>
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
+                        t('schedule.reference')
+                      }}</label>
+                      <input
+                        v-model="referencia"
+                        type="text"
+                        :placeholder="t('schedule.reference')"
+                        class="w-full mt-1 p-3 rounded-xl border focus:border-[#4FD1C5] outline-none transition-all font-semibold bg-[#141A28] border-[#262E42] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -374,15 +417,6 @@ const fechar = () => emit('update:modelValue', false)
             </div>
 
             <div class="p-5 sm:p-6 pt-5 sm:pt-6 border-t border-[#262E42] bg-[#0F1420]/50 space-y-3 flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
-              <template v-if="!agendamentoInicial">
-                <button
-                  class="w-full py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.99] shadow-lg bg-[#1B4F4A] text-[#EAFBF6] border border-[#2C6E67] shadow-[#1B4F4A]/30 hover:bg-[#23655F]"
-                  @click="handleSalvar"
-                >
-                  {{ t('schedule.confirmService') }}
-                </button>
-              </template>
-
               <div class="grid grid-cols-2 gap-3">
                 <button
                   class="py-3.5 rounded-xl border font-black text-sm border-[#262E42] bg-[#1E2A3D] text-[#EDEFF4] hover:bg-[#262E42] hover:border-[#8A93A6]/30 transition-all active:scale-[0.99]"
@@ -391,11 +425,10 @@ const fechar = () => emit('update:modelValue', false)
                   {{ t('schedule.cancel') }}
                 </button>
                 <button
-                  v-if="agendamentoInicial"
-                  class="py-3.5 rounded-xl bg-[#233350] text-[#9FC1F5] border border-[#33517F] font-black text-sm hover:bg-[#2A3D52] active:scale-[0.99] transition-all shadow-lg shadow-[#233350]/20"
+                  class="py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.99] shadow-lg bg-[#1B4F4A] text-[#EAFBF6] border border-[#2C6E67] shadow-[#1B4F4A]/30 hover:bg-[#23655F]"
                   @click="handleSalvar"
                 >
-                  {{ t('schedule.saveChanges') }}
+                  {{ agendamentoInicial ? t('schedule.saveChanges') : t('schedule.confirmService') }}
                 </button>
               </div>
             </div>

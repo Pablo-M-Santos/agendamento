@@ -125,6 +125,10 @@ export const useSchedulePage = () => {
     try {
       await atualizarStatus(item.id, { servicoConcluido: novoStatus })
       await carregarAgendamentos()
+      const atualizado = agendamentos.value.find((a) => a.id === item.id)
+      if (atualizado && agendamentoDetalhes.value?.id === item.id) {
+        agendamentoDetalhes.value = atualizado
+      }
     } catch (error: unknown) {
       const err = error as FirebaseError
       console.error('Erro ao atualizar status:', err)
@@ -141,6 +145,12 @@ export const useSchedulePage = () => {
 
       isModalOpen.value = false
       await carregarAgendamentos()
+      if (dados.id && agendamentoDetalhes.value?.id === dados.id) {
+        const atualizado = agendamentos.value.find((a) => a.id === dados.id)
+        if (atualizado) {
+          agendamentoDetalhes.value = atualizado
+        }
+      }
     } catch (error: unknown) {
       const err = error as FirebaseError
       console.error('Erro ao salvar agendamento:', err)
