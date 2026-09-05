@@ -107,7 +107,7 @@ const statsLate = computed(() =>
 </script>
 
 <template>
-  <div class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]" :class="{ 'lg:pl-[22rem]': isSidebarOpen }">
+  <div class="h-full px-4  sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]" :class="{ 'lg:pl-[22rem]': isSidebarOpen }">
       <DashboardTopBar
         :greeting="saudacaoDashboard"
         :photo-url="user?.photoURL"
