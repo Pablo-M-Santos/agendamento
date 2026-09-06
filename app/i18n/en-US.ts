@@ -141,11 +141,8 @@ export const enUS = {
   'reports.export.empty': 'No data to export in this period',
   'reports.charts.statusDistribution': 'Status distribution',
   'reports.charts.completionTrend': 'Completion trend',
-  'reports.charts.heatmap': 'Bookings by day and hour',
-  'reports.insights.title': 'Actionable insights',
-  'reports.insights.upcoming': 'Upcoming',
-  'reports.insights.late': 'Late',
-  'dashboard.topBar.appointmentsToday': "Today's appointments",
+   'reports.charts.heatmap': 'Bookings by day and hour',
+   'dashboard.topBar.appointmentsToday': "Today's appointments",
   'dashboard.topBar.notifications': 'Notifications',
   'dashboard.topBar.noNotifications': 'No notifications',
   'dashboard.stats.appointmentsToday': 'Appointments today',
@@ -156,5 +153,4 @@ export const enUS = {
   'dashboard.upcomingAppointments': 'Upcoming appointments',
   'dashboard.noUpcomingAppointments': 'No upcoming appointments.',
   'dashboard.topBar.unreadNotifications': 'unread notifications',
-  'reports.topAddresses': 'Top addresses'
 }

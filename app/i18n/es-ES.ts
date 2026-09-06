@@ -130,11 +130,8 @@ export const esES = {
   'reports.export.empty': 'Sin datos para exportar en el periodo',
   'reports.charts.statusDistribution': 'Distribucion por estado',
   'reports.charts.completionTrend': 'Tendencia de finalizacion',
-  'reports.charts.heatmap': 'Atenciones por dia y horario',
-  'reports.insights.title': 'Insights accionables',
-  'reports.insights.upcoming': 'Proximos',
-  'reports.insights.late': 'Atrasados',
-  'dashboard.topBar.appointmentsToday': 'Agendamientos del dia',
+   'reports.charts.heatmap': 'Atenciones por dia y horario',
+   'dashboard.topBar.appointmentsToday': 'Agendamientos del dia',
   'dashboard.topBar.notifications': 'Notificaciones',
   'dashboard.topBar.noNotifications': 'Sin notificaciones',
   'dashboard.stats.appointmentsToday': 'Agendamientos hoy',
@@ -144,6 +141,5 @@ export const esES = {
   'dashboard.moduleCards.history': 'Historial',
   'dashboard.upcomingAppointments': 'Proximos agendamientos',
   'dashboard.noUpcomingAppointments': 'Ningun agendamiento futuro.',
-  'dashboard.topBar.unreadNotifications': 'notificaciones no leidas',
-  'reports.topAddresses': 'Top direcciones'
+   'dashboard.topBar.unreadNotifications': 'notificaciones no leidas',
 }
