@@ -105,7 +105,7 @@ const links = computed(() => [
       >
         <aside
           v-if="props.modelValue"
-          class="relative w-80 max-w-[85vw] h-full p-6 flex flex-col pointer-events-auto bg-[#141A28] text-[#EDEFF4]"
+          class="relative w-80 max-w-[85vw] h-full p-6 flex flex-col pointer-events-auto bg-[#0F1729] text-[#EDEFF4]"
         >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3 min-w-0">
@@ -171,7 +171,7 @@ const links = computed(() => [
 
       <aside
         v-if="isDesktop && props.modelValue"
-        class="fixed left-0 top-0 z-[90] h-full w-80 max-w-[85vw] p-6 flex flex-col pointer-events-auto bg-[#141A28] text-[#EDEFF4] border-r border-[#262E42]"
+        class="fixed left-0 top-0 z-[90] h-full w-80 max-w-[85vw] p-6 flex flex-col pointer-events-auto bg-[#0F1729] text-[#EDEFF4] border-r border-[#262E42]"
       >
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3 min-w-0">
