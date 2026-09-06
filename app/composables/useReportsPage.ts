@@ -194,6 +194,24 @@ export const useReportsPage = () => {
       .slice(0, 5)
   })
 
+  const volumePorHorario = computed(() => {
+    const mapa = new Map<number, number>()
+    agendamentosFiltrados.value.forEach((item) => {
+      if (!item.data) return
+      const hora = item.data.toDate().getHours()
+      mapa.set(hora, (mapa.get(hora) || 0) + 1)
+    })
+
+    const linhas: { label: string; total: number }[] = []
+    for (let h = 7; h <= 20; h++) {
+      linhas.push({
+        label: `${String(h).padStart(2, '0')}h`,
+        total: mapa.get(h) || 0
+      })
+    }
+    return linhas
+  })
+
   const diaMaisCheio = computed(() => {
     if (!serieDiaria.value.length) return null
 
@@ -204,6 +222,7 @@ export const useReportsPage = () => {
     periodoSelecionado,
     filtroStatus,
     carregando,
+    carregar,
     agendamentos,
     totalAgendamentos,
     totalFinalizados,
@@ -213,6 +232,7 @@ export const useReportsPage = () => {
     materialResumo,
     serieDiaria,
     topClientes,
+    volumePorHorario,
     diaMaisCheio,
     agendamentosNoPeriodo,
     agendamentosFiltrados
