@@ -112,7 +112,7 @@ const xLabels = computed(() => {
         <span class="text-[#8A93A6] font-bold uppercase tracking-wider">Total</span>
       </div>
       <div class="flex items-center gap-1.5">
-        <div class="w-3 h-3 rounded-sm bg-[#4FD1C5]" />
+        <div class="w-3 h-3 rounded-sm bg-[#7FE0CC]" />
         <span class="text-[#8A93A6] font-bold uppercase tracking-wider">Concluídos</span>
       </div>
       <div class="ml-auto flex items-center gap-3 text-[#8A93A6]">
@@ -174,7 +174,7 @@ const xLabels = computed(() => {
           v-if="pathLineConcluidos"
           :d="pathLineConcluidos"
           fill="none"
-          stroke="#4FD1C5"
+          stroke="#7FE0CC"
           stroke-width="2.5"
           stroke-linecap="round"
           stroke-linejoin="round"
@@ -196,7 +196,7 @@ const xLabels = computed(() => {
           :cx="p.x"
           :cy="p.yConcluidos"
           r="3.5"
-          fill="#4FD1C5"
+          fill="#7FE0CC"
           stroke="#141A28"
           stroke-width="2"
         />
