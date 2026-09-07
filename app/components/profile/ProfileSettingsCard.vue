@@ -1,7 +1,6 @@
 <script setup lang="ts">
 withDefaults(
   defineProps<{
-    isLightTheme: boolean
     title: string
     options: Array<{ value: string; label: string }>
     selectedValue: string
@@ -21,12 +20,10 @@ const emit = defineEmits<{
 
 <template>
   <section
-    class="p-5 rounded-3xl border transition-colors"
-    :class="isLightTheme ? 'border-[#D8E7FF] bg-white' : 'border-white/15 bg-white/10'"
+    class="p-5 rounded-3xl border transition-colors border-[#262E42] bg-[#1A2132]"
   >
     <h3
-      class="text-xs font-black uppercase tracking-[0.2em] mb-4"
-      :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-white/80'"
+      class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-[#8A93A6]"
     >
       {{ title }}
     </h3>
@@ -40,12 +37,8 @@ const emit = defineEmits<{
         :aria-pressed="selectedValue === option.value"
         :class="
           selectedValue === option.value
-            ? isLightTheme
-              ? 'bg-[#003D7A] border-[#003D7A] text-white'
-              : 'bg-white border-white text-[#003D7A]'
-            : isLightTheme
-              ? 'bg-[#F4F8FF] border-[#D8E7FF] text-[#0B1F3A]'
-              : 'bg-white/10 border-white/20 text-white'
+            ? 'bg-[#1B4F4A] border-[#2C6E67] text-[#EAFBF6]'
+            : 'bg-[#1E2A3D] border-[#262E42] text-[#EDEFF4]'
         "
         @click="emit('select', option.value)"
       >
@@ -53,7 +46,7 @@ const emit = defineEmits<{
       </button>
     </div>
 
-    <p class="text-xs mt-3" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-white/70'">
+    <p class="text-xs mt-3 text-[#6E7789]">
       {{ feedback }}
     </p>
   </section>

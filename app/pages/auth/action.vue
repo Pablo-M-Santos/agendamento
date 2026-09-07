@@ -3,8 +3,6 @@ import { applyActionCode } from 'firebase/auth'
 
 const { $auth } = useNuxtApp()
 const route = useRoute()
-const { settings } = useUserSettings()
-const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const loading = ref(true)
 const message = ref('Processando ação...')
@@ -12,15 +10,6 @@ const hasError = ref(false)
 
 const mode = computed(() => String(route.query.mode || ''))
 const oobCode = computed(() => String(route.query.oobCode || ''))
-
-const redirectToResetPassword = async () => {
-  await navigateTo({
-    path: '/reset-password',
-    query: {
-      oobCode: oobCode.value
-    }
-  })
-}
 
 const verifyEmailAction = async () => {
   await applyActionCode($auth, oobCode.value)
@@ -41,13 +30,15 @@ onMounted(async () => {
   }
 
   try {
-    if (mode.value === 'resetPassword') {
-      await redirectToResetPassword()
+    if (mode.value === 'verifyEmail') {
+      await verifyEmailAction()
       return
     }
 
-    if (mode.value === 'verifyEmail') {
-      await verifyEmailAction()
+    if (mode.value === 'resetPassword') {
+      hasError.value = true
+      message.value = 'Ação não suportada.'
+      loading.value = false
       return
     }
 
@@ -64,11 +55,10 @@ onMounted(async () => {
 
 <template>
   <div
-    class="h-dvh flex items-center justify-center px-6 transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+    class="h-dvh flex items-center justify-center px-6 transition-colors bg-[#141A28] text-[#EDEFF4]"
   >
     <div class="text-center">
-      <p v-if="loading" :class="isLightTheme ? 'text-[#003D7A]' : 'text-white'">
+      <p v-if="loading" class="text-[#EDEFF4]">
         Processando link...
       </p>
       <p v-else :class="hasError ? 'text-red-300' : 'text-green-300'">{{ message }}</p>

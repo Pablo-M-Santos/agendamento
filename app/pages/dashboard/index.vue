@@ -1,14 +1,22 @@
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
+import DashboardStatsCards from '~/components/dashboard/DashboardStatsCards.vue'
+import DashboardQuickLinks from '~/components/dashboard/DashboardQuickLinks.vue'
+
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { user } = useAuth()
-const { listarAgendamentos } = useAgendamentos()
-const { settings } = useUserSettings()
+const { listarAgendamentos, atualizarStatus } = useAgendamentos()
 const { t } = useAppI18n()
 
 const agendamentos = ref<Agendamento[]>([])
 const isSidebarOpen = ref(false)
-const isLightTheme = computed(() => settings.value.theme === 'light')
+const selectedAgendamento = ref<Agendamento | null>(null)
+const isDetailsModalOpen = ref(false)
+
+onMounted(() => {
+  isSidebarOpen.value = window.matchMedia('(min-width: 1024px)').matches
+})
 
 const isGoogleLogin = computed(() => {
   return user.value?.providerData?.some((provider) => provider.providerId === 'google.com') ?? false
@@ -66,34 +74,78 @@ const labelsRecentes = computed(() => ({
   serviceOpen: t('schedule.serviceOpen'),
   serviceNotCompleted: t('schedule.serviceNotCompleted')
 }))
+
+const handleViewItem = (item: Agendamento) => {
+  selectedAgendamento.value = item
+  isDetailsModalOpen.value = true
+}
+
+const toggleServicoConcluido = async (item: Agendamento) => {
+  if (!item.id) return
+  const novoStatus = item.servicoConcluido === true ? false : true
+  await atualizarStatus(item.id, { servicoConcluido: novoStatus })
+  await carregar()
+}
+
+const handleToggleStatus = async (item: Agendamento) => {
+  await toggleServicoConcluido(item)
+  isDetailsModalOpen.value = false
+}
+
+const statsTotal = computed(() => agendamentos.value.length)
+const statsCompleted = computed(() => agendamentos.value.filter((a) => a.servicoConcluido === true).length)
+const statsOpen = computed(() => agendamentos.value.filter((a) => a.servicoConcluido !== true).length)
+const hoje = new Date()
+hoje.setHours(0, 0, 0, 0)
+const statsLate = computed(() =>
+  agendamentos.value.filter((a) => {
+    const data = a.data.toDate()
+    data.setHours(0, 0, 0, 0)
+    return data < hoje && a.servicoConcluido !== true
+  }).length
+)
 </script>
 
 <template>
-  <div
-    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
-  >
-    <DashboardTopBar
-      :is-light-theme="isLightTheme"
-      :greeting="saudacaoDashboard"
-      :photo-url="user?.photoURL"
-      :user-initial="inicialUsuario"
-      :open-sidebar-label="t('dashboard.openSidebar')"
-      :go-profile-label="t('dashboard.goProfile')"
-      @open-sidebar="isSidebarOpen = true"
-    />
+  <div class="h-full px-4  sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden text-[#EDEFF4] bg-[#141A28]" :class="{ 'lg:pl-[22rem]': isSidebarOpen }">
+      <DashboardTopBar
+        :greeting="saudacaoDashboard"
+        :photo-url="user?.photoURL"
+        :user-initial="inicialUsuario"
+        :open-sidebar-label="t('dashboard.openSidebar')"
+        :go-profile-label="t('dashboard.goProfile')"
+        :sidebar-open="isSidebarOpen"
+        @open-sidebar="isSidebarOpen = !isSidebarOpen"
+      />
 
-    <DashboardSidebar v-model="isSidebarOpen" />
+      <DashboardSidebar v-model="isSidebarOpen" />
 
-    <DashboardQuickActions
-      :schedule-label="t('dashboard.scheduleCard')"
-      :reports-label="t('dashboard.reportsCard')"
-    />
+      <DashboardStatsCards
+        title="Resumo"
+        :total="statsTotal"
+        :completed="statsCompleted"
+        :open="statsOpen"
+        :late="statsLate"
+      />
 
-    <DashboardRecentServicesSection
-      :is-light-theme="isLightTheme"
-      :items="ultimosServicos"
-      :labels="labelsRecentes"
-    />
+      <DashboardQuickLinks
+        title="Acesso rapido"
+        :schedule-label="t('dashboard.scheduleCard')"
+        :reports-label="t('dashboard.reportsCard')"
+        :notifications-label="t('dashboard.notificationsCard')"
+        :history-label="t('dashboard.historyCard')"
+      />
+
+      <DashboardRecentServicesSection
+        :items="ultimosServicos"
+        :labels="labelsRecentes"
+        @view-item="handleViewItem"
+      />
+
+      <ScheduleServiceDetailsModal
+        v-model="isDetailsModalOpen"
+        :agendamento="selectedAgendamento"
+        @toggle-status="handleToggleStatus"
+      />
   </div>
 </template>

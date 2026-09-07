@@ -5,14 +5,14 @@ import type { FirebaseError } from 'firebase/app'
 import type { AgendamentoForm } from '~/types/agendamento'
 import { useAuth } from '~/composables/useAuth'
 import { useAgendamentos, type Agendamento } from '~/composables/useAgendamentos'
-import { useUserSettings } from '~/composables/useUserSettings'
 
 export const useSchedulePage = () => {
   const { user } = useAuth()
-  const { settings } = useUserSettings()
   const route = useRoute()
-  const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento } =
+  const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento, atualizarStatus } =
     useAgendamentos()
+  const toast = useToast()
+  const { t } = useAppI18n()
 
   const agendamentos = ref<Agendamento[]>([])
   const dataSelecionada = ref(new Date())
@@ -27,8 +27,7 @@ export const useSchedulePage = () => {
   const centralizacaoInicialFeita = ref(false)
   const centralizacaoInicialEmAndamento = ref(false)
 
-  const isLightTheme = computed(() => settings.value.theme === 'light')
-
+  
   const diasCarrossel = computed(() => {
     const inicio = startOfMonth(dataSelecionada.value)
     const fim = endOfMonth(dataSelecionada.value)
@@ -122,20 +121,49 @@ export const useSchedulePage = () => {
     abrirModal(item)
   }
 
+  const toggleServicoConcluido = async (item: Agendamento) => {
+    if (!item.id) return
+    const novoStatus = item.servicoConcluido === true ? false : true
+    try {
+      await atualizarStatus(item.id, { servicoConcluido: novoStatus })
+      await carregarAgendamentos()
+      const atualizado = agendamentos.value.find((a) => a.id === item.id)
+      if (atualizado && agendamentoDetalhes.value?.id === item.id) {
+        agendamentoDetalhes.value = atualizado
+      }
+      toast.add({
+        title: novoStatus ? t('schedule.toast.completed') : t('schedule.toast.reopened'),
+        color: 'success'
+      })
+    } catch (err: unknown) {
+      const e = err as FirebaseError
+      console.error('Erro ao atualizar status:', e)
+      toast.add({ title: t('schedule.toast.statusError'), color: 'error' })
+    }
+  }
+
   const handleSalvarAgendamento = async (dados: AgendamentoForm) => {
     try {
       if (dados.id) {
         await editarAgendamento(dados.id, dados)
+        toast.add({ title: t('schedule.toast.updated'), color: 'success' })
       } else {
         await criarAgendamento(dados)
+        toast.add({ title: t('schedule.toast.created'), color: 'success' })
       }
 
       isModalOpen.value = false
       await carregarAgendamentos()
-    } catch (error: unknown) {
-      const err = error as FirebaseError
-      console.error('Erro ao salvar agendamento:', err)
-      alert(err?.message || 'Nao foi possivel salvar o agendamento.')
+      if (dados.id && agendamentoDetalhes.value?.id === dados.id) {
+        const atualizado = agendamentos.value.find((a) => a.id === dados.id)
+        if (atualizado) {
+          agendamentoDetalhes.value = atualizado
+        }
+      }
+    } catch (err: unknown) {
+      const e = err as FirebaseError
+      console.error('Erro ao salvar agendamento:', e)
+      toast.add({ title: t('schedule.toast.saveError'), color: 'error' })
     }
   }
 
@@ -246,7 +274,6 @@ export const useSchedulePage = () => {
     isDetalhesOpen,
     agendamentoDetalhes,
     isConfirmOpen,
-    isLightTheme,
     diasCarrossel,
     agendamentosFiltrados,
     agendamentoAlvoIdNoDia,
@@ -256,6 +283,7 @@ export const useSchedulePage = () => {
     abrirModal,
     abrirDetalhes,
     abrirEdicaoPelosDetalhes,
-    handleSalvarAgendamento
+    handleSalvarAgendamento,
+    toggleServicoConcluido
   }
 }

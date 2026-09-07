@@ -11,17 +11,16 @@ import {
 import type { Agendamento } from '~/composables/useAgendamentos'
 import { useAgendamentos } from '~/composables/useAgendamentos'
 import { useAuth } from '~/composables/useAuth'
-import { useUserSettings } from '~/composables/useUserSettings'
 
 export type ReportsPeriod = '7d' | '30d' | 'mes'
+export type StatusFilter = 'todos' | 'concluidos' | 'abertos' | 'atrasados'
 
 export const useReportsPage = () => {
   const { user } = useAuth()
   const { listarAgendamentos } = useAgendamentos()
-  const { settings } = useUserSettings()
 
-  const isLightTheme = computed(() => settings.value.theme === 'light')
   const periodoSelecionado = ref<ReportsPeriod>('30d')
+  const filtroStatus = ref<StatusFilter>('todos')
   const carregando = ref(true)
   const agendamentos = ref<Agendamento[]>([])
 
@@ -90,15 +89,35 @@ export const useReportsPage = () => {
     })
   })
 
-  const totalAgendamentos = computed(() => agendamentosNoPeriodo.value.length)
+  const agendamentosFiltrados = computed(() => {
+    const lista = agendamentosNoPeriodo.value
+    const agora = Date.now()
+
+    switch (filtroStatus.value) {
+      case 'concluidos':
+        return lista.filter((item) => item.servicoConcluido === true)
+      case 'abertos':
+        return lista.filter((item) => item.servicoConcluido === false)
+      case 'atrasados':
+        return lista.filter((item) => {
+          if (!item.data) return false
+          if (item.servicoConcluido === true) return false
+          return item.data.toMillis() < agora
+        })
+      default:
+        return lista
+    }
+  })
+
+  const totalAgendamentos = computed(() => agendamentosFiltrados.value.length)
   const totalFinalizados = computed(
-    () => agendamentosNoPeriodo.value.filter((item) => item.servicoConcluido === true).length
+    () => agendamentosFiltrados.value.filter((item) => item.servicoConcluido === true).length
   )
   const totalNaoConcluidos = computed(
-    () => agendamentosNoPeriodo.value.filter((item) => item.servicoConcluido !== true).length
+    () => agendamentosFiltrados.value.filter((item) => item.servicoConcluido !== true).length
   )
   const totalMaterialPronto = computed(
-    () => agendamentosNoPeriodo.value.filter((item) => item.materialPronto === true).length
+    () => agendamentosFiltrados.value.filter((item) => item.materialPronto === true).length
   )
 
   const taxaConclusao = computed(() => {
@@ -107,11 +126,11 @@ export const useReportsPage = () => {
   })
 
   const materialResumo = computed(() => {
-    const pronto = agendamentosNoPeriodo.value.filter((item) => item.materialPronto === true).length
-    const semMaterial = agendamentosNoPeriodo.value.filter(
+    const pronto = agendamentosFiltrados.value.filter((item) => item.materialPronto === true).length
+    const semMaterial = agendamentosFiltrados.value.filter(
       (item) => item.materialPronto === false
     ).length
-    const naoInformado = agendamentosNoPeriodo.value.length - pronto - semMaterial
+    const naoInformado = agendamentosFiltrados.value.length - pronto - semMaterial
 
     return {
       pronto,
@@ -130,7 +149,7 @@ export const useReportsPage = () => {
       mapa.set(format(dia, 'yyyy-MM-dd'), { total: 0, finalizados: 0 })
     })
 
-    agendamentosNoPeriodo.value.forEach((item) => {
+    agendamentosFiltrados.value.forEach((item) => {
       const chave = format(item.data.toDate(), 'yyyy-MM-dd')
       const atual = mapa.get(chave)
       if (!atual) return
@@ -157,7 +176,7 @@ export const useReportsPage = () => {
   const topClientes = computed(() => {
     const mapa = new Map<string, { total: number; finalizados: number }>()
 
-    agendamentosNoPeriodo.value.forEach((item) => {
+    agendamentosFiltrados.value.forEach((item) => {
       const nome = (item.cliente || 'Cliente nao informado').trim() || 'Cliente nao informado'
       const atual = mapa.get(nome) || { total: 0, finalizados: 0 }
       atual.total += 1
@@ -175,6 +194,24 @@ export const useReportsPage = () => {
       .slice(0, 5)
   })
 
+  const volumePorHorario = computed(() => {
+    const mapa = new Map<number, number>()
+    agendamentosFiltrados.value.forEach((item) => {
+      if (!item.data) return
+      const hora = item.data.toDate().getHours()
+      mapa.set(hora, (mapa.get(hora) || 0) + 1)
+    })
+
+    const linhas: { label: string; total: number }[] = []
+    for (let h = 7; h <= 20; h++) {
+      linhas.push({
+        label: `${String(h).padStart(2, '0')}h`,
+        total: mapa.get(h) || 0
+      })
+    }
+    return linhas
+  })
+
   const diaMaisCheio = computed(() => {
     if (!serieDiaria.value.length) return null
 
@@ -182,9 +219,11 @@ export const useReportsPage = () => {
   })
 
   return {
-    isLightTheme,
     periodoSelecionado,
+    filtroStatus,
     carregando,
+    carregar,
+    agendamentos,
     totalAgendamentos,
     totalFinalizados,
     totalNaoConcluidos,
@@ -193,6 +232,9 @@ export const useReportsPage = () => {
     materialResumo,
     serieDiaria,
     topClientes,
-    diaMaisCheio
+    volumePorHorario,
+    diaMaisCheio,
+    agendamentosNoPeriodo,
+    agendamentosFiltrados
   }
 }

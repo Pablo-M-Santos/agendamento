@@ -5,13 +5,9 @@ export const useLoginPage = () => {
   const { $auth } = useNuxtApp()
   const {
     loginWithEmail: authLoginWithEmail,
-    loginWithGoogle: authLoginWithGoogle,
-    sendSetPasswordEmail: authSendSetPasswordEmail
+    loginWithGoogle: authLoginWithGoogle
   } = useAuth()
-  const { settings } = useUserSettings()
   const toast = useToast()
-
-  const isLightTheme = computed(() => settings.value.theme === 'light')
   const email = ref('')
   const password = ref('')
   const loading = ref(false)
@@ -53,26 +49,6 @@ export const useLoginPage = () => {
     return !!email.value && !!password.value && !errors.email && !errors.password
   })
 
-  const handleSetPasswordByEmail = async () => {
-    const result = await authSendSetPasswordEmail(email.value.trim())
-
-    if (!result.ok) {
-      toast.add({
-        title: 'Erro ao enviar e-mail',
-        description: 'Nao foi possivel enviar agora. Tente novamente em instantes.',
-        color: 'error'
-      })
-      return
-    }
-
-    toast.add({
-      title: 'Confira seu e-mail',
-      description:
-        'Enviamos os proximos passos para definir sua senha. Veja tambem a caixa de spam ou entre com Google.',
-      color: 'warning'
-    })
-  }
-
   const loginWithEmail = async () => {
     validateField('email')
     validateField('password')
@@ -91,8 +67,8 @@ export const useLoginPage = () => {
           case 'auth/invalid-login':
           case 'auth/wrong-password':
           case 'auth/invalid-credential':
-            await handleSetPasswordByEmail()
-            return
+            message = 'Email ou senha incorretos.'
+            break
           case 'auth/invalid-email':
             message = 'Email invalido.'
             break
@@ -173,7 +149,6 @@ export const useLoginPage = () => {
   }
 
   return {
-    isLightTheme,
     email,
     password,
     loading,

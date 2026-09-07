@@ -3,8 +3,6 @@ import { onBeforeUnmount, ref, watch } from 'vue'
 import { format, isSameDay } from 'date-fns'
 
 const { dateLocale } = useUserSettings()
-const { settings } = useUserSettings()
-const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const props = defineProps<{
   diasCarrossel: Date[]
@@ -76,30 +74,31 @@ onBeforeUnmount(() => {
 <template>
   <div
     ref="carouselRef"
-    class="flex overflow-x-auto px-6 py-8 gap-3 no-scrollbar scroll-smooth snap-x snap-proximity"
+    class="flex overflow-x-auto px-2 sm:px-6 py-6 sm:py-8 gap-2 sm:gap-3 no-scrollbar scroll-smooth snap-x snap-proximity"
   >
     <button
       v-for="dia in diasCarrossel"
       :id="'dia-' + format(dia, 'yyyy-MM-dd')"
       :key="dia.toISOString()"
       :data-date="format(dia, 'yyyy-MM-dd')"
-      :class="[
-        'relative flex flex-col items-center min-w-[65px] py-4 rounded-[10px] transition-all duration-300 snap-center',
-        isSameDay(dia, dataSelecionada)
-          ? 'bg-[#FBFBFB] text-white scale-110 shadow-md'
-          : eHoje(dia)
-            ? isLightTheme
-              ? 'border-2 border-[#003D7A] text-[#003D7A] font-bold'
-              : 'border-2 border-white text-white font-bold'
-            : isLightTheme
-              ? 'border-2 border-transparent text-[#5B6B8A] hover:bg-[#E8F1FF]'
-              : 'border-2 border-transparent text-white hover:bg-white/10'
-      ]"
+        :class="[
+          'relative flex flex-col items-center min-w-[65px] py-4 rounded-[10px] transition-all duration-300 snap-center',
+          isSameDay(dia, dataSelecionada)
+            ? 'bg-[#1B4F4A] text-[#EAFBF6] scale-110 shadow-md'
+            : eHoje(dia)
+              ? 'border-2 border-[#4FD1C5] text-[#4FD1C5] font-bold'
+              : 'border-2 border-transparent text-[#EDEFF4] hover:bg-white/5'
+        ]"
       @click="handleClickDia(dia)"
     >
       <div
         v-if="getQuantidadePorDia(dia) > 0"
-        class="absolute -top-3 bg-green-500 text-black text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md"
+        :class="[
+          'absolute -top-3 text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-md',
+          isSameDay(dia, dataSelecionada)
+            ? 'bg-[#4FD1C5] text-[#141A28]'
+            : 'bg-[#1B4F4A] text-[#EAFBF6]'
+        ]"
       >
         {{ getQuantidadePorDia(dia) }}
       </div>
@@ -107,11 +106,7 @@ onBeforeUnmount(() => {
       <span
         :class="[
           'text-[16px] uppercase font-black tracking-widest mb-1',
-          isSameDay(dia, dataSelecionada)
-            ? 'text-[#003D7A]'
-            : isLightTheme
-              ? 'text-[#5B6B8A]'
-              : 'text-white'
+          isSameDay(dia, dataSelecionada) ? 'text-[#EAFBF6]' : 'text-[#EDEFF4]'
         ]"
       >
         {{ getDiaLetra(dia) }}
@@ -120,11 +115,7 @@ onBeforeUnmount(() => {
       <span
         :class="[
           'font-black text-xl',
-          isSameDay(dia, dataSelecionada)
-            ? 'text-[#003D7A]'
-            : isLightTheme
-              ? 'text-[#0B1F3A]'
-              : 'text-white'
+          isSameDay(dia, dataSelecionada) ? 'text-[#EAFBF6]' : 'text-[#EDEFF4]'
         ]"
       >
         {{ format(dia, 'd') }}

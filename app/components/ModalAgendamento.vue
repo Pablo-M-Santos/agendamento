@@ -2,11 +2,10 @@
 import { ref, watch, computed, nextTick } from 'vue'
 import { format } from 'date-fns'
 import type { AgendamentoForm } from '~/types/agendamento'
+import { formatarValor, parseValor, valorValido } from '~/utils/formatarValor'
 
 const { dateLocale } = useUserSettings()
-const { settings } = useUserSettings()
 const { t, language } = useAppI18n()
-const isLightTheme = computed(() => settings.value.theme === 'light')
 
 const props = defineProps<{
   modelValue: boolean
@@ -14,32 +13,21 @@ const props = defineProps<{
   dataSelecionadaNoPai: Date
 }>()
 
-type AgendamentoPayload = {
-  id?: string
-  cliente: string
-  numeroCasa: string
-  endereco: string
-  descricao: string
-  materialPronto?: boolean | null
-  servicoConcluido?: boolean | null
-  telefone?: string
-  referencia?: string
-  observacoes?: string
-  data: string
-}
-
-const emit = defineEmits(['update:modelValue', 'salvar'])
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'salvar', dados: AgendamentoForm): void
+}>()
 
 const cliente = ref('')
 const numeroCasa = ref('')
 const endereco = ref('')
-const descricao = ref('')
+const valor = ref('')
 const materialPronto = ref<boolean | null>(null)
-const servicoConcluido = ref<boolean | null>(null)
-const telefone = ref('')
-const referencia = ref('')
+const servicoConcluido = ref<boolean>(false)
 const observacoes = ref('')
 const horaSelecionada = ref('09:00')
+
+const erros = ref<Record<string, string>>({})
 
 const horarios = computed(() => {
   const lista = []
@@ -73,21 +61,53 @@ const pegarHorarioMaisProximo = () => {
   return horaFinal
 }
 
+const onClienteInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  cliente.value = target.value.replace(/[0-9]/g, '')
+  erros.value.cliente = ''
+}
+
+const onNumeroCasaInput = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  numeroCasa.value = target.value.replace(/\D/g, '')
+  erros.value.numeroCasa = ''
+}
+
+  const onValorInput = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    valor.value = target.value.replace(/[^\d,]/g, '')
+    erros.value.valor = ''
+  }
+
+  const onValorBlur = () => {
+    if (valor.value.trim()) {
+      valor.value = formatarValor(parseValor(valor.value))
+    }
+  }
+
+const onEnderecoInput = () => {
+  erros.value.endereco = ''
+}
+
+const onObservacoesInput = () => {
+  erros.value.observacoes = ''
+}
+
 watch(
   () => props.modelValue,
   async (isOpen) => {
     if (isOpen) {
+      erros.value = {}
+
       if (props.agendamentoInicial) {
         const dataDoc = new Date(props.agendamentoInicial.data)
 
-        cliente.value = props.agendamentoInicial.cliente
-        numeroCasa.value = props.agendamentoInicial.numeroCasa || ''
+        cliente.value = (props.agendamentoInicial.cliente || '').replace(/[0-9]/g, '')
+        numeroCasa.value = (props.agendamentoInicial.numeroCasa || '').replace(/\D/g, '')
         endereco.value = props.agendamentoInicial.endereco || ''
-        descricao.value = props.agendamentoInicial.descricao || ''
+        valor.value = formatarValor(props.agendamentoInicial.valor)
         materialPronto.value = props.agendamentoInicial.materialPronto ?? null
-        servicoConcluido.value = props.agendamentoInicial.servicoConcluido ?? null
-        telefone.value = props.agendamentoInicial.telefone || ''
-        referencia.value = props.agendamentoInicial.referencia || ''
+        servicoConcluido.value = props.agendamentoInicial.servicoConcluido ?? false
         observacoes.value = props.agendamentoInicial.observacoes || ''
         horaSelecionada.value = Number.isNaN(dataDoc.getTime())
           ? pegarHorarioMaisProximo()
@@ -96,11 +116,9 @@ watch(
         cliente.value = ''
         numeroCasa.value = ''
         endereco.value = ''
-        descricao.value = ''
+        valor.value = ''
         materialPronto.value = null
-        servicoConcluido.value = null
-        telefone.value = ''
-        referencia.value = ''
+        servicoConcluido.value = false
         observacoes.value = ''
 
         horaSelecionada.value = pegarHorarioMaisProximo()
@@ -120,32 +138,55 @@ watch(
   }
 )
 
-const handleSalvar = () => {
-  if (!cliente.value.trim()) return alert(t('schedule.validation.clientRequired'))
-  if (!numeroCasa.value.trim()) return alert(t('schedule.validation.houseRequired'))
-  if (!endereco.value.trim()) return alert(t('schedule.validation.addressRequired'))
+  const validarFormulario = (): boolean => {
+    erros.value = {}
 
-  const dataFinal = new Date(props.dataSelecionadaNoPai)
-  const [h, m] = horaSelecionada.value.split(':')
-  dataFinal.setHours(Number(h), Number(m), 0)
+    if (!cliente.value.trim()) {
+      erros.value.cliente = t('schedule.validation.clientRequired')
+    }
 
-  const dados: AgendamentoPayload = {
-    cliente: cliente.value.trim(),
-    numeroCasa: numeroCasa.value.trim(),
-    endereco: endereco.value.trim(),
-    descricao: descricao.value.trim(),
-    materialPronto: materialPronto.value,
-    servicoConcluido: servicoConcluido.value,
-    telefone: telefone.value.trim(),
-    referencia: referencia.value.trim(),
-    observacoes: observacoes.value.trim(),
-    data: format(dataFinal, "yyyy-MM-dd'T'HH:mm")
+    if (!numeroCasa.value.trim()) {
+      erros.value.numeroCasa = t('schedule.validation.houseRequired')
+    }
+
+    if (!endereco.value.trim()) {
+      erros.value.endereco = t('schedule.validation.addressRequired')
+    }
+
+    if (valor.value.trim() && !valorValido(valor.value)) {
+      erros.value.valor = t('schedule.validation.valueInvalid')
+    }
+
+    return Object.keys(erros.value).length === 0
   }
 
-  if (props.agendamentoInicial?.id) dados.id = props.agendamentoInicial.id
+  const handleSalvar = () => {
+    if (!validarFormulario()) return
 
-  emit('salvar', dados)
-}
+    const dataFinal = new Date(props.dataSelecionadaNoPai)
+    const [h, m] = horaSelecionada.value.split(':')
+    dataFinal.setHours(Number(h), Number(m), 0)
+
+    const valorTexto = valor.value.trim()
+    const valorNumerico = valorTexto ? parseValor(valorTexto) : undefined
+
+    const dados: AgendamentoForm = {
+      cliente: cliente.value.trim(),
+      numeroCasa: numeroCasa.value.trim(),
+      endereco: endereco.value.trim(),
+      valor: valorNumerico,
+      materialPronto: materialPronto.value,
+      servicoConcluido: servicoConcluido.value,
+      observacoes: observacoes.value.trim(),
+      data: format(dataFinal, "yyyy-MM-dd'T'HH:mm")
+    }
+
+    if (props.agendamentoInicial?.id) dados.id = props.agendamentoInicial.id
+
+    emit('salvar', dados)
+  }
+
+const fechar = () => emit('update:modelValue', false)
 </script>
 
 <template>
@@ -153,383 +194,300 @@ const handleSalvar = () => {
     <Transition name="fade">
       <div
         v-if="modelValue"
-        class="fixed inset-0 backdrop-blur-sm z-[60]"
-        :class="isLightTheme ? 'bg-[#0B1F3A]/35' : 'bg-[#0A2A52]/85'"
-      />
-    </Transition>
-
-    <Transition name="zoom-in">
-      <div
-        v-if="modelValue"
-        class="fixed inset-0 z-[70] transition-colors"
-        :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0F1420]/70 sm:backdrop-blur-sm sm:p-6"
+        @click="fechar"
       >
-        <div class="h-full flex flex-col">
-          <header
-            class="px-6 pt-6 pb-4 border-b flex items-center justify-between"
-            :class="isLightTheme ? 'border-[#D8E7FF]' : 'border-white/15'"
+        <Transition name="scale">
+          <div
+            v-if="modelValue"
+            class="relative w-full h-full sm:max-w-2xl sm:max-h-[85vh] sm:h-auto rounded-none sm:rounded-3xl border border-[#262E42] bg-[#141A28] text-[#EDEFF4] shadow-2xl shadow-black/50 z-[101] flex flex-col overflow-hidden"
+            @click.stop
           >
-            <div>
-              <p
-                class="text-[11px] font-black uppercase tracking-[0.2em]"
-                :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-white/70'"
-              >
-                {{ t('schedule.title') }}
-              </p>
-              <h3 class="text-2xl font-black mt-1">
-                {{
-                  agendamentoInicial ? t('schedule.modalTitleEdit') : t('schedule.modalTitleCreate')
-                }}
-              </h3>
-              <p class="text-sm mt-1" :class="isLightTheme ? 'text-[#5B6B8A]' : 'text-white/80'">
-                {{ format(dataSelecionadaNoPai, dataHeaderFormat, { locale: dateLocale }) }}
-              </p>
-              <p class="text-xs mt-1" :class="isLightTheme ? 'text-[#7A8FB1]' : 'text-white/60'">
-                {{ t('schedule.fillMainFields') }}
-              </p>
-            </div>
+            <div class="p-5 sm:p-6 pt-8 sm:pt-6 flex-none border-b border-[#262E42]/50">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                  <p class="text-[10px] font-black uppercase tracking-[0.2em] text-[#8A93A6]">
+                    {{ t('schedule.title') }}
+                  </p>
+                  <h3 class="text-xl sm:text-2xl font-black mt-1 truncate">
+                    {{
+                      agendamentoInicial ? t('schedule.modalTitleEdit') : t('schedule.modalTitleCreate')
+                    }}
+                  </h3>
+                  <p class="text-sm mt-1 text-[#8A93A6]">
+                    {{ format(dataSelecionadaNoPai, dataHeaderFormat, { locale: dateLocale }) }}
+                  </p>
+                </div>
 
-            <button
-              class="w-11 h-11 rounded-xl border flex items-center justify-center transition"
-              :class="
-                isLightTheme
-                  ? 'border-white/25 bg-[#003D7A] text-white hover:bg-[#003872]'
-                  : 'border-white/25 bg-white/10 hover:bg-white/20'
-              "
-              :aria-label="t('schedule.closeForm')"
-              @click="emit('update:modelValue', false)"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </header>
-
-          <div class="flex-1 overflow-y-auto px-6 py-6 no-scrollbar space-y-6">
-            <section
-              class="rounded-3xl border p-5 space-y-4"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-[#00D3B8]/40 bg-[#00D3B8]/10'
-              "
-            >
-              <div class="flex items-center justify-between">
-                <h4
-                  class="text-sm font-black uppercase tracking-wider"
-                  :class="isLightTheme ? 'text-white' : 'text-[#B5FFF6]'"
-                >
-                  {{ t('schedule.mainData') }}
-                </h4>
-                <span
-                  class="text-[10px] font-black uppercase tracking-[0.18em]"
-                  :class="isLightTheme ? 'text-white/80' : 'text-[#B5FFF6]'"
-                >
-                  {{ t('schedule.required') }}
-                </span>
-              </div>
-
-              <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  {{ t('schedule.clientName') }}
-                </label>
-                <input
-                  v-model="cliente"
-                  type="text"
-                  :placeholder="t('schedule.clientName')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
-                />
-              </div>
-
-              <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  {{ t('schedule.houseNumber') }}
-                </label>
-                <input
-                  v-model="numeroCasa"
-                  type="text"
-                  inputmode="numeric"
-                  :placeholder="t('schedule.houseNumber')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
-                />
-              </div>
-
-              <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  {{ t('schedule.clientAddress') }}
-                </label>
-                <input
-                  v-model="endereco"
-                  type="text"
-                  :placeholder="t('schedule.clientAddress')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
-                />
-              </div>
-            </section>
-
-            <section
-              class="rounded-3xl border p-5"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
-            >
-              <label class="text-[10px] font-black uppercase tracking-[0.18em] block mb-3">
-                {{ t('schedule.serviceTime') }}
-              </label>
-              <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
                 <button
-                  v-for="hora in horarios"
-                  :id="'hora-' + hora"
-                  :key="hora"
-                  :class="[
-                    'px-5 py-3 rounded-xl font-bold text-sm flex-shrink-0 border transition-all',
-                    horaSelecionada === hora
-                      ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                      : isLightTheme
-                        ? 'bg-white/10 border-white/25 text-white'
-                        : 'bg-white/10 border-white/25 text-white'
-                  ]"
-                  @click="horaSelecionada = hora"
+                  class="w-10 h-10 rounded-xl border flex items-center justify-center transition border-[#262E42] bg-[#1E2A3D] hover:bg-[#262E42] hover:border-[#8A93A6]/30 flex-shrink-0"
+                  :aria-label="t('schedule.closeForm')"
+                  @click="fechar"
                 >
-                  {{ hora }}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
               </div>
-            </section>
-
-            <section
-              class="rounded-3xl border p-5"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
-            >
-              <div class="flex items-center justify-between gap-4">
-                <div>
-                  <p class="text-sm font-black uppercase tracking-wider">
-                    {{ t('schedule.materialReadyQuestion') }}
-                  </p>
-                  <p class="text-xs mt-1" :class="isLightTheme ? 'text-white/70' : 'text-white/70'">
-                    {{ t('schedule.materialReadyHint') }}
-                  </p>
-                </div>
-
-                <div class="flex gap-2">
-                  <button
-                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
-                    :class="
-                      materialPronto === true
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
-                    "
-                    @click="materialPronto = true"
-                  >
-                    {{ t('schedule.yes') }}
-                  </button>
-                  <button
-                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
-                    :class="
-                      materialPronto === false
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
-                    "
-                    @click="materialPronto = false"
-                  >
-                    {{ t('schedule.no') }}
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <section
-              class="rounded-3xl border p-5"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
-            >
-              <div class="flex items-center justify-between gap-4">
-                <div>
-                  <p class="text-sm font-black uppercase tracking-wider">
-                    {{ t('schedule.serviceStatusQuestion') }}
-                  </p>
-                  <p class="text-xs mt-1" :class="isLightTheme ? 'text-white/70' : 'text-white/70'">
-                    {{ t('schedule.serviceStatusHint') }}
-                  </p>
-                </div>
-
-                <div class="flex gap-2">
-                  <button
-                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
-                    :class="
-                      servicoConcluido === true
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
-                    "
-                    @click="servicoConcluido = true"
-                  >
-                    {{ t('schedule.serviceCompleted') }}
-                  </button>
-                  <button
-                    class="min-w-[58px] px-4 py-2 rounded-xl border font-black text-sm transition"
-                    :class="
-                      servicoConcluido === false
-                        ? 'bg-[#00D3B8] border-[#00D3B8] text-[#003D7A]'
-                        : isLightTheme
-                          ? 'bg-white/10 border-white/30 text-white'
-                          : 'bg-white/10 border-white/30 text-white'
-                    "
-                    @click="servicoConcluido = false"
-                  >
-                    {{ t('schedule.serviceOpen') }}
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <section
-              class="rounded-3xl border p-5 space-y-4"
-              :class="
-                isLightTheme
-                  ? 'border-white/20 bg-[#003D7A] text-white'
-                  : 'border-white/20 bg-white/8'
-              "
-            >
-              <h4 class="text-sm font-black uppercase tracking-wider">
-                {{ t('schedule.optionalFields') }}
-              </h4>
-
-              <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">{{
-                  t('schedule.phone')
-                }}</label>
-                <input
-                  v-model="telefone"
-                  type="tel"
-                  :placeholder="t('schedule.phone')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
-                />
-              </div>
-
-              <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">{{
-                  t('schedule.reference')
-                }}</label>
-                <input
-                  v-model="referencia"
-                  type="text"
-                  :placeholder="t('schedule.reference')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
-                />
-              </div>
-
-              <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">
-                  {{ t('schedule.serviceDetails') }}
-                </label>
-                <textarea
-                  v-model="descricao"
-                  rows="3"
-                  :placeholder="t('schedule.serviceDetails')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold resize-none"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
-                />
-              </div>
-
-              <div>
-                <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1">{{
-                  t('schedule.notes')
-                }}</label>
-                <textarea
-                  v-model="observacoes"
-                  rows="2"
-                  :placeholder="t('schedule.notes')"
-                  class="w-full mt-1 p-4 rounded-2xl border focus:border-[#00D3B8] outline-none transition-all font-semibold resize-none"
-                  :class="
-                    isLightTheme
-                      ? 'bg-white/10 border-white/30 text-white placeholder:text-white/45'
-                      : 'bg-white/8 border-white/30 text-white placeholder:text-white/45'
-                  "
-                />
-              </div>
-            </section>
-          </div>
-
-          <footer
-            class="px-6 py-4 border-t"
-            :class="isLightTheme ? 'border-white/15 bg-[#003870]' : 'border-white/15 bg-[#003870]'"
-          >
-            <div class="grid grid-cols-2 gap-3">
-              <button
-                class="py-4 rounded-2xl border font-black text-sm"
-                :class="
-                  isLightTheme
-                    ? 'border-white/25 bg-white/10 text-white'
-                    : 'border-white/25 bg-white/10 text-white'
-                "
-                @click="emit('update:modelValue', false)"
-              >
-                {{ t('schedule.cancel') }}
-              </button>
-
-              <button
-                class="py-4 rounded-2xl bg-[#00D3B8] text-[#003D7A] font-black text-sm shadow-xl active:scale-[0.99] transition-all"
-                @click="handleSalvar"
-              >
-                {{ agendamentoInicial ? t('schedule.saveChanges') : t('schedule.confirmService') }}
-              </button>
             </div>
-          </footer>
-        </div>
+
+            <div class="flex-1 overflow-y-auto px-5 sm:px-6 py-5 sm:py-6">
+              <div class="space-y-4">
+                <section
+                  class="rounded-2xl border p-4 sm:p-5 space-y-4 border-[#262E42] bg-[#1A2132]"
+                >
+                  <div class="flex items-center justify-between">
+                    <h4 class="text-sm font-black uppercase tracking-wider text-[#8A93A6]">
+                      {{ t('schedule.mainData') }}
+                    </h4>
+                    <span class="text-[10px] font-black uppercase tracking-[0.18em] text-[#4FD1C5]">
+                      {{ t('schedule.required') }}
+                    </span>
+                  </div>
+
+                  <div>
+                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                      {{ t('schedule.clientName') }}
+                    </label>
+                    <input
+                      :value="cliente"
+                      type="text"
+                      :placeholder="t('schedule.clientName')"
+                      class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      :class="erros.cliente ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                      @input="onClienteInput"
+                    />
+                    <p v-if="erros.cliente" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                      {{ erros.cliente }}
+                    </p>
+                  </div>
+
+                  <div class="sm:hidden space-y-3">
+                    <div>
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.clientAddress') }}
+                      </label>
+                      <input
+                        v-model="endereco"
+                        type="text"
+                        :placeholder="t('schedule.clientAddress')"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.endereco ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onEnderecoInput"
+                      />
+                      <p v-if="erros.endereco" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.endereco }}
+                      </p>
+                    </div>
+                    <div>
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.houseNumber') }}
+                      </label>
+                      <input
+                        :value="numeroCasa"
+                        type="text"
+                        inputmode="numeric"
+                        :placeholder="t('schedule.houseNumber')"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.numeroCasa ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onNumeroCasaInput"
+                      />
+                      <p v-if="erros.numeroCasa" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.numeroCasa }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="hidden sm:grid sm:grid-cols-3 sm:gap-3">
+                    <div class="sm:col-span-1">
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.houseNumber') }}
+                      </label>
+                      <input
+                        :value="numeroCasa"
+                        type="text"
+                        inputmode="numeric"
+                        :placeholder="t('schedule.houseNumber')"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.numeroCasa ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onNumeroCasaInput"
+                      />
+                      <p v-if="erros.numeroCasa" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.numeroCasa }}
+                      </p>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                        {{ t('schedule.clientAddress') }}
+                      </label>
+                      <input
+                        v-model="endereco"
+                        type="text"
+                        :placeholder="t('schedule.clientAddress')"
+                        class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.endereco ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onEnderecoInput"
+                      />
+                      <p v-if="erros.endereco" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                        {{ erros.endereco }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">
+                      {{ t('schedule.serviceValue') }}
+                    </label>
+                    <div class="relative mt-1">
+                      <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-[#8A93A6]">R$</span>
+                      <input
+                        :value="valor"
+                        type="text"
+                        inputmode="decimal"
+                        :placeholder="t('schedule.serviceValue')"
+                        class="w-full pl-10 pr-3 py-3 rounded-xl border outline-none transition-all font-semibold bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                        :class="erros.valor ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                        @input="onValorInput"
+                        @blur="onValorBlur"
+                      />
+                    </div>
+                    <p v-if="erros.valor" class="text-[10px] mt-1 ml-1 font-bold text-[#F5A89C]">
+                      {{ erros.valor }}
+                    </p>
+                  </div>
+                </section>
+
+                <section
+                  class="rounded-2xl border p-4 sm:p-5 border-[#262E42] bg-[#1A2132]"
+                >
+                  <div class="flex items-center justify-between mb-3">
+                    <label class="text-[10px] font-black uppercase tracking-[0.18em] text-[#6E7789]">
+                      {{ t('schedule.serviceTime') }}
+                    </label>
+                    <span class="text-[10px] font-black text-[#4FD1C5]">
+                      {{ horaSelecionada }}
+                    </span>
+                  </div>
+                  <div class="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-[160px] overflow-y-auto no-scrollbar">
+                    <button
+                      v-for="hora in horarios"
+                      :id="'hora-' + hora"
+                      :key="hora"
+                      type="button"
+                      :class="[
+                        'px-2 py-2 rounded-lg font-bold text-xs border transition-all',
+                        horaSelecionada === hora
+                          ? 'bg-[#1B4F4A] text-[#EAFBF6] border-[#2C6E67]'
+                          : 'bg-[#141A28] border-[#262E42] text-[#EDEFF4] hover:bg-[#1E2A3D]'
+                      ]"
+                      @click="horaSelecionada = hora"
+                    >
+                      {{ hora }}
+                    </button>
+                  </div>
+                </section>
+
+                <section
+                  class="rounded-2xl border p-4 sm:p-5 border-[#262E42] bg-[#1A2132]"
+                >
+                  <div class="flex items-center justify-between gap-4">
+                    <div class="flex-1">
+                      <p class="text-sm font-black uppercase tracking-wider text-[#EDEFF4]">
+                        {{ t('schedule.materialReadyQuestion') }}
+                      </p>
+                      <p class="text-xs mt-1 text-[#6E7789]">
+                        {{ t('schedule.materialReadyHint') }}
+                      </p>
+                    </div>
+
+                    <div class="flex gap-2 flex-shrink-0">
+                      <button
+                        type="button"
+                        class="min-w-[56px] px-3 py-2 rounded-xl border font-black text-sm transition"
+                        :class="
+                          materialPronto === true
+                            ? 'bg-[#1B4F4A] text-[#EAFBF6] border-[#2C6E67]'
+                            : 'bg-[#141A28] border-[#262E42] text-[#EDEFF4]'
+                        "
+                        @click="materialPronto = true"
+                      >
+                        {{ t('schedule.yes') }}
+                      </button>
+                      <button
+                        type="button"
+                        class="min-w-[56px] px-3 py-2 rounded-xl border font-black text-sm transition"
+                        :class="
+                          materialPronto === false
+                            ? 'bg-[#233350] text-[#9FC1F5] border-[#33517F]'
+                            : 'bg-[#141A28] border-[#262E42] text-[#EDEFF4]'
+                        "
+                        @click="materialPronto = false"
+                      >
+                        {{ t('schedule.no') }}
+                      </button>
+                    </div>
+                  </div>
+                </section>
+
+                <section
+                  class="rounded-2xl border p-4 sm:p-5 space-y-4 border-[#262E42] bg-[#1A2132]"
+                >
+                  <h4 class="text-sm font-black uppercase tracking-wider text-[#8A93A6]">
+                    {{ t('schedule.optionalFields') }}
+                  </h4>
+
+                  <div>
+                    <label class="text-[10px] font-black uppercase tracking-[0.18em] ml-1 text-[#6E7789]">{{
+                      t('schedule.notes')
+                    }}</label>
+                    <textarea
+                      v-model="observacoes"
+                      rows="3"
+                      :placeholder="t('schedule.notes')"
+                      class="w-full mt-1 p-3 rounded-xl border outline-none transition-all font-semibold resize-none bg-[#141A28] text-[#EDEFF4] placeholder:text-[#6E7789]"
+                      :class="erros.observacoes ? 'border-[#F5A89C]' : 'border-[#262E42] focus:border-[#4FD1C5]'"
+                      maxlength="500"
+                      @input="onObservacoesInput"
+                    />
+                    <p class="text-[10px] mt-1 ml-1 text-[#6E7789]">
+                      {{ observacoes.length }}/500
+                    </p>
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <div class="p-5 sm:p-6 pt-5 sm:pt-6 border-t border-[#262E42] bg-[#0F1420]/50 space-y-3 flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
+              <div class="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  class="py-3.5 rounded-xl border font-black text-sm border-[#262E42] bg-[#1E2A3D] text-[#EDEFF4] hover:bg-[#262E42] hover:border-[#8A93A6]/30 transition-all active:scale-[0.99]"
+                  @click="fechar"
+                >
+                  {{ t('schedule.cancel') }}
+                </button>
+                <button
+                  type="button"
+                  class="py-3.5 rounded-xl font-black text-sm transition-all active:scale-[0.99] shadow-lg bg-[#1B4F4A] text-[#EAFBF6] border border-[#2C6E67] shadow-[#1B4F4A]/30 hover:bg-[#23655F]"
+                  @click="handleSalvar"
+                >
+                  {{ agendamentoInicial ? t('schedule.saveChanges') : t('schedule.confirmService') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Transition>
       </div>
     </Transition>
   </Teleport>
@@ -546,22 +504,22 @@ const handleSalvar = () => {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.3s;
+  transition: opacity 0.2s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
 
-.zoom-in-enter-active,
-.zoom-in-leave-active {
-  transition:
-    opacity 0.2s ease,
-    transform 0.25s ease;
+.scale-enter-active,
+.scale-leave-active {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
-.zoom-in-enter-from,
-.zoom-in-leave-to {
+
+.scale-enter-from,
+.scale-leave-to {
+  transform: scale(0.95) translateY(10px);
   opacity: 0;
-  transform: scale(0.98);
 }
 </style>

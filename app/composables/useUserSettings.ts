@@ -3,11 +3,10 @@ import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore'
 import { enUS, es, ptBR } from 'date-fns/locale'
 
 export type AppLanguage = 'pt-BR' | 'en-US' | 'es-ES'
-export type AppTheme = 'light' | 'dark'
 
 type UserSettings = {
   language: AppLanguage
-  theme: AppTheme
+  theme: 'dark'
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -40,13 +39,11 @@ export const useUserSettings = () => {
           ? parsed.language
           : null
 
-      const theme = parsed.theme === 'light' || parsed.theme === 'dark' ? parsed.theme : null
-
-      if (!language || !theme) return null
+      if (!language) return null
 
       return {
         language,
-        theme
+        theme: 'dark'
       }
     } catch {
       return null
@@ -61,7 +58,8 @@ export const useUserSettings = () => {
   const applySettings = (nextSettings: Partial<UserSettings>) => {
     settings.value = {
       ...settings.value,
-      ...nextSettings
+      ...nextSettings,
+      theme: 'dark'
     }
 
     saveLocalSettings(settings.value)
@@ -97,8 +95,7 @@ export const useUserSettings = () => {
         language:
           data.language === 'pt-BR' || data.language === 'en-US' || data.language === 'es-ES'
             ? data.language
-            : settings.value.language,
-        theme: data.theme === 'light' || data.theme === 'dark' ? data.theme : settings.value.theme
+            : settings.value.language
       })
 
       loadedUid.value = user.value.uid
@@ -120,28 +117,6 @@ export const useUserSettings = () => {
         ref,
         {
           language,
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      )
-    } finally {
-      settingsSaving.value = false
-    }
-  }
-
-  const saveTheme = async (theme: AppTheme) => {
-    applySettings({ theme })
-
-    if (!user.value?.uid) return
-
-    settingsSaving.value = true
-
-    try {
-      const ref = doc($db, 'user_settings', user.value.uid)
-      await setDoc(
-        ref,
-        {
-          theme,
           updatedAt: serverTimestamp()
         },
         { merge: true }
@@ -193,21 +168,14 @@ export const useUserSettings = () => {
     { value: 'es-ES', label: 'Español' }
   ]
 
-  const availableThemes: Array<{ value: AppTheme; label: string }> = [
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' }
-  ]
-
   return {
     settings,
     settingsLoading,
     settingsSaving,
     availableLanguages,
-    availableThemes,
     dateLocale,
     loadSettings,
     saveLanguage,
-    saveTheme,
     initUserSettings
   }
 }

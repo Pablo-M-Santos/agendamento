@@ -1,5 +1,12 @@
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+import { ref, computed, onMounted } from 'vue'
+import DashboardTopBar from '~/components/dashboard/DashboardTopBar.vue'
+import DashboardSidebar from '~/components/DashboardSidebar.vue'
+
+definePageMeta({ middleware: 'auth', layout: 'app' })
+
+const { user } = useAuth()
+const { t } = useAppI18n()
 
 const {
   dataSelecionada,
@@ -7,56 +14,81 @@ const {
   agendamentoParaEditar,
   isDetalhesOpen,
   agendamentoDetalhes,
-  isConfirmOpen,
-  isLightTheme,
   diasCarrossel,
   agendamentosFiltrados,
   agendamentoAlvoIdNoDia,
   quantidadePorDia,
-  abrirModalConfirmacao,
-  confirmarExclusao,
   abrirModal,
   abrirDetalhes,
   abrirEdicaoPelosDetalhes,
-  handleSalvarAgendamento
+  handleSalvarAgendamento,
+  toggleServicoConcluido
 } = useSchedulePage()
+
+const isSidebarOpen = ref(false)
+
+onMounted(() => {
+  isSidebarOpen.value = window.matchMedia('(min-width: 1024px)').matches
+})
+
+const saudacaoAgenda = computed(() => t('schedule.title'))
+
+const inicialUsuario = computed(() => {
+  const nome = user.value?.displayName?.trim()
+  if (nome) return nome.charAt(0).toUpperCase()
+  return user.value?.email?.charAt(0).toUpperCase() || 'U'
+})
 </script>
 
 <template>
   <div
-    class="h-full p-5 overflow-y-auto overflow-x-hidden transition-colors"
-    :class="isLightTheme ? 'bg-[#F4F8FF] text-[#0B1F3A]' : 'bg-[#003D7A] text-white'"
+    class="h-full px-5 sm:px-8 lg:px-12 py-5 sm:py-8 overflow-y-auto overflow-x-hidden transition-colors bg-[#141A28] text-[#EDEFF4]"
+    :class="{ 'lg:pl-[22rem]': isSidebarOpen }"
   >
-    <ScheduleHeader :data-selecionada="dataSelecionada" @add="abrirModal()" />
+      <DashboardTopBar
+        :greeting="saudacaoAgenda"
+        :photo-url="user?.photoURL"
+        :user-initial="inicialUsuario"
+        :open-sidebar-label="t('dashboard.openSidebar')"
+        :go-profile-label="t('dashboard.goProfile')"
+        :sidebar-open="isSidebarOpen"
+        @open-sidebar="isSidebarOpen = !isSidebarOpen"
+      />
 
-    <ScheduleDaysCarousel
-      :dias-carrossel="diasCarrossel"
-      :data-selecionada="dataSelecionada"
-      :quantidade-por-dia="quantidadePorDia"
-      @update:data-selecionada="dataSelecionada = $event"
-    />
+      <DashboardSidebar v-model="isSidebarOpen" />
 
-    <ScheduleAppointmentsList
-      :agendamentos="agendamentosFiltrados"
-      :highlighted-id="agendamentoAlvoIdNoDia"
-      @details="abrirDetalhes"
-      @edit="abrirModal"
-      @delete="abrirModalConfirmacao"
-    />
+      <ScheduleHeader
+        :data-selecionada="dataSelecionada"
+        @add="abrirModal()"
+      />
 
-    <ScheduleServiceDetailsModal
-      v-model="isDetalhesOpen"
-      :agendamento="agendamentoDetalhes"
-      @edit="abrirEdicaoPelosDetalhes"
-    />
+      <ScheduleDaysCarousel
+        :dias-carrossel="diasCarrossel"
+        :data-selecionada="dataSelecionada"
+        :quantidade-por-dia="quantidadePorDia"
+        @update:data-selecionada="dataSelecionada = $event"
+      />
 
-    <ModalAgendamento
-      v-model="isModalOpen"
-      :agendamento-inicial="agendamentoParaEditar"
-      :data-selecionada-no-pai="dataSelecionada"
-      @salvar="handleSalvarAgendamento"
-    />
+      <ScheduleAppointmentsList
+        :agendamentos="agendamentosFiltrados"
+        :highlighted-id="agendamentoAlvoIdNoDia"
+        @details="abrirDetalhes"
+        @edit="abrirModal"
+        @toggle-completed="toggleServicoConcluido"
+      />
 
-    <ScheduleConfirmDeleteModal v-model="isConfirmOpen" @confirm="confirmarExclusao" />
+      <ScheduleServiceDetailsModal
+        v-model="isDetalhesOpen"
+        :agendamento="agendamentoDetalhes"
+        @edit="abrirEdicaoPelosDetalhes"
+        @toggle-status="toggleServicoConcluido"
+      />
+
+      <ModalAgendamento
+        v-model="isModalOpen"
+        :agendamento-inicial="agendamentoParaEditar"
+        :data-selecionada-no-pai="dataSelecionada"
+        @salvar="handleSalvarAgendamento"
+      />
   </div>
 </template>
