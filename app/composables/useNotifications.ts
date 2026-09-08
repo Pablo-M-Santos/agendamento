@@ -1,4 +1,4 @@
-import type { NotificationItem, CreateNotificationPayload, NotificationChannel, ReminderTime } from '~/types/notification'
+import type { NotificationItem, CreateNotificationPayload, ReminderTime } from '~/types/notification'
 
 const BASE_URL = 'https://notification-service-production-5bc5.up.railway.app'
 

@@ -1,6 +1,6 @@
 export type NotificationChannel = 'TELEGRAM' | 'EMAIL' | 'SMS'
 
-export type NotificationStatus = 'PENDING' | 'SENT' | 'DELIVERED' | 'FAILED'
+export type NotificationStatus = 'PENDING' | 'SCHEDULED' | 'SENT' | 'FAILED'
 
 export type ReminderTime = 0 | 5 | 15 | 30
 
@@ -13,6 +13,7 @@ export interface NotificationItem {
   status: NotificationStatus
   createdAt: string
   sentAt: string | null
+  scheduledAt?: string | null
 }
 
 export interface CreateNotificationPayload {

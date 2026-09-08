@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import DashboardTopBar from '~/components/dashboard/DashboardTopBar.vue'
 import DashboardSidebar from '~/components/DashboardSidebar.vue'
 import { useNotifications } from '~/composables/useNotifications'
-import type { NotificationItem, NotificationChannel, ReminderTime } from '~/types/notification'
+import type { NotificationItem } from '~/types/notification'
 
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { t } = useAppI18n()
 const { user } = useAuth()
-const { listarNotificacoes, criarNotificacao, carregando: carregandoApi, erro: erroApi, getReminderOptions } = useNotifications()
+const { listarNotificacoes, criarNotificacao } = useNotifications()
 
 const isSidebarOpen = ref(false)
 
@@ -37,18 +37,7 @@ const filtro = ref<'todas' | 'nao-lidas' | 'lidas'>('todas')
 const abertoCriar = ref(false)
 const tituloNotificacao = ref('')
 const mensagemNotificacao = ref('')
-const canalNotificacao = ref<NotificationChannel>('TELEGRAM')
 const horarioNotificacao = ref('')
-const clienteNotificacao = ref('')
-const reminderTime = ref<ReminderTime>(0)
-
-const channelOptions = [
-  { key: 'TELEGRAM', label: 'Telegram' },
-  { key: 'EMAIL', label: 'E-mail' },
-  { key: 'SMS', label: 'SMS' }
-]
-
-const reminderOptions = getReminderOptions()
 
 const carregarNotificacoes = async () => {
   if (!externalId.value) return
@@ -72,9 +61,9 @@ const notificacoesFiltradas = computed(() => {
   let resultado = [...notificacoes.value]
 
   if (filtro.value === 'nao-lidas') {
-    resultado = resultado.filter((n) => n.status === 'PENDING')
+    resultado = resultado.filter((n) => n.status === 'PENDING' || n.status === 'SCHEDULED')
   } else if (filtro.value === 'lidas') {
-    resultado = resultado.filter((n) => n.status !== 'PENDING')
+    resultado = resultado.filter((n) => n.status === 'SENT' || n.status === 'FAILED')
   }
 
   return resultado.sort((a, b) => {
@@ -84,7 +73,7 @@ const notificacoesFiltradas = computed(() => {
   })
 })
 
-const naoLidas = computed(() => notificacoes.value.filter((n) => n.status === 'PENDING').length)
+const naoLidas = computed(() => notificacoes.value.filter((n) => n.status === 'PENDING' || n.status === 'SCHEDULED').length)
 
 const opcoesFiltro = computed(() => [
   { key: 'todas', label: `Todas (${notificacoes.value.length})` },
@@ -135,66 +124,58 @@ const bgPorCanal = (canal: NotificationItem['channel']) => {
 
 const statusLabel = (status: NotificationItem['status']) => {
   if (status === 'PENDING') return 'Pendente'
+  if (status === 'SCHEDULED') return 'Agendada'
   if (status === 'SENT') return 'Enviada'
-  if (status === 'DELIVERED') return 'Entregue'
   return 'Falhou'
 }
 
 const statusColor = (status: NotificationItem['status']) => {
   if (status === 'PENDING') return 'text-[#F59E0B]'
+  if (status === 'SCHEDULED') return 'text-[#60A5FA]'
   if (status === 'SENT') return 'text-[#34D399]'
-  if (status === 'DELIVERED') return 'text-[#60A5FA]'
   return 'text-[#EF4444]'
+}
+
+const statusBg = (status: NotificationItem['status']) => {
+  if (status === 'PENDING') return 'bg-[#92400E]/20'
+  if (status === 'SCHEDULED') return 'bg-[#1E3A5F]/20'
+  if (status === 'SENT') return 'bg-[#065F46]/20'
+  return 'bg-[#991B1B]/20'
 }
 
 const abrirModalCriar = () => {
   abertoCriar.value = true
   tituloNotificacao.value = ''
   mensagemNotificacao.value = ''
-  canalNotificacao.value = 'TELEGRAM'
   horarioNotificacao.value = ''
-  clienteNotificacao.value = ''
-  reminderTime.value = 0
 }
 
 const fecharModalCriar = () => {
   abertoCriar.value = false
   tituloNotificacao.value = ''
   mensagemNotificacao.value = ''
-  canalNotificacao.value = 'TELEGRAM'
   horarioNotificacao.value = ''
-  clienteNotificacao.value = ''
-  reminderTime.value = 0
+  erro.value = null
 }
 
 const handleCriarNotificacao = async () => {
   if (!tituloNotificacao.value.trim() || !mensagemNotificacao.value.trim()) return
 
   const tituloFinal = tituloNotificacao.value
-  const mensagemFinal = mensagemNotificacao.value
+  const messageFinal = mensagemNotificacao.value
 
-  let messageFinal = mensagemFinal
-  if (clienteNotificacao.value) {
-    messageFinal = `${mensagemFinal} | Cliente: ${clienteNotificacao.value}`
-  }
+  let scheduledAt: string | undefined = undefined
   if (horarioNotificacao.value) {
-    const diff = reminderTime.value
-    if (diff > 0) {
-      messageFinal += ` | Lembrete: ${diff} min antes`
-    }
+    scheduledAt = new Date(horarioNotificacao.value).toISOString()
   }
-
-  const scheduledAt = horarioNotificacao.value
-    ? new Date(horarioNotificacao.value).getTime() - reminderTime.value * 60 * 1000
-    : undefined
 
   try {
     await criarNotificacao({
       externalId: externalId.value,
       title: tituloFinal,
       message: messageFinal,
-      channel: canalNotificacao.value,
-      scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined
+      channel: 'TELEGRAM',
+      scheduledAt
     })
     fecharModalCriar()
     carregarNotificacoes()
@@ -278,8 +259,12 @@ const handleCriarNotificacao = async () => {
         <div
           v-for="item in notificacoesFiltradas"
           :key="item.id"
-          class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-4 sm:p-5"
-          :class="item.status === 'PENDING' ? 'border-l-4 border-l-[#60A5FA]' : ''"
+          class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-4 sm:p-5 transition-colors"
+          :class="{
+            'border-l-4 border-l-[#F59E0B]': item.status === 'PENDING',
+            'border-l-4 border-l-[#60A5FA]': item.status === 'SCHEDULED',
+            'border-l-4 border-l-[#34D399]': item.status === 'SENT'
+          }"
         >
           <div class="flex items-start justify-between gap-3 mb-3">
             <div class="flex items-center gap-3">
@@ -291,28 +276,58 @@ const handleCriarNotificacao = async () => {
               </span>
               <div class="min-w-0">
                 <p class="text-sm font-black text-[#F8FAFC] truncate">{{ item.title }}</p>
-                <div class="flex items-center gap-2">
-                  <p class="text-[10px] text-[#94A3B8] font-bold">{{ formatarData(new Date(item.createdAt)) }}</p>
-                  <span class="text-[9px] font-black uppercase tracking-wider" :class="statusColor(item.status)">
-                    • {{ statusLabel(item.status) }}
+                <div class="flex items-center gap-2 flex-wrap">
+                  <p class="text-[10px] text-[#94A3B8] font-bold">
+                    Criada: {{ formatarData(new Date(item.createdAt)) }}
+                  </p>
+                  <span
+                    class="inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wider"
+                    :class="`${statusBg(item.status)} ${statusColor(item.status)}`"
+                  >
+                    {{ statusLabel(item.status) }}
                   </span>
                 </div>
+                <p
+                  v-if="item.scheduledAt"
+                  class="text-[10px] text-[#60A5FA] font-bold mt-0.5"
+                >
+                  Agendada para: {{ format(new Date(item.scheduledAt), 'dd/MM/yyyy às HH:mm', { locale: ptBR }) }}
+                </p>
+                <p
+                  v-else-if="item.status === 'PENDING'"
+                  class="text-[10px] text-[#94A3B8] font-bold mt-0.5"
+                >
+                  Enviando em instante
+                </p>
               </div>
             </div>
             <span
-              class="text-[10px] font-black uppercase tracking-wider"
+              class="text-[10px] font-black uppercase tracking-wider shrink-0"
               :class="item.channel === 'TELEGRAM' ? 'text-[#2DD4CF]' : item.channel === 'EMAIL' ? 'text-[#60A5FA]' : 'text-[#F59E0B]'"
             >
-              {{ item.channel }}
+              {{ item.channel === 'TELEGRAM' ? 'Telegram' : item.channel === 'EMAIL' ? 'E-mail' : 'SMS' }}
             </span>
           </div>
 
           <p class="text-xs text-[#EDEFF4] font-semibold leading-relaxed mb-3">{{ item.message }}</p>
 
-          <div v-if="item.sentAt" class="pt-3 border-t border-[#1E293B]">
-            <p class="text-[10px] text-[#94A3B8] font-bold">
-              Enviada: {{ formatarData(new Date(item.sentAt)) }}
-            </p>
+          <div class="pt-3 border-t border-[#1E293B] flex flex-col gap-1">
+            <div v-if="item.sentAt" class="flex items-center gap-2">
+              <span class="text-[10px] font-black uppercase tracking-wider bg-[#065F46]/20 text-[#34D399] rounded-md px-2 py-0.5">
+                Enviada
+              </span>
+              <p class="text-[10px] text-[#94A3B8] font-bold">
+                {{ format(new Date(item.sentAt), 'dd/MM/yyyy às HH:mm', { locale: ptBR }) }}
+              </p>
+            </div>
+            <div v-else-if="item.status !== 'PENDING'" class="flex items-center gap-2">
+              <span class="text-[10px] font-black uppercase tracking-wider bg-[#991B1B]/20 text-[#EF4444] rounded-md px-2 py-0.5">
+                Não enviada
+              </span>
+              <p class="text-[10px] text-[#94A3B8] font-bold">
+                Aguardando processamento
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -341,108 +356,103 @@ const handleCriarNotificacao = async () => {
       <div
         v-if="abertoCriar"
         class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60"
+        @click.self="fecharModalCriar"
       >
         <div
-          class="relative w-full max-w-lg mx-3 sm:mx-4 rounded-2xl border border-[#1E293B] bg-[#1A2338] p-5 sm:p-6"
+          class="relative w-full max-w-lg mx-3 sm:mx-4 rounded-2xl border border-[#1E293B] bg-[#1A2338] p-5 sm:p-6 shadow-2xl shadow-[#0F1729]/70"
         >
-          <h3 class="text-sm sm:text-base font-black uppercase tracking-wider text-[#F8FAFC] mb-4">
-            Nova notificação
-          </h3>
+          <div class="flex items-center gap-3 mb-4">
+            <span
+              class="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-[#1E293B] bg-[#065F46]/20 text-[#2DD4CF]"
+            >
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 14l-4-4m4 4l4-4" />
+              </svg>
+            </span>
+            <h3 class="text-sm sm:text-base font-black uppercase tracking-wider text-[#F8FAFC]">
+              Nova notificação
+            </h3>
+            <span
+              class="ml-auto inline-flex items-center gap-1 rounded-md bg-[#065F46]/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#2DD4CF]"
+            >
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C7.58 2 4 4.92 4 9c0 3.73 2.96 6.83 7 7.7V22h2v-5.3c3.82-.86 6.62-4.37 6.62-8.7A5.99 5.99 0 0012 4z" />
+              </svg>
+              Telegram
+            </span>
+          </div>
 
           <div class="space-y-4">
             <div>
-              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+              <label
+                class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1"
+              >
                 Título
               </label>
               <input
                 v-model="tituloNotificacao"
                 type="text"
                 placeholder="Ex: Lembrete de agendamento"
-                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] placeholder-[#94A3B8] outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
+                class="field-input"
               />
             </div>
 
             <div>
-              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
-                Cliente (opcional)
-              </label>
-              <input
-                v-model="clienteNotificacao"
-                type="text"
-                placeholder="Ex: Osvaldo"
-                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] placeholder-[#94A3B8] outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
-              />
-            </div>
-
-            <div>
-              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+              <label
+                class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1"
+              >
                 Mensagem
               </label>
               <textarea
                 v-model="mensagemNotificacao"
                 rows="3"
                 placeholder="Digite a mensagem da notificação..."
-                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] placeholder-[#94A3B8] resize-none outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
+                class="field-input resize-none"
               />
             </div>
 
             <div>
-              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+              <label
+                class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1"
+              >
                 Horário
               </label>
-              <input
-                v-model="horarioNotificacao"
-                type="datetime-local"
-                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
-              />
-            </div>
-
-            <div>
-              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
-                Lembrete
-              </label>
-              <div class="flex gap-2 overflow-x-auto no-scrollbar">
-                <button
-                  v-for="option in reminderOptions"
-                  :key="option.key"
-                  class="px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-[0.12em] whitespace-nowrap transition focus-visible:outline-none"
-                  :class="
-                    reminderTime === option.key
-                      ? 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white border-[#33517F]'
-                      : 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white/80 border-[#33517F]/30'
-                  "
-                  @click="reminderTime = option.key"
+              <div class="relative">
+                <input
+                  v-model="horarioNotificacao"
+                  type="datetime-local"
+                  class="field-input pl-10"
+                />
+                <svg
+                  class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#60A5FA]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  {{ option.label }}
-                </button>
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 7V3m8 4V3M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2zM12 11a3 3 0 100 6 3 3 0 000-6z"
+                  />
+                </svg>
               </div>
-            </div>
-
-            <div>
-              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
-                Canal
-              </label>
-              <div class="flex gap-2">
-                <button
-                  v-for="option in channelOptions"
-                  :key="option.key"
-                  class="flex-1 px-3 py-2 rounded-lg border text-[10px] font-black uppercase tracking-[0.12em] transition focus-visible:outline-none"
-                  :class="
-                    canalNotificacao === option.key
-                      ? 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white border-[#33517F] shadow-lg shadow-[#33517F]/20'
-                      : 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white/80 border-[#33517F]/30'
-                  "
-                  @click="canalNotificacao = option.key as NotificationChannel"
-                >
-                  {{ option.label }}
-                </button>
-              </div>
+              <p
+                v-if="horarioNotificacao"
+                class="mt-1.5 text-[10px] text-[#60A5FA] font-bold"
+              >
+                Enviando em: {{ format(new Date(horarioNotificacao), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) }}
+              </p>
+              <p v-else class="mt-1.5 text-[10px] text-[#94A3B8] font-bold">
+                Deixe em branco para enviar agora
+              </p>
             </div>
           </div>
 
           <div class="flex gap-3 mt-6">
             <button
-              class="flex-1 px-4 py-2.5 rounded-xl bg-[#1E3A5F] text-[#E3EBFB] border border-[#33517F] hover:bg-[#33517F] active:scale-95 transition font-black text-xs uppercase tracking-[0.12em]"
+              class="flex-1 px-4 py-2.5 rounded-xl bg-[#1E3A5F] text-[#E3EBFB] border border-[#33517F] hover:bg-[#274980] active:scale-95 transition font-black text-xs uppercase tracking-[0.12em] disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="!tituloNotificacao.trim() || !mensagemNotificacao.trim()"
               @click="handleCriarNotificacao"
             >
               Confirmar
@@ -456,7 +466,7 @@ const handleCriarNotificacao = async () => {
           </div>
 
           <button
-            class="absolute top-3 right-3 text-[#94A3B8] hover:text-[#F8FAFC] transition"
+            class="absolute top-3 right-3 p-1 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] transition"
             @click="fecharModalCriar"
           >
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -470,6 +480,24 @@ const handleCriarNotificacao = async () => {
 </template>
 
 <style scoped>
+.field-input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #334155;
+  background-color: #0f1729;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #edefee;
+  outline: none;
+}
+.field-input::placeholder {
+  color: #94a3b8;
+}
+.field-input:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 1px #60a5fa;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
