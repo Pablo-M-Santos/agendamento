@@ -30,15 +30,17 @@ export const useNotifications = () => {
     carregando.value = true
     erro.value = null
     try {
+      console.log('[createNotification]', payload)
       return await $fetch<NotificationItem>(`${BASE_URL}/notifications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: payload
       })
     } catch (e: any) {
+      console.error('[createNotification error]', e)
       erro.value = e?.message || 'Erro ao criar notificação'
       throw e
     } finally {
