@@ -170,7 +170,6 @@ const fecharModalCriar = () => {
 const handleCriarNotificacao = async () => {
   if (!tituloNotificacao.value.trim() || !mensagemNotificacao.value.trim()) return
 
-  const horario = horarioNotificacao.value
   const tituloFinal = tituloNotificacao.value
   const mensagemFinal = mensagemNotificacao.value
 
@@ -178,19 +177,24 @@ const handleCriarNotificacao = async () => {
   if (clienteNotificacao.value) {
     messageFinal = `${mensagemFinal} | Cliente: ${clienteNotificacao.value}`
   }
-  if (horario) {
+  if (horarioNotificacao.value) {
     const diff = reminderTime.value
     if (diff > 0) {
       messageFinal += ` | Lembrete: ${diff} min antes`
     }
   }
 
+  const scheduledAt = horarioNotificacao.value
+    ? new Date(horarioNotificacao.value).getTime() - reminderTime.value * 60 * 1000
+    : undefined
+
   try {
     await criarNotificacao({
       externalId: externalId.value,
       title: tituloFinal,
       message: messageFinal,
-      channel: canalNotificacao.value
+      channel: canalNotificacao.value,
+      scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined
     })
     fecharModalCriar()
     carregarNotificacoes()

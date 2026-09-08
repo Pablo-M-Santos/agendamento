@@ -20,4 +20,5 @@ export interface CreateNotificationPayload {
   title: string
   message: string
   channel: NotificationChannel
+  scheduledAt?: string
 }
