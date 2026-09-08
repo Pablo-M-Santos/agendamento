@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { format, formatDistanceToNow } from 'date-fns'
+import { ref, computed, onMounted, watch } from 'vue'
+import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import DashboardTopBar from '~/components/dashboard/DashboardTopBar.vue'
 import DashboardSidebar from '~/components/DashboardSidebar.vue'
+import { useNotifications } from '~/composables/useNotifications'
+import type { NotificationItem, NotificationChannel, ReminderTime } from '~/types/notification'
 
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { t } = useAppI18n()
 const { user } = useAuth()
+const { listarNotificacoes, criarNotificacao, carregando: carregandoApi, erro: erroApi, getReminderOptions } = useNotifications()
 
 const isSidebarOpen = ref(false)
 
@@ -24,72 +27,38 @@ const inicialUsuario = computed(() => {
   return user.value?.email?.charAt(0).toUpperCase() || 'U'
 })
 
-type Notification = {
-  id: string
-  title: string
-  description: string
-  type: 'info' | 'success' | 'warning' | 'error'
-  read: boolean
-  createdAt: Date
-}
+const externalId = computed(() => user.value?.uid || '')
 
+const notificacoes = ref<NotificationItem[]>([])
 const carregando = ref(true)
-const notificacoes = ref<Notification[]>([])
+const erro = ref<string | null>(null)
 const filtro = ref<'todas' | 'nao-lidas' | 'lidas'>('todas')
 
-const marcarComoLida = async (id: string) => {
-  const index = notificacoes.value.findIndex((n) => n.id === id)
-  if (index >= 0) {
-    notificacoes.value[index] = { ...notificacoes.value[index], read: true }
-  }
-}
+const abertoCriar = ref(false)
+const tituloNotificacao = ref('')
+const mensagemNotificacao = ref('')
+const canalNotificacao = ref<NotificationChannel>('TELEGRAM')
+const horarioNotificacao = ref('')
+const clienteNotificacao = ref('')
+const reminderTime = ref<ReminderTime>(0)
 
-const marcarTodasComoLidas = async () => {
-  notificacoes.value = notificacoes.value.map((n) => ({ ...n, read: true }))
-}
+const channelOptions = [
+  { key: 'TELEGRAM', label: 'Telegram' },
+  { key: 'EMAIL', label: 'E-mail' },
+  { key: 'SMS', label: 'SMS' }
+]
 
-const limparNotificacoes = async () => {
-  notificacoes.value = []
-}
+const reminderOptions = getReminderOptions()
 
 const carregarNotificacoes = async () => {
+  if (!externalId.value) return
   carregando.value = true
+  erro.value = null
   try {
-    await new Promise((resolve) => setTimeout(resolve, 600))
-    notificacoes.value = [
-      {
-        id: '1',
-        title: 'Agendamento confirmado',
-        description: 'Seu agendamento com Ana para o dia 05/09/2026 às 09:00 foi confirmado.',
-        type: 'success',
-        read: false,
-        createdAt: new Date(Date.now() - 1000 * 60 * 30)
-      },
-      {
-        id: '2',
-        title: 'Material pronto',
-        description: 'O material do serviço do Bruno já está pronto para retirada.',
-        type: 'info',
-        read: false,
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2)
-      },
-      {
-        id: '3',
-        title: 'Agendamento cancelado',
-        description: 'O agendamento com Diego do dia 04/09/2026 foi cancelado pelo cliente.',
-        type: 'error',
-        read: true,
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24)
-      },
-      {
-        id: '4',
-        title: 'Lembrete de horário',
-        description: 'Você tem um agendamento com Carla hoje às 14:00.',
-        type: 'warning',
-        read: true,
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48)
-      }
-    ]
+    notificacoes.value = await listarNotificacoes(externalId.value)
+  } catch {
+    erro.value = 'Erro ao carregar notificações'
+    notificacoes.value = []
   } finally {
     carregando.value = false
   }
@@ -103,15 +72,19 @@ const notificacoesFiltradas = computed(() => {
   let resultado = [...notificacoes.value]
 
   if (filtro.value === 'nao-lidas') {
-    resultado = resultado.filter((n) => !n.read)
+    resultado = resultado.filter((n) => n.status === 'PENDING')
   } else if (filtro.value === 'lidas') {
-    resultado = resultado.filter((n) => n.read)
+    resultado = resultado.filter((n) => n.status !== 'PENDING')
   }
 
-  return resultado.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+  return resultado.sort((a, b) => {
+    const dateA = new Date(b.createdAt).getTime()
+    const dateB = new Date(a.createdAt).getTime()
+    return dateA - dateB
+  })
 })
 
-const naoLidas = computed(() => notificacoes.value.filter((n) => !n.read).length)
+const naoLidas = computed(() => notificacoes.value.filter((n) => n.status === 'PENDING').length)
 
 const opcoesFiltro = computed(() => [
   { key: 'todas', label: `Todas (${notificacoes.value.length})` },
@@ -138,31 +111,92 @@ const formatarData = (data: Date) => {
   return format(data, 'dd/MM/yyyy', { locale: ptBR })
 }
 
-const iconePorTipo = (tipo: Notification['type']) => {
-  if (tipo === 'success') {
-    return `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
+const iconePorTipo = (item: NotificationItem) => {
+  if (item.channel === 'TELEGRAM') {
+    return `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 14l-4-4m4 4l4-4" /></svg>`
   }
-  if (tipo === 'warning') {
-    return `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>`
+  if (item.channel === 'EMAIL') {
+    return `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12H8m0 0l3-3m-3 3l3 3" /></svg>`
   }
-  if (tipo === 'error') {
-    return `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
-  }
-  return `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`
+  return `<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 14l-4-4m4 4l4-4" /></svg>`
 }
 
-const corPorTipo = (tipo: Notification['type']) => {
-  if (tipo === 'success') return 'text-[#10B981]'
-  if (tipo === 'warning') return 'text-[#F59E0B]'
-  if (tipo === 'error') return 'text-[#EF4444]'
-  return 'text-[#60A5FA]'
+const corPorCanal = (canal: NotificationItem['channel']) => {
+  if (canal === 'TELEGRAM') return 'text-[#2DD4CF]'
+  if (canal === 'EMAIL') return 'text-[#60A5FA]'
+  return 'text-[#F59E0B]'
 }
 
-const bgPorTipo = (tipo: Notification['type']) => {
-  if (tipo === 'success') return 'bg-[#065F46]/20'
-  if (tipo === 'warning') return 'bg-[#92400E]/20'
-  if (tipo === 'error') return 'bg-[#991B1B]/20'
-  return 'bg-[#1E3A5F]/20'
+const bgPorCanal = (canal: NotificationItem['channel']) => {
+  if (canal === 'TELEGRAM') return 'bg-[#065F46]/20'
+  if (canal === 'EMAIL') return 'bg-[#1E3A5F]/20'
+  return 'bg-[#92400E]/20'
+}
+
+const statusLabel = (status: NotificationItem['status']) => {
+  if (status === 'PENDING') return 'Pendente'
+  if (status === 'SENT') return 'Enviada'
+  if (status === 'DELIVERED') return 'Entregue'
+  return 'Falhou'
+}
+
+const statusColor = (status: NotificationItem['status']) => {
+  if (status === 'PENDING') return 'text-[#F59E0B]'
+  if (status === 'SENT') return 'text-[#34D399]'
+  if (status === 'DELIVERED') return 'text-[#60A5FA]'
+  return 'text-[#EF4444]'
+}
+
+const abrirModalCriar = () => {
+  abertoCriar.value = true
+  tituloNotificacao.value = ''
+  mensagemNotificacao.value = ''
+  canalNotificacao.value = 'TELEGRAM'
+  horarioNotificacao.value = ''
+  clienteNotificacao.value = ''
+  reminderTime.value = 0
+}
+
+const fecharModalCriar = () => {
+  abertoCriar.value = false
+  tituloNotificacao.value = ''
+  mensagemNotificacao.value = ''
+  canalNotificacao.value = 'TELEGRAM'
+  horarioNotificacao.value = ''
+  clienteNotificacao.value = ''
+  reminderTime.value = 0
+}
+
+const handleCriarNotificacao = async () => {
+  if (!tituloNotificacao.value.trim() || !mensagemNotificacao.value.trim()) return
+
+  const horario = horarioNotificacao.value
+  const tituloFinal = tituloNotificacao.value
+  const mensagemFinal = mensagemNotificacao.value
+
+  let messageFinal = mensagemFinal
+  if (clienteNotificacao.value) {
+    messageFinal = `${mensagemFinal} | Cliente: ${clienteNotificacao.value}`
+  }
+  if (horario) {
+    const diff = reminderTime.value
+    if (diff > 0) {
+      messageFinal += ` | Lembrete: ${diff} min antes`
+    }
+  }
+
+  try {
+    await criarNotificacao({
+      externalId: externalId.value,
+      title: tituloFinal,
+      message: messageFinal,
+      channel: canalNotificacao.value
+    })
+    fecharModalCriar()
+    carregarNotificacoes()
+  } catch (e: any) {
+    erro.value = e?.message || 'Erro ao criar notificação'
+  }
 }
 </script>
 
@@ -183,16 +217,27 @@ const bgPorTipo = (tipo: Notification['type']) => {
 
     <DashboardSidebar v-model="isSidebarOpen" />
 
-    <div class="mb-4 sm:mb-6">
-      <h1 class="text-lg sm:text-xl md:text-2xl font-black tracking-wide text-[#EDEFF4]">
-        Notificações
-      </h1>
-      <p class="text-xs sm:text-sm text-[#8A93A6] font-bold mt-1">
-        Acompanhe suas notificações e lembretes
-      </p>
+    <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div>
+        <h1 class="text-lg sm:text-xl md:text-2xl font-black tracking-wide text-[#EDEFF4]">
+          Notificações
+        </h1>
+        <p class="text-xs sm:text-sm text-[#8A93A6] font-bold mt-1">
+          Acompanhe suas notificações e crie lembretes
+        </p>
+      </div>
+      <button
+        class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[#1E3A5F] text-[#E3EBFB] border border-[#33517F] hover:bg-[#33517F] active:scale-95 transition font-black text-[10px] uppercase tracking-[0.12em] whitespace-nowrap"
+        @click="abrirModalCriar"
+      >
+        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Criar notificação
+      </button>
     </div>
 
-    <section v-if="!carregando && notificacoes.length" class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
+    <section v-if="notificacoes.length" class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3">
         <div class="flex gap-2 overflow-x-auto no-scrollbar">
           <button
@@ -210,20 +255,8 @@ const bgPorTipo = (tipo: Notification['type']) => {
           </button>
         </div>
 
-        <div class="flex gap-2">
-          <button
-            v-if="naoLidas > 0"
-            class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[#1E3A5F] text-[#E3EBFB] border border-[#33517F] hover:bg-[#33517F] active:scale-95 transition font-black text-[10px] uppercase tracking-[0.12em]"
-            @click="marcarTodasComoLidas"
-          >
-            Marcar todas como lidas
-          </button>
-          <button
-            class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-[#991B1B] text-[#E3EBFB] border border-[#991B1B] hover:bg-[#B91C1C] active:scale-95 transition font-black text-[10px] uppercase tracking-[0.12em]"
-            @click="limparNotificacoes"
-          >
-            Limpar tudo
-          </button>
+        <div class="text-xs text-[#94A3B8] font-bold">
+          {{ naoLidas }} {{ naoLidas === 1 ? 'não lida' : 'não lidas' }}
         </div>
       </div>
     </section>
@@ -232,40 +265,50 @@ const bgPorTipo = (tipo: Notification['type']) => {
       <p class="font-black uppercase tracking-[0.16em] text-sm text-[#94A3B8]">Carregando...</p>
     </section>
 
+    <section v-else-if="erro" class="rounded-2xl border p-6 text-center border-[#991B1B] bg-[#991B1B]/10">
+      <p class="font-black text-[#EF4444]">{{ erro }}</p>
+    </section>
+
     <template v-else>
       <section v-if="notificacoesFiltradas.length" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 md:gap-5">
         <div
           v-for="item in notificacoesFiltradas"
           :key="item.id"
           class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-4 sm:p-5"
-          :class="!item.read ? 'border-l-4 border-l-[#60A5FA]' : ''"
+          :class="item.status === 'PENDING' ? 'border-l-4 border-l-[#60A5FA]' : ''"
         >
           <div class="flex items-start justify-between gap-3 mb-3">
             <div class="flex items-center gap-3">
               <span
                 class="inline-flex items-center justify-center w-10 h-10 rounded-xl border"
-                :class="`${bgPorTipo(item.type)} ${corPorTipo(item.type)} border-[#1E293B]`"
+                :class="`${bgPorCanal(item.channel)} ${corPorCanal(item.channel)} border-[#1E293B]`"
               >
-                <span v-html="iconePorTipo(item.type)" />
+                <span v-html="iconePorTipo(item)" />
               </span>
               <div class="min-w-0">
                 <p class="text-sm font-black text-[#F8FAFC] truncate">{{ item.title }}</p>
-                <p class="text-[10px] text-[#94A3B8] font-bold">{{ formatarData(item.createdAt) }}</p>
+                <div class="flex items-center gap-2">
+                  <p class="text-[10px] text-[#94A3B8] font-bold">{{ formatarData(new Date(item.createdAt)) }}</p>
+                  <span class="text-[9px] font-black uppercase tracking-wider" :class="statusColor(item.status)">
+                    • {{ statusLabel(item.status) }}
+                  </span>
+                </div>
               </div>
             </div>
-            <button
-              v-if="!item.read"
-              class="text-[10px] font-black uppercase tracking-wider text-[#60A5FA] hover:text-white transition whitespace-nowrap"
-              @click="marcarComoLida(item.id)"
+            <span
+              class="text-[10px] font-black uppercase tracking-wider"
+              :class="item.channel === 'TELEGRAM' ? 'text-[#2DD4CF]' : item.channel === 'EMAIL' ? 'text-[#60A5FA]' : 'text-[#F59E0B]'"
             >
-              Marcar como lida
-            </button>
+              {{ item.channel }}
+            </span>
           </div>
 
-          <p class="text-xs text-[#EDEFF4] font-semibold leading-relaxed">{{ item.description }}</p>
+          <p class="text-xs text-[#EDEFF4] font-semibold leading-relaxed mb-3">{{ item.message }}</p>
 
-          <div v-if="item.read" class="mt-3 pt-3 border-t border-[#1E293B]">
-            <span class="text-[10px] font-black uppercase tracking-wider text-[#94A3B8]">Lida</span>
+          <div v-if="item.sentAt" class="pt-3 border-t border-[#1E293B]">
+            <p class="text-[10px] text-[#94A3B8] font-bold">
+              Enviada: {{ formatarData(new Date(item.sentAt)) }}
+            </p>
           </div>
         </div>
       </section>
@@ -278,10 +321,147 @@ const bgPorTipo = (tipo: Notification['type']) => {
         </div>
         <p class="text-[#EDEFF4] font-black text-sm sm:text-base">Nenhuma notificação encontrada</p>
         <p class="text-xs text-[#94A3B8] mt-1">
-          Quando houver novidades, elas aparecerão aqui
+          Crie uma notificação para começar
         </p>
       </section>
     </template>
+
+    <Transition
+      enter-active-class="transition-opacity duration-300 ease-out"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-200 ease-in"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="abertoCriar"
+        class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60"
+      >
+        <div
+          class="relative w-full max-w-lg mx-3 sm:mx-4 rounded-2xl border border-[#1E293B] bg-[#1A2338] p-5 sm:p-6"
+        >
+          <h3 class="text-sm sm:text-base font-black uppercase tracking-wider text-[#F8FAFC] mb-4">
+            Nova notificação
+          </h3>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+                Título
+              </label>
+              <input
+                v-model="tituloNotificacao"
+                type="text"
+                placeholder="Ex: Lembrete de agendamento"
+                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] placeholder-[#94A3B8] outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+                Cliente (opcional)
+              </label>
+              <input
+                v-model="clienteNotificacao"
+                type="text"
+                placeholder="Ex: Osvaldo"
+                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] placeholder-[#94A3B8] outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+                Mensagem
+              </label>
+              <textarea
+                v-model="mensagemNotificacao"
+                rows="3"
+                placeholder="Digite a mensagem da notificação..."
+                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] placeholder-[#94A3B8] resize-none outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+                Horário
+              </label>
+              <input
+                v-model="horarioNotificacao"
+                type="datetime-local"
+                class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
+              />
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+                Lembrete
+              </label>
+              <div class="flex gap-2 overflow-x-auto no-scrollbar">
+                <button
+                  v-for="option in reminderOptions"
+                  :key="option.key"
+                  class="px-3 py-1.5 rounded-lg border text-[10px] font-black uppercase tracking-[0.12em] whitespace-nowrap transition focus-visible:outline-none"
+                  :class="
+                    reminderTime === option.key
+                      ? 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white border-[#33517F]'
+                      : 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white/80 border-[#33517F]/30'
+                  "
+                  @click="reminderTime = option.key"
+                >
+                  {{ option.label }}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[10px] font-black uppercase tracking-wider text-[#94A3B8] mb-1">
+                Canal
+              </label>
+              <div class="flex gap-2">
+                <button
+                  v-for="option in channelOptions"
+                  :key="option.key"
+                  class="flex-1 px-3 py-2 rounded-lg border text-[10px] font-black uppercase tracking-[0.12em] transition focus-visible:outline-none"
+                  :class="
+                    canalNotificacao === option.key
+                      ? 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white border-[#33517F] shadow-lg shadow-[#33517F]/20'
+                      : 'bg-gradient-to-br from-[#233350] to-[#1C2A45] text-white/80 border-[#33517F]/30'
+                  "
+                  @click="canalNotificacao = option.key as NotificationChannel"
+                >
+                  {{ option.label }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <button
+              class="flex-1 px-4 py-2.5 rounded-xl bg-[#1E3A5F] text-[#E3EBFB] border border-[#33517F] hover:bg-[#33517F] active:scale-95 transition font-black text-xs uppercase tracking-[0.12em]"
+              @click="handleCriarNotificacao"
+            >
+              Confirmar
+            </button>
+            <button
+              class="flex-1 px-4 py-2.5 rounded-xl bg-[#4A3D2A] text-[#FDE68A] border border-[#6E5A3A] hover:bg-[#6E5A3ABA] active:scale-95 transition font-black text-xs uppercase tracking-[0.12em]"
+              @click="fecharModalCriar"
+            >
+              Cancelar
+            </button>
+          </div>
+
+          <button
+            class="absolute top-3 right-3 text-[#94A3B8] hover:text-[#F8FAFC] transition"
+            @click="fecharModalCriar"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
