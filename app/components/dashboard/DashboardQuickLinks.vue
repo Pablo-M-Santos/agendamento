@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { CalendarDaysIcon, ChartBarIcon, BellIcon, ClockIcon } from '@heroicons/vue/24/outline'
+import { CalendarDaysIcon, ChartBarIcon, ClockIcon } from '@heroicons/vue/24/outline'
 
 defineProps<{
   scheduleLabel: string
   reportsLabel: string
-  notificationsLabel: string
   historyLabel: string
   title?: string
 }>()
@@ -50,22 +49,6 @@ const { t } = useAppI18n()
         </div>
         <h3 class="font-black text-sm sm:text-base tracking-wide text-[#EAF0FB]">
           {{ reportsLabel }}
-        </h3>
-      </div>
-    </NuxtLink>
-
-    <NuxtLink
-      to="/notifications"
-      class="relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-5 w-full h-[90px] sm:h-[103px] bg-gradient-to-br from-[#3D2A2A] to-[#332020] shadow-xl shadow-[#3D2A2A]/20 active:scale-95 transition hover:shadow-[#5C3A3A]/30"
-    >
-      <div class="relative h-full flex flex-col justify-between">
-        <div class="flex justify-end">
-          <span class="p-2 rounded-full bg-[#5C3A3A]">
-            <BellIcon class="w-5 h-5 text-[#F5A89C]" />
-          </span>
-        </div>
-        <h3 class="font-black text-sm sm:text-base tracking-wide text-[#F5A89C]">
-          {{ notificationsLabel }}
         </h3>
       </div>
     </NuxtLink>

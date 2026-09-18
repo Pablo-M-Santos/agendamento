@@ -132,7 +132,6 @@ const statsLate = computed(() =>
         title="Acesso rapido"
         :schedule-label="t('dashboard.scheduleCard')"
         :reports-label="t('dashboard.reportsCard')"
-        :notifications-label="t('dashboard.notificationsCard')"
         :history-label="t('dashboard.historyCard')"
       />
 
