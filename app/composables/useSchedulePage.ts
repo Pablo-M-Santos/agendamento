@@ -1,6 +1,6 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { endOfMonth, eachDayOfInterval, format, isSameDay, startOfMonth } from 'date-fns'
+import { endOfMonth, eachDayOfInterval, format, isSameDay, startOfMonth, subMonths, addMonths } from 'date-fns'
 import type { FirebaseError } from 'firebase/app'
 import type { AgendamentoForm } from '~/types/agendamento'
 import { useAuth } from '~/composables/useAuth'
@@ -73,6 +73,14 @@ export const useSchedulePage = () => {
 
     return mapa
   })
+
+  const mesAnterior = () => {
+    dataSelecionada.value = subMonths(dataSelecionada.value, 1)
+  }
+
+  const proximoMes = () => {
+    dataSelecionada.value = addMonths(dataSelecionada.value, 1)
+  }
 
   const carregarAgendamentos = async () => {
     if (!user.value) return
@@ -283,7 +291,9 @@ export const useSchedulePage = () => {
     abrirModal,
     abrirDetalhes,
     abrirEdicaoPelosDetalhes,
-    handleSalvarAgendamento,
-    toggleServicoConcluido
+     handleSalvarAgendamento,
+    toggleServicoConcluido,
+    mesAnterior,
+    proximoMes
   }
 }

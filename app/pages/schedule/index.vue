@@ -19,10 +19,12 @@ const {
   agendamentoAlvoIdNoDia,
   quantidadePorDia,
   abrirModal,
-  abrirDetalhes,
-  abrirEdicaoPelosDetalhes,
-  handleSalvarAgendamento,
-  toggleServicoConcluido
+   abrirDetalhes,
+   abrirEdicaoPelosDetalhes,
+   handleSalvarAgendamento,
+   toggleServicoConcluido,
+   mesAnterior,
+   proximoMes
 } = useSchedulePage()
 
 const isSidebarOpen = ref(false)
@@ -60,6 +62,8 @@ const inicialUsuario = computed(() => {
       <ScheduleHeader
         :data-selecionada="dataSelecionada"
         @add="abrirModal()"
+        @prev-month="mesAnterior()"
+        @next-month="proximoMes()"
       />
 
       <ScheduleDaysCarousel
