@@ -378,10 +378,10 @@ User (Firebase Auth)
 
 | # | Problema | Local | Status |
 |---|----------|-------|--------|
-| 3 | **Carga total de dados sem paginação** | `useAgendamentos.ts:141-152` | 🔴 Aberto (requer cursor queries Firestore) |
-| 4 | **Acoplamento direto ao Firebase** | Composables | 🟡 Em progresso (parcial — validação extraída) |
+| 3 | **Carga total de dados sem paginação** | `useAgendamentos.ts` | ✅ **RESOLVIDO** — Cursor queries com `PaginatedResult`, UI com "Carregar mais" |
+| 4 | **Acoplamento direto ao Firebase** | Composables | ✅ **RESOLVIDO** — Interface `IAgendamentoRepository` implementada |
 | 5 | **Sem rate limiting** | `server/api/auth/register.post.ts` | 🔧 **FIXED** — 5 tentativas / 15 min por IP |
-| 6 | **Sem error boundaries** | App inteiro | 🟡 Parcialmente fixed (history.vue) |
+| 6 | **Sem error boundaries** | App inteiro | ✅ **RESOLVIDO** — `<NuxtErrorBoundary>` no app.vue |
 | 7 | **Sem sanitização de inputs** | `useRegisterPage.ts` | 🔧 **FIXED** — `.trim().toLowerCase()` no endpoint + validação compartilhada |
 
 ### 🟡 Problemas de Média Prioridade
@@ -419,12 +419,10 @@ Os itens abaixo precisam de atenção. Priorizados por impacto:
 
 | Prioridade | Problema | Onde | O que fazer |
 |-----------|----------|------|-------------|
-| **Alta** | Sem rate limiting no login | `useLoginPage.ts` | Adicionar throttling no client ou backend |
-| **Alta** | Paginação de agendamentos | `useAgendamentos.ts:144` | Migrar de `getDocs` para cursor queries com limite (ex: 50 por página) |
-| **Alta** | Acoplamento direto ao Firebase | Composables | Criar interface/repository pattern (`AgendamentoRepository`) para abstrair Firestore |
+| Prioridade | Problema | Onde | O que fazer |
+|-----------|----------|------|-------------|
 | **Média** | Lazy loading de componentes | Todos os componentes pesados | Usar `defineAsyncComponent` para charts e modais |
 | **Média** | PWA / offline | `nuxt.config.ts` | Adicionar `@vite-pwa/nuxt` |
-| **Média** | Error boundaries app-wide | App inteiro | Adicionar `<NuxtErrorBoundary>` em componentes críticos |
 | **Baixa** | Console logs estruturados | Composables/server | Substituir `console.log` por logger estruturado |
 
 ## Segurança
@@ -583,9 +581,9 @@ pnpm preview
 
 - [ ] **Crítico:** Regras de segurança Firestore
 - [x] **Crítico:** Suite de testes (Vitest + Playwright)
-- [ ] **Alto:** Paginação de agendamentos (cursor queries)
-- [ ] **Alto:** Rate limiting no backend
-- [ ] **Alto:** Error boundaries
+- [x] **Alto:** Paginação de agendamentos (cursor queries)
+- [x] **Alto:** Acoplamento direto ao Firebase (repository pattern)
+- [x] **Alto:** Error boundaries
 - [ ] **Médio:** Search de CEP (autofill de endereço)
 - [ ] **Médio:** Notificações push
 - [ ] **Médio:** PWA / Service Worker
