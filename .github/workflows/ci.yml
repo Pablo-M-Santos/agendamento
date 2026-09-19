@@ -32,3 +32,14 @@ jobs:
 
       - name: Typecheck
         run: pnpm run typecheck
+
+      - name: Unit tests
+        run: pnpm run test
+
+      - name: E2E tests
+        run: |
+          npx playwright install --with-deps
+          pnpm run dev &
+          sleep 10
+          pnpm run test:e2e
+        timeout-minutes: 10
