@@ -9,7 +9,7 @@ import ApexHorizontalBarsChart from '~/components/charts/apex/ApexHorizontalBars
 import ApexHourlyBarsChart from '~/components/charts/apex/ApexHourlyBarsChart.vue'
 import ApexStatusStackedChart from '~/components/charts/apex/ApexStatusStackedChart.vue'
 import ApexPeriodComparisonChart from '~/components/charts/apex/ApexPeriodComparisonChart.vue'
-import ApexMovementMapChart from '~/components/charts/apex/ApexMovementMapChart.vue'
+import type { Agendamento } from '~/composables/useAgendamentos'
 import VueApexCharts from 'vue3-apexcharts'
 
 definePageMeta({ middleware: 'auth', layout: 'app' })
@@ -37,7 +37,6 @@ const {
   periodoSelecionado,
   filtroStatus,
   carregando,
-  carregar,
   totalAgendamentos,
   totalFinalizados,
   totalNaoConcluidos,
@@ -52,13 +51,15 @@ const {
 const {
   buildStatusDonut,
   buildCompletionTrend,
-  buildHeatmap,
   receitaTotal,
   ticketMedio,
-  receitaPorDia,
+  receitaPorMes,
+  mediaMensal,
   statusPorDia,
   comparacaoPeriodo
 } = useChartData(agendamentosFiltrados as Ref<Agendamento[]>)
+
+const mesSelecionado = ref('')
 
 const exporting = ref(false)
 
@@ -74,9 +75,40 @@ const handleStatusSelect = (status: string) => {
   filtroStatus.value = status as StatusFilter
 }
 
+const dadosReceita = computed(() => {
+  if (!mesSelecionado.value) {
+    return receitaPorMes.value.map((m) => ({ x: m.x, valor: m.valor }))
+  }
+  const [mesNum, ano] = mesSelecionado.value.split('/')
+  const mesFilter = `${ano}-${mesNum}`
+  const diasNoMes = new Date(parseInt(ano), parseInt(mesNum), 0).getDate()
+
+  const mapa = new Map<string, number>()
+  for (let dia = 1; dia <= diasNoMes; dia++) {
+    const diaStr = String(dia).padStart(2, '0')
+    mapa.set(`${mesFilter}-${diaStr}`, 0)
+  }
+
+  agendamentosFiltrados.value.forEach((item) => {
+    if (!item.data) return
+    const chaveData = format(item.data.toDate(), 'yyyy-MM-dd')
+    const chaveMes = chaveData.substring(0, 7)
+    if (chaveMes !== mesFilter) return
+    mapa.set(chaveData, (mapa.get(chaveData) || 0) + (item.valor || 0))
+  })
+
+  return Array.from(mapa.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([chave, valor]) => ({
+      x: format(new Date(`${chave}T00:00:00`), 'dd/MM'),
+      valor
+    }))
+})
+
+const mesesDisponiveis = computed(() => receitaPorMes.value.map((m) => m.x))
+
 const donutSegments = computed(() => buildStatusDonut())
 const trendPontos = computed(() => buildCompletionTrend(periodoSelecionado.value === '7d' ? 7 : 14))
-const heatmapDados = computed(() => buildHeatmap())
 
 const handleExportarPdf = async () => {
   if (exporting.value) return
@@ -232,81 +264,45 @@ const handleExportarPdf = async () => {
         </div>
       </section>
 
-      <section class="grid grid-cols-1 md:grid-cols-2 md:items-start gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
+      <section class="grid grid-cols-1 gap-3 sm:gap-4 md:gap-6 mb-4 sm:mb-6 md:mb-8">
         <div class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-3 sm:p-4 md:p-5">
-          <h2 class="text-xs sm:text-sm font-black uppercase tracking-[0.16em] mb-3 sm:mb-4 text-[#F8FAFC]">
-            Mapa de movimento
-          </h2>
-          <div v-if="heatmapDados.rows.some((row) => row.cells.some((cell) => cell.value > 0))">
-            <div class="overflow-x-auto no-scrollbar">
-              <div class="min-w-[260px]">
-                <div class="flex mb-1" :style="{ paddingLeft: '36px' }">
-                  <div
-                    v-for="(col, i) in heatmapDados.columns"
-                    :key="`col-${i}`"
-                    class="text-center text-[9px] font-black uppercase tracking-wider text-[#94A3B8]"
-                    :style="{ width: '24px', marginRight: '2px' }"
-                  >
-                    {{ col }}
-                  </div>
-                </div>
-                <div
-                  v-for="(row, rIdx) in heatmapDados.rows"
-                  :key="`row-${rIdx}`"
-                  class="flex items-center mt-1"
-                >
-                  <div
-                    class="text-[9px] font-black uppercase tracking-wider text-[#94A3B8] pr-1 text-right"
-                    :style="{ width: '36px' }"
-                  >
-                    {{ row.label }}
-                  </div>
-                  <div
-                    v-for="(cell, cIdx) in row.cells"
-                    :key="`cell-${rIdx}-${cIdx}`"
-                    class="rounded-md flex items-center justify-center text-[10px] font-black transition-colors"
-                    :style="{
-                      width: '24px',
-                      height: '24px',
-                      marginRight: '2px',
-                      backgroundColor: cell.value === 0 ? '#1E293B' : 'rgba(59, 130, 246, ' + Math.min(0.25 + cell.value * 0.15, 1) + ')'
-                    }"
-                    :class="cell.value > 0 && cell.value / Math.max(...heatmapDados.rows.flatMap(r => r.cells.map(c => c.value))) > 0.6 ? 'text-[#0F1420]' : 'text-[#F8FAFC]'"
-                  >
-                    {{ cell.value > 0 ? cell.value : '' }}
-                  </div>
-                </div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <h2 class="text-xs sm:text-sm font-black uppercase tracking-[0.16em] text-[#F8FAFC]">
+              Receita mensal
+            </h2>
+            <div class="flex items-center gap-2 sm:gap-3">
+              <div class="text-right">
+                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.12em] text-[#94A3B8]">
+                  Média mensal
+                </p>
+                <p class="text-sm sm:text-base font-black text-[#F59E0B]">
+                  {{ new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(mediaMensal) }}
+                </p>
               </div>
+              <select
+                v-model="mesSelecionado"
+                class="bg-[#233350] border border-[#33517F] rounded-lg px-2 py-1 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#EDEFF4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 cursor-pointer"
+              >
+                <option value="">Todos os meses</option>
+                <option
+                  v-for="mes in mesesDisponiveis"
+                  :key="mes"
+                  :value="mes"
+                >
+                  {{ mes }}
+                </option>
+              </select>
             </div>
           </div>
-          <div v-else class="flex flex-col items-center justify-center py-10 text-center">
-            <div
-              class="w-14 h-14 rounded-full bg-[#1A2338]/30 border border-[#94A3B8]/30 flex items-center justify-center mb-3"
-            >
-              <svg class="w-6 h-6 text-[#94A3B8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 002 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <p class="text-sm text-[#F8FAFC] font-bold">Sem agendamentos no período</p>
-            <p class="text-xs text-[#94A3B8] mt-1">
-              Cadastre serviços para ver o mapa de movimento
-            </p>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-3 sm:p-4 md:p-5">
-          <h2 class="text-xs sm:text-sm font-black uppercase tracking-[0.16em] mb-3 sm:mb-4 text-[#F8FAFC]">
-            Receita diária
-          </h2>
-          <div v-if="receitaPorDia.length" class="overflow-x-auto no-scrollbar">
+          <div v-if="dadosReceita.length" class="overflow-x-auto no-scrollbar">
             <VueApexCharts
               type="area"
-              height="180"
+              height="260"
               width="100%"
               :options="{
                 chart: {
                   type: 'area',
-                  height: 180,
+                  height: 260,
                   background: 'transparent',
                   foreColor: '#94A3B8',
                   toolbar: { show: false },
@@ -333,7 +329,7 @@ const handleExportarPdf = async () => {
                   xaxis: { lines: { show: false } }
                 },
                 xaxis: {
-                  categories: receitaPorDia.map((p) => p.x),
+                  categories: dadosReceita.map((m) => m.x),
                   labels: {
                     style: { colors: '#94A3B8', fontSize: '9px', fontWeight: 700 }
                   }
@@ -352,10 +348,10 @@ const handleExportarPdf = async () => {
                   }
                 },
                 responsive: [
-                  { breakpoint: 480, options: { chart: { height: 160 } } }
+                  { breakpoint: 480, options: { chart: { height: 220 } } }
                 ]
               }"
-              :series="[{ name: 'Receita', data: receitaPorDia.map((p) => p.valor) }]"
+              :series="[{ name: 'Receita', data: dadosReceita.map((m) => m.valor) }]"
             />
           </div>
           <div v-else class="flex flex-col items-center justify-center py-10 text-center">

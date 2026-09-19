@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
 import DashboardTopBar from '~/components/dashboard/DashboardTopBar.vue'
 import DashboardSidebar from '~/components/DashboardSidebar.vue'
 
@@ -9,13 +8,10 @@ definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { t } = useAppI18n()
 const { user } = useAuth()
-const { listarAgendamentos } = useAgendamentos()
+const { listarAgendamentosCompleto } = useAgendamentos()
+const { dateLocale, settings } = useUserSettings()
 
 const isSidebarOpen = ref(false)
-
-onMounted(() => {
-  isSidebarOpen.value = window.matchMedia('(min-width: 1024px)').matches
-})
 
 const saudacao = computed(() => t('sidebar.history'))
 
@@ -27,23 +23,36 @@ const inicialUsuario = computed(() => {
 
 const agendamentos = ref<Awaited<ReturnType<typeof listarAgendamentos>>>([])
 const carregando = ref(true)
+const erro = ref<string | null>(null)
 const busca = ref('')
 const filtroStatus = ref<'todos' | 'concluidos' | 'abertos' | 'materialPronto' | 'atrasados'>('todos')
 
 const carregarAgendamentos = async () => {
+  if (!user.value) return
   carregando.value = true
+  erro.value = null
   try {
-    agendamentos.value = await listarAgendamentos()
+    agendamentos.value = await listarAgendamentosCompleto()
+  } catch {
+    erro.value = t('history.error')
+    agendamentos.value = []
   } finally {
     carregando.value = false
   }
 }
 
 onMounted(() => {
+  isSidebarOpen.value = window.matchMedia('(min-width: 1024px)').matches
   carregarAgendamentos()
 })
 
 const agora = () => new Date()
+
+const dateFmt = computed(() => {
+  if (settings.value.language === 'en-US') return "MMM d, yyyy 'at' h:mm a"
+  if (settings.value.language === 'es-ES') return "dd/MM/yyyy 'a las' HH:mm"
+  return "dd/MM/yyyy 'às' HH:mm"
+})
 
 const agendamentosFiltrados = computed(() => {
   let resultado = [...agendamentos.value]
@@ -90,23 +99,23 @@ const agendamentosFiltrados = computed(() => {
 
 const formatarData = (timestamp: { toDate: () => Date }) => {
   if (!timestamp) return ''
-  return format(timestamp.toDate(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
+  return format(timestamp.toDate(), dateFmt.value, { locale: dateLocale.value })
 }
 
 const formatarValor = (valor?: number) => {
   if (valor === undefined || valor === null) return '—'
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat(settings.value.language, {
     style: 'currency',
     currency: 'BRL'
   }).format(valor)
 }
 
 const opcoesStatus = computed(() => [
-  { key: 'todos', label: 'Todos' },
-  { key: 'concluidos', label: 'Concluídos' },
-  { key: 'abertos', label: 'Em aberto' },
-  { key: 'materialPronto', label: 'Material pronto' },
-  { key: 'atrasados', label: 'Atrasados' }
+  { key: 'todos', label: t('history.filter.todos') },
+  { key: 'concluidos', label: t('history.filter.concluidos') },
+  { key: 'abertos', label: t('history.filter.abertos') },
+  { key: 'materialPronto', label: t('history.filter.materialPronto') },
+  { key: 'atrasados', label: t('history.filter.atrasados') }
 ])
 
 const handleStatusSelect = (status: string) => {
@@ -134,23 +143,25 @@ const handleStatusSelect = (status: string) => {
 
     <div class="mb-4 sm:mb-6">
       <h1 class="text-lg sm:text-xl md:text-2xl font-black tracking-wide text-[#EDEFF4]">
-        Histórico de agendamentos
+        {{ t('history.title') }}
       </h1>
       <p class="text-xs sm:text-sm text-[#8A93A6] font-bold mt-1">
-        Pesquise e filtre seus agendamentos passados e atuais
+        {{ t('history.subtitle') }}
       </p>
     </div>
 
     <section class="rounded-2xl border border-[#1E293B] bg-[#1A2338] p-3 sm:p-4 md:p-5 mb-4 sm:mb-6">
       <div class="flex items-center gap-2 mb-3">
-        <h2 class="text-xs font-black uppercase tracking-[0.16em] text-[#94A3B8]">Busca e filtros</h2>
+        <h2 class="text-xs font-black uppercase tracking-[0.16em] text-[#94A3B8]">
+          {{ t('history.filtersTitle') }}
+        </h2>
       </div>
       <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
         <div class="relative flex-1">
           <input
             v-model="busca"
             type="text"
-            placeholder="Buscar por cliente, endereço ou observação..."
+            :placeholder="t('history.searchPlaceholder')"
             class="w-full rounded-xl border border-[#334155] bg-[#0F1729] px-3 py-2 text-sm text-[#EDEFF4] placeholder-[#94A3B8] outline-none focus:border-[#60A5FA] focus:ring-1 focus:ring-[#60A5FA]"
           />
         </div>
@@ -174,13 +185,17 @@ const handleStatusSelect = (status: string) => {
     </section>
 
     <section v-if="carregando" class="rounded-2xl border p-6 text-center border-[#1E293B] bg-[#1A2338]">
-      <p class="font-black uppercase tracking-[0.16em] text-sm text-[#94A3B8]">Carregando...</p>
+      <p class="font-black uppercase tracking-[0.16em] text-sm text-[#94A3B8]">{{ t('history.loading') }}</p>
+    </section>
+
+    <section v-else-if="erro" class="rounded-2xl border border-[#991B1B] bg-[#451A1A] p-6 text-center">
+      <p class="font-black text-[#FCA5A5]">{{ erro }}</p>
     </section>
 
     <template v-else>
       <div v-if="agendamentosFiltrados.length" class="flex items-center gap-2 mb-3 sm:mb-4">
         <h2 class="text-xs font-black uppercase tracking-[0.16em] text-[#94A3B8]">
-          {{ agendamentosFiltrados.length }} {{ agendamentosFiltrados.length === 1 ? 'agendamento encontrado' : 'agendamentos encontrados' }}
+          {{ agendamentosFiltrados.length }} {{ agendamentosFiltrados.length === 1 ? t('history.foundOne') : t('history.foundMany') }}
         </h2>
         <div class="flex-1 h-[1px] bg-[#1E293B]" />
       </div>
@@ -206,35 +221,35 @@ const handleStatusSelect = (status: string) => {
                     : 'bg-[#92400E]/20 text-[#F59E0B] border-[#92400E]'
               "
             >
-              {{ item.servicoConcluido === true ? 'Concluído' : item.servicoConcluido === false ? 'Em aberto' : 'Sem status' }}
+              {{ item.servicoConcluido === true ? t('history.status.concluido') : item.servicoConcluido === false ? t('history.status.emAberto') : t('history.status.semStatus') }}
             </span>
           </div>
 
           <div class="grid grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
             <div>
-              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">Data</p>
+              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">{{ t('history.label.data') }}</p>
               <p class="text-[#F8FAFC] font-bold">{{ formatarData(item.data) }}</p>
             </div>
             <div>
-              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">Valor</p>
+              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">{{ t('history.label.valor') }}</p>
               <p class="text-[#F8FAFC] font-bold">{{ formatarValor(item.valor) }}</p>
             </div>
             <div>
-              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">Material</p>
+              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">{{ t('history.label.material') }}</p>
               <p class="font-bold" :class="item.materialPronto ? 'text-[#10B981]' : 'text-[#94A3B8]'">
-                {{ item.materialPronto ? 'Pronto' : 'Não informado' }}
+                {{ item.materialPronto ? t('history.material.pronto') : t('history.material.naoInformado') }}
               </p>
             </div>
             <div>
-              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">Status</p>
+              <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-0.5">{{ t('history.label.status') }}</p>
               <p class="font-bold" :class="item.servicoConcluido === true ? 'text-[#10B981]' : item.servicoConcluido === false ? 'text-[#EF4444]' : 'text-[#F59E0B]'">
-                {{ item.servicoConcluido === true ? 'Concluído' : item.servicoConcluido === false ? 'Pendente' : 'Sem status' }}
+                {{ item.servicoConcluido === true ? t('history.status.concluido') : item.servicoConcluido === false ? t('history.status.pendente') : t('history.status.semStatus') }}
               </p>
             </div>
           </div>
 
           <div v-if="item.observacoes" class="mt-3 pt-3 border-t border-[#1E293B]">
-            <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-1">Observações</p>
+            <p class="text-[10px] uppercase tracking-wider text-[#94A3B8] font-black mb-1">{{ t('schedule.notes') }}</p>
             <p class="text-xs text-[#EDEFF4] font-semibold leading-relaxed">{{ item.observacoes }}</p>
           </div>
         </div>
@@ -248,7 +263,7 @@ const handleStatusSelect = (status: string) => {
         </div>
         <p class="text-[#EDEFF4] font-black text-sm sm:text-base">{{ t('reports.noData') }}</p>
         <p class="text-xs text-[#94A3B8] mt-1">
-          Nenhum agendamento encontrado para este filtro
+          {{ t('history.empty.subtitle') }}
         </p>
       </section>
     </template>

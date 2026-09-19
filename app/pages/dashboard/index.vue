@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import DashboardStatsCards from '~/components/dashboard/DashboardStatsCards.vue'
 import DashboardQuickLinks from '~/components/dashboard/DashboardQuickLinks.vue'
 
@@ -121,7 +121,7 @@ const statsLate = computed(() =>
       <DashboardSidebar v-model="isSidebarOpen" />
 
       <DashboardStatsCards
-        title="Resumo"
+        :title="t('dashboard.stats.title')"
         :total="statsTotal"
         :completed="statsCompleted"
         :open="statsOpen"
@@ -129,7 +129,7 @@ const statsLate = computed(() =>
       />
 
       <DashboardQuickLinks
-        title="Acesso rapido"
+        :title="t('dashboard.quickLinks.title')"
         :schedule-label="t('dashboard.scheduleCard')"
         :reports-label="t('dashboard.reportsCard')"
         :history-label="t('dashboard.historyCard')"
