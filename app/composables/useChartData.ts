@@ -35,11 +35,33 @@ export const useChartData = (agendamentosRef: Ref<Agendamento[]>) => {
       mapa.set(chave, (mapa.get(chave) || 0) + (item.valor || 0))
     })
     return Array.from(mapa.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
       .map(([chave, valor]) => ({
         x: format(new Date(`${chave}T00:00:00`), 'dd/MM'),
         valor
       }))
       .slice(-14)
+  })
+
+  const receitaPorMes = computed(() => {
+    const mapa = new Map<string, number>()
+    agendamentosRef.value.forEach((item) => {
+      if (!item.data) return
+      const chave = format(item.data.toDate(), 'yyyy-MM')
+      mapa.set(chave, (mapa.get(chave) || 0) + (item.valor || 0))
+    })
+    return Array.from(mapa.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([chave, valor]) => ({
+        x: format(new Date(`${chave}-01T00:00:00`), 'MM/yyyy'),
+        valor
+      }))
+  })
+
+  const mediaMensal = computed(() => {
+    const meses = receitaPorMes.value
+    if (!meses.length) return 0
+    return meses.reduce((acc, m) => acc + m.valor, 0) / meses.length
   })
 
   const statusPorDia = computed(() => {
@@ -233,6 +255,8 @@ export const useChartData = (agendamentosRef: Ref<Agendamento[]>) => {
     receitaTotal,
     ticketMedio,
     receitaPorDia,
+    receitaPorMes,
+    mediaMensal,
     statusPorDia,
     comparacaoPeriodo
   }

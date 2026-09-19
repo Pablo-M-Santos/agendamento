@@ -1,8 +1,10 @@
 import { computed, reactive, ref } from 'vue'
+import { validarEmail, validarSenha } from '~/utils/validacao'
 
 export const useRegisterPage = () => {
   const { loginWithGoogle: authLoginWithGoogle } = useAuth()
   const toast = useToast()
+  const { t } = useAppI18n()
   const email = ref('')
   const password = ref('')
   const loading = ref(false)
@@ -13,17 +15,12 @@ export const useRegisterPage = () => {
     password: ''
   })
 
-  const validateEmail = (value: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return regex.test(value)
-  }
-
   const validateField = (field: 'email' | 'password') => {
     if (field === 'email') {
       if (!email.value) {
-        errors.email = 'Email e obrigatorio'
-      } else if (!validateEmail(email.value)) {
-        errors.email = 'Digite um email valido'
+        errors.email = t('auth.emailRequired')
+      } else if (!validarEmail(email.value)) {
+        errors.email = t('auth.emailInvalid')
       } else {
         errors.email = ''
       }
@@ -31,9 +28,9 @@ export const useRegisterPage = () => {
 
     if (field === 'password') {
       if (!password.value) {
-        errors.password = 'Senha e obrigatoria'
-      } else if (password.value.length < 6) {
-        errors.password = 'Minimo de 6 caracteres'
+        errors.password = t('auth.passwordRequired')
+      } else if (!validarSenha(password.value)) {
+        errors.password = t('auth.passwordMin')
       } else {
         errors.password = ''
       }
@@ -62,7 +59,7 @@ export const useRegisterPage = () => {
       })
 
       toast.add({
-        title: 'Cadastro realizado com sucesso!',
+        title: t('auth.registerSuccess'),
         description: response.message,
         color: 'success'
       })
@@ -73,10 +70,10 @@ export const useRegisterPage = () => {
       await navigateTo('/')
     } catch (error: unknown) {
       const err = error as { data?: { statusMessage?: string } }
-      const message = err.data?.statusMessage || 'Nao foi possivel concluir seu cadastro. Tente novamente.'
+      const message = err.data?.statusMessage || t('auth.registerErrorGeneric')
 
       toast.add({
-        title: 'Erro no cadastro',
+        title: t('auth.registerError'),
         description: message,
         color: 'error'
       })
@@ -91,22 +88,22 @@ export const useRegisterPage = () => {
       const result = await authLoginWithGoogle()
 
       if (!result.ok) {
-        let message = 'Tente novamente.'
+        let message = t('auth.tryAgain')
 
         switch (result.code) {
           case 'auth/account-exists-with-different-credential':
-            message = 'Este email ja esta cadastrado com senha. Entre com email e senha.'
+            message = t('auth.googleOnlyAccount')
             break
           case 'auth/popup-closed-by-user':
-            message = 'Login com Google cancelado.'
+            message = t('auth.popupClosed')
             break
           case 'auth/too-many-requests':
-            message = 'Muitas tentativas. Tente mais tarde.'
+            message = t('auth.loginErrorTooManyRequests')
             break
         }
 
         toast.add({
-          title: 'Erro no login com Google',
+          title: t('auth.loginError'),
           description: message,
           color: 'error'
         })
@@ -115,7 +112,7 @@ export const useRegisterPage = () => {
       }
 
       toast.add({
-        title: 'Login com Google realizado!',
+        title: t('auth.registerGoogleSuccess'),
         color: 'success'
       })
 

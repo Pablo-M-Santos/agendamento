@@ -9,7 +9,7 @@ import { useAgendamentos, type Agendamento } from '~/composables/useAgendamentos
 export const useSchedulePage = () => {
   const { user } = useAuth()
   const route = useRoute()
-  const { listarAgendamentos, criarAgendamento, editarAgendamento, excluirAgendamento, atualizarStatus } =
+  const { listarAgendamentosCompleto, criarAgendamento, editarAgendamento, excluirAgendamento, atualizarStatus } =
     useAgendamentos()
   const toast = useToast()
   const { t } = useAppI18n()
@@ -27,7 +27,6 @@ export const useSchedulePage = () => {
   const centralizacaoInicialFeita = ref(false)
   const centralizacaoInicialEmAndamento = ref(false)
 
-  
   const diasCarrossel = computed(() => {
     const inicio = startOfMonth(dataSelecionada.value)
     const fim = endOfMonth(dataSelecionada.value)
@@ -84,7 +83,7 @@ export const useSchedulePage = () => {
 
   const carregarAgendamentos = async () => {
     if (!user.value) return
-    agendamentos.value = await listarAgendamentos()
+    agendamentos.value = await listarAgendamentosCompleto()
   }
 
   const abrirModalConfirmacao = (id: string) => {
@@ -291,7 +290,7 @@ export const useSchedulePage = () => {
     abrirModal,
     abrirDetalhes,
     abrirEdicaoPelosDetalhes,
-     handleSalvarAgendamento,
+    handleSalvarAgendamento,
     toggleServicoConcluido,
     mesAnterior,
     proximoMes

@@ -1,13 +1,12 @@
-import { computed, reactive, ref } from 'vue'
+import { computed, onUnmounted, reactive, ref } from 'vue'
 import { signOut } from 'firebase/auth'
+import { validarEmail, validarSenha } from '~/utils/validacao'
 
 export const useLoginPage = () => {
   const { $auth } = useNuxtApp()
-  const {
-    loginWithEmail: authLoginWithEmail,
-    loginWithGoogle: authLoginWithGoogle
-  } = useAuth()
+  const { loginWithEmail: authLoginWithEmail, loginWithGoogle: authLoginWithGoogle } = useAuth()
   const toast = useToast()
+  const { t } = useAppI18n()
   const email = ref('')
   const password = ref('')
   const loading = ref(false)
@@ -18,17 +17,49 @@ export const useLoginPage = () => {
     password: ''
   })
 
-  const validateEmail = (value: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return regex.test(value)
+  const MAX_ATTEMPTS = 3
+  const BASE_COOLDOWN_SEC = 5
+  const MAX_COOLDOWN_SEC = 30
+
+  const failedAttempts = ref(0)
+  const cooldownSeconds = ref(0)
+  let cooldownTimer: ReturnType<typeof setInterval> | null = null
+
+  const isRateLimited = computed(() => cooldownSeconds.value > 0)
+
+  const clearCooldown = () => {
+    if (cooldownTimer) {
+      clearInterval(cooldownTimer)
+      cooldownTimer = null
+    }
+    cooldownSeconds.value = 0
   }
+
+  const startCooldown = () => {
+    const overshoot = failedAttempts.value - MAX_ATTEMPTS + 1
+    const duration = Math.min(
+      BASE_COOLDOWN_SEC * 2 ** (overshoot - 1),
+      MAX_COOLDOWN_SEC
+    )
+    cooldownSeconds.value = duration
+
+    cooldownTimer = setInterval(() => {
+      cooldownSeconds.value--
+      if (cooldownSeconds.value <= 0) {
+        clearCooldown()
+        failedAttempts.value = 0
+      }
+    }, 1000)
+  }
+
+  onUnmounted(() => clearCooldown())
 
   const validateField = (field: 'email' | 'password') => {
     if (field === 'email') {
       if (!email.value) {
-        errors.email = 'Email e obrigatorio'
-      } else if (!validateEmail(email.value)) {
-        errors.email = 'Digite um email valido'
+        errors.email = t('auth.emailRequired')
+      } else if (!validarEmail(email.value)) {
+        errors.email = t('auth.emailInvalid')
       } else {
         errors.email = ''
       }
@@ -36,9 +67,9 @@ export const useLoginPage = () => {
 
     if (field === 'password') {
       if (!password.value) {
-        errors.password = 'Senha e obrigatoria'
-      } else if (password.value.length < 6) {
-        errors.password = 'Minimo de 6 caracteres'
+        errors.password = t('auth.passwordRequired')
+      } else if (!validarSenha(password.value)) {
+        errors.password = t('auth.passwordMin')
       } else {
         errors.password = ''
       }
@@ -50,6 +81,15 @@ export const useLoginPage = () => {
   })
 
   const loginWithEmail = async () => {
+    if (isRateLimited.value) {
+      toast.add({
+        title: t('auth.loginError'),
+        description: t('auth.loginThrottled', { seconds: cooldownSeconds.value }),
+        color: 'warning'
+      })
+      return
+    }
+
     validateField('email')
     validateField('password')
 
@@ -60,25 +100,30 @@ export const useLoginPage = () => {
       const result = await authLoginWithEmail(email.value, password.value)
 
       if (!result.ok) {
-        let message = 'Tente novamente.'
+        failedAttempts.value++
+        if (failedAttempts.value >= MAX_ATTEMPTS) {
+          startCooldown()
+        }
+
+        let message = t('auth.tryAgain')
 
         switch (result.code) {
           case 'auth/google-only-account':
           case 'auth/invalid-login':
           case 'auth/wrong-password':
           case 'auth/invalid-credential':
-            message = 'Email ou senha incorretos.'
+            message = t('auth.loginErrorInvalid')
             break
           case 'auth/invalid-email':
-            message = 'Email invalido.'
+            message = t('auth.loginErrorInvalidEmail')
             break
           case 'auth/too-many-requests':
-            message = 'Muitas tentativas. Tente mais tarde.'
+            message = t('auth.loginErrorTooManyRequests')
             break
         }
 
         toast.add({
-          title: 'Erro no login',
+          title: t('auth.loginError'),
           description: message,
           color: 'error'
         })
@@ -88,8 +133,8 @@ export const useLoginPage = () => {
 
       if (!$auth.currentUser?.emailVerified) {
         toast.add({
-          title: 'Email nao verificado',
-          description: 'Verifique seu email antes de entrar',
+          title: t('auth.loginError'),
+          description: t('auth.emailNotVerified'),
           color: 'warning'
         })
 
@@ -97,8 +142,11 @@ export const useLoginPage = () => {
         return
       }
 
+      clearCooldown()
+      failedAttempts.value = 0
+
       toast.add({
-        title: 'Login realizado com sucesso!',
+        title: t('auth.loginSuccess'),
         color: 'success'
       })
 
@@ -114,22 +162,22 @@ export const useLoginPage = () => {
       const result = await authLoginWithGoogle()
 
       if (!result.ok) {
-        let message = 'Tente novamente.'
+        let message = t('auth.tryAgain')
 
         switch (result.code) {
           case 'auth/account-exists-with-different-credential':
-            message = 'Este email ja esta cadastrado com senha. Entre com email e senha.'
+            message = t('auth.googleOnlyAccount')
             break
           case 'auth/popup-closed-by-user':
-            message = 'Login com Google cancelado.'
+            message = t('auth.popupClosed')
             break
           case 'auth/too-many-requests':
-            message = 'Muitas tentativas. Tente mais tarde.'
+            message = t('auth.loginErrorTooManyRequests')
             break
         }
 
         toast.add({
-          title: 'Erro no login com Google',
+          title: t('auth.loginError'),
           description: message,
           color: 'error'
         })
@@ -138,7 +186,7 @@ export const useLoginPage = () => {
       }
 
       toast.add({
-        title: 'Login com Google realizado!',
+        title: t('auth.loginSuccess'),
         color: 'success'
       })
 
@@ -155,6 +203,8 @@ export const useLoginPage = () => {
     showPassword,
     errors,
     isFormValid,
+    isRateLimited,
+    cooldownSeconds,
     validateField,
     loginWithEmail,
     loginWithGoogle

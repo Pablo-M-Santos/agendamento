@@ -17,7 +17,7 @@ export type StatusFilter = 'todos' | 'concluidos' | 'abertos' | 'atrasados'
 
 export const useReportsPage = () => {
   const { user } = useAuth()
-  const { listarAgendamentos } = useAgendamentos()
+  const { listarAgendamentosCompleto } = useAgendamentos()
 
   const periodoSelecionado = ref<ReportsPeriod>('30d')
   const filtroStatus = ref<StatusFilter>('todos')
@@ -34,7 +34,7 @@ export const useReportsPage = () => {
     carregando.value = true
 
     try {
-      agendamentos.value = await listarAgendamentos()
+      agendamentos.value = await listarAgendamentosCompleto()
     } finally {
       carregando.value = false
     }

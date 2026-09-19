@@ -1,33 +1,15 @@
-import {
-  collection,
-  addDoc,
-  getDocs,
-  query,
-  where,
-  deleteDoc,
-  doc,
-  Timestamp,
-  updateDoc
-} from 'firebase/firestore'
 import { useAuth } from './useAuth'
+import { AgendamentoRepository } from '~/repositories/AgendamentoRepository'
+import type { Agendamento } from '~/types/agendamento'
+import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 
-export interface Agendamento {
-  id: string
-  cliente: string
-  numeroCasa: string
-  endereco: string
-  valor?: number
-  data: Timestamp
-  materialPronto?: boolean | null
-  servicoConcluido?: boolean | null
-  observacoes?: string
-  userId: string
-  createdAt: Timestamp
-}
+export type { Agendamento } from '~/types/agendamento'
+export { LIMIT_POR_PAGINA } from '~/repositories/AgendamentoRepository'
 
 export const useAgendamentos = () => {
   const { $db } = useNuxtApp()
   const { user } = useAuth()
+  const repo = new AgendamentoRepository($db)
 
   const validarCamposObrigatorios = (dados: {
     cliente: string
@@ -45,19 +27,16 @@ export const useAgendamentos = () => {
     if (!dados.endereco || !dados.endereco.trim()) {
       throw new Error('Endereço é obrigatório')
     }
-    if (dados.valor !== undefined && dados.valor !== null && (typeof dados.valor !== 'number' || Number.isNaN(dados.valor) || dados.valor < 0)) {
+    if (
+      dados.valor !== undefined &&
+      dados.valor !== null &&
+      (typeof dados.valor !== 'number' || Number.isNaN(dados.valor) || dados.valor < 0)
+    ) {
       throw new Error('Valor do serviço inválido')
     }
     if (!dados.data) {
       throw new Error('Data/hora é obrigatória')
     }
-  }
-
-  const formatarDataParaFirestore = (dataString: string) => {
-    const dateFormatted = dataString.includes('T')
-      ? dataString.replace('T', ' ')
-      : `${dataString} 00:00:00`
-    return Timestamp.fromDate(new Date(dateFormatted))
   }
 
   const criarAgendamento = async (dados: {
@@ -79,17 +58,16 @@ export const useAgendamentos = () => {
     const endereco = dados.endereco.trim()
     const observacoes = (dados.observacoes || '').trim()
 
-    await addDoc(collection($db, 'agendamentos'), {
+    await repo.create({
       cliente,
       numeroCasa,
       endereco,
       valor: dados.valor ?? 0,
+      data: dados.data,
       materialPronto: dados.materialPronto ?? null,
       servicoConcluido: dados.servicoConcluido ?? false,
       observacoes,
-      data: formatarDataParaFirestore(dados.data),
-      userId: user.value.uid,
-      createdAt: Timestamp.fromDate(new Date())
+      userId: user.value.uid
     })
   }
 
@@ -115,15 +93,15 @@ export const useAgendamentos = () => {
     const endereco = dados.endereco.trim()
     const observacoes = (dados.observacoes || '').trim()
 
-    await updateDoc(doc($db, 'agendamentos', id), {
+    await repo.update(id, {
       cliente,
       numeroCasa,
       endereco,
       valor: dados.valor ?? 0,
+      data: dados.data,
       materialPronto: dados.materialPronto ?? null,
       servicoConcluido: dados.servicoConcluido ?? false,
-      observacoes,
-      data: Timestamp.fromDate(new Date(dados.data))
+      observacoes
     })
   }
 
@@ -133,31 +111,31 @@ export const useAgendamentos = () => {
   ) => {
     if (!user.value?.uid) throw new Error('Usuário não autenticado')
 
-    await updateDoc(doc($db, 'agendamentos', id), {
-      ...status
-    })
+    await repo.updateStatus(id, status)
   }
 
-  const listarAgendamentos = async (): Promise<Agendamento[]> => {
+  const listarAgendamentos = async (
+    opciones?: { limite?: number; ultimoDoc?: QueryDocumentSnapshot<DocumentData> }
+  ): Promise<Agendamento[]> => {
     if (!user.value) return []
 
-    const q = query(collection($db, 'agendamentos'), where('userId', '==', user.value.uid))
+    return repo.findAllPaginated(user.value.uid, opciones)
+  }
 
-    const snapshot = await getDocs(q)
+  const listarAgendamentosCompleto = async (): Promise<Agendamento[]> => {
+    if (!user.value) return []
 
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<Agendamento, 'id'>)
-    }))
+    return repo.findAll(user.value.uid)
   }
 
   const excluirAgendamento = async (id: string) => {
-    await deleteDoc(doc($db, 'agendamentos', id))
+    await repo.delete(id)
   }
 
   return {
     criarAgendamento,
     listarAgendamentos,
+    listarAgendamentosCompleto,
     excluirAgendamento,
     editarAgendamento,
     atualizarStatus
