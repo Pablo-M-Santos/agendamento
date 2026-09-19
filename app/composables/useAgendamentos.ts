@@ -1,15 +1,15 @@
 import { useAuth } from './useAuth'
-import { AgendamentoRepository } from '~/repositories/AgendamentoRepository'
+import { AgendamentoRepository, type IAgendamentoRepository, type PaginatedResult, LIMIT_POR_PAGINA } from '~/repositories/AgendamentoRepository'
 import type { Agendamento } from '~/types/agendamento'
 import type { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 
 export type { Agendamento } from '~/types/agendamento'
-export { LIMIT_POR_PAGINA } from '~/repositories/AgendamentoRepository'
+export { LIMIT_POR_PAGINA, type IAgendamentoRepository, type PaginatedResult }
 
 export const useAgendamentos = () => {
   const { $db } = useNuxtApp()
   const { user } = useAuth()
-  const repo = new AgendamentoRepository($db)
+  const repo: IAgendamentoRepository = new AgendamentoRepository($db)
 
   const validarCamposObrigatorios = (dados: {
     cliente: string
@@ -114,18 +114,43 @@ export const useAgendamentos = () => {
     await repo.updateStatus(id, status)
   }
 
+  const ultimoDoc = ref<QueryDocumentSnapshot<DocumentData> | null>(null)
+  const temMais = ref(true)
+
   const listarAgendamentos = async (
     opciones?: { limite?: number; ultimoDoc?: QueryDocumentSnapshot<DocumentData> }
   ): Promise<Agendamento[]> => {
     if (!user.value) return []
 
-    return repo.findAllPaginated(user.value.uid, opciones)
+    if (!opciones?.ultimoDoc) {
+      ultimoDoc.value = null
+      temMais.value = true
+    }
+
+    const resultado = await repo.findAllPaginated(user.value.uid, opciones)
+    if (!opciones?.ultimoDoc) {
+      ultimoDoc.value = resultado.lastDoc
+      temMais.value = resultado.hasMore
+    }
+    return resultado.items
   }
 
   const listarAgendamentosCompleto = async (): Promise<Agendamento[]> => {
     if (!user.value) return []
 
     return repo.findAll(user.value.uid)
+  }
+
+  const carregarMais = async (): Promise<Agendamento[]> => {
+    if (!user.value || !temMais.value || !ultimoDoc.value) return []
+
+    const resultado = await repo.findAllPaginated(user.value.uid, {
+      limite: LIMIT_POR_PAGINA,
+      ultimoDoc: ultimoDoc.value
+    })
+    ultimoDoc.value = resultado.lastDoc
+    temMais.value = resultado.hasMore
+    return resultado.items
   }
 
   const excluirAgendamento = async (id: string) => {
@@ -136,8 +161,10 @@ export const useAgendamentos = () => {
     criarAgendamento,
     listarAgendamentos,
     listarAgendamentosCompleto,
+    carregarMais,
     excluirAgendamento,
     editarAgendamento,
-    atualizarStatus
+    atualizarStatus,
+    temMais
   }
 }
