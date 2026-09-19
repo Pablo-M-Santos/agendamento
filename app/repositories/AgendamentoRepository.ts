@@ -42,9 +42,25 @@ export type AgendamentoUpdate = {
   observacoes?: string
 }
 
-export class AgendamentoRepository {
+export type PaginatedResult<T> = {
+  items: T[]
+  lastDoc: QueryDocumentSnapshot<DocumentData> | null
+  hasMore: boolean
+}
+
+export interface IAgendamentoRepository {
+  create(dados: AgendamentoInput): Promise<void>
+  update(id: string, dados: AgendamentoUpdate): Promise<void>
+  updateStatus(id: string, status: { servicoConcluido?: boolean | null; materialPronto?: boolean | null }): Promise<void>
+  delete(id: string): Promise<void>
+  findAllPaginated(userId: string, opciones?: { limite?: number; ultimoDoc?: QueryDocumentSnapshot<DocumentData> }): Promise<PaginatedResult<Agendamento>>
+  findAll(userId: string): Promise<Agendamento[]>
+  count(userId: string): Promise<number>
+}
+
+export class AgendamentoRepository implements IAgendamentoRepository {
   private db: Firestore
-  private colRef
+  private colRef: ReturnType<typeof collection>
 
   constructor(db: Firestore) {
     this.db = db
@@ -102,7 +118,7 @@ export class AgendamentoRepository {
   async findAllPaginated(
     userId: string,
     opciones?: { limite?: number; ultimoDoc?: QueryDocumentSnapshot<DocumentData> }
-  ): Promise<Agendamento[]> {
+  ): Promise<PaginatedResult<Agendamento>> {
     const limite = opciones?.limite ?? LIMIT_POR_PAGINA
 
     let q = query(
@@ -118,10 +134,16 @@ export class AgendamentoRepository {
 
     const snapshot = await getDocs(q)
 
-    return snapshot.docs.map((d) => ({
+    const items = snapshot.docs.map((d) => ({
       id: d.id,
       ...(d.data() as Omit<Agendamento, 'id'>)
     }))
+
+    return {
+      items,
+      lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+      hasMore: snapshot.docs.length === limite
+    }
   }
 
   async findAll(userId: string): Promise<Agendamento[]> {
@@ -133,10 +155,12 @@ export class AgendamentoRepository {
 
     const snapshot = await getDocs(q)
 
-    return snapshot.docs.map((d) => ({
+    const items = snapshot.docs.map((d) => ({
       id: d.id,
       ...(d.data() as Omit<Agendamento, 'id'>)
     }))
+
+    return items
   }
 
   async count(userId: string): Promise<number> {
