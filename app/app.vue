@@ -2,7 +2,13 @@
 const { initAuth } = useAuth()
 const { initUserSettings } = useUserSettings()
 const { initTheme } = useTheme()
-const { clearError } = useNuxtApp()
+
+const retry = ref(false)
+
+function handleRetry () {
+  retry.value = false
+  navigateTo('/')
+}
 
 initAuth()
 initUserSettings()
@@ -12,7 +18,7 @@ initTheme()
 <template>
   <UApp>
     <NuxtErrorBoundary>
-      <NuxtPage />
+      <NuxtPage :key="retry" />
       <template #error="{ error }">
         <div class="flex flex-col items-center justify-center min-h-screen bg-[#0F1729] text-[#EDEFF4] px-6">
           <div class="w-16 h-16 rounded-full bg-[#991B1B]/30 border border-[#991B1B] flex items-center justify-center mb-4">
@@ -23,7 +29,7 @@ initTheme()
           <h1 class="text-xl font-black text-[#F8FAFC] mb-2">Algo deu errado</h1>
           <p class="text-sm text-[#94A3B8] mb-6">{{ error?.message || 'Erro desconhecido' }}</p>
           <button
-            @click="clearError()"
+            @click="handleRetry"
             class="px-6 py-2 rounded-lg bg-[#233350] border border-[#33517F] text-[#F8FAFC] text-sm font-black uppercase tracking-[0.12em] hover:bg-[#2A3A55] transition"
           >
             Tentar novamente
