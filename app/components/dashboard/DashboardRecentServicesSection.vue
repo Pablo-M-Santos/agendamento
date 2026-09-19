@@ -2,6 +2,8 @@
 import { format } from 'date-fns'
 import type { Agendamento } from '~/composables/useAgendamentos'
 
+const { dateLocale } = useUserSettings()
+
 defineProps<{
   items: Agendamento[]
   labels: {
@@ -23,8 +25,8 @@ const emit = defineEmits<{
   'view-item': [item: Agendamento]
 }>()
 
-const formatarData = (data: Agendamento['data']) => format(data.toDate(), 'dd/MM/yyyy')
-const formatarHora = (data: Agendamento['data']) => format(data.toDate(), 'HH:mm')
+const formatarData = (data: Agendamento['data']) => format(data.toDate(), 'dd/MM/yyyy', { locale: dateLocale.value })
+const formatarHora = (data: Agendamento['data']) => format(data.toDate(), 'HH:mm', { locale: dateLocale.value })
 </script>
 
 <template>

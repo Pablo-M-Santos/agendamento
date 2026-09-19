@@ -28,7 +28,7 @@ const { t } = useAppI18n()
         </span>
         <div>
           <p class="text-xl sm:text-2xl font-black text-[#EDEFF4]">{{ total }}</p>
-          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">Total</p>
+          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">{{ t('dashboard.stats.total') }}</p>
         </div>
       </div>
 
@@ -38,7 +38,7 @@ const { t } = useAppI18n()
         </span>
         <div>
           <p class="text-xl sm:text-2xl font-black text-[#7FE0CC]">{{ completed }}</p>
-          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">Concluídos</p>
+          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">{{ t('dashboard.stats.completed') }}</p>
         </div>
       </div>
 
@@ -48,7 +48,7 @@ const { t } = useAppI18n()
         </span>
         <div>
           <p class="text-xl sm:text-2xl font-black text-[#9FC1F5]">{{ open }}</p>
-          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">Abertos</p>
+          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">{{ t('dashboard.stats.open') }}</p>
         </div>
       </div>
 
@@ -58,7 +58,7 @@ const { t } = useAppI18n()
         </span>
         <div>
           <p class="text-xl sm:text-2xl font-black text-[#7FE0E8]">{{ late }}</p>
-          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">Atrasados</p>
+          <p class="text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] text-[#8A93A6]">{{ t('dashboard.stats.late') }}</p>
         </div>
       </div>
     </div>
