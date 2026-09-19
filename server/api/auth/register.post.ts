@@ -1,34 +1,51 @@
 import { createError, defineEventHandler, readBody } from 'h3'
+import { validarEmail, validarSenha, MIN_PASSWORD_LENGTH } from '~/utils/validacao'
 import { createFirebaseUser, generateEmailVerificationLink, checkIfUserExists } from '#server/utils/firebase-admin'
 import { sendVerificationEmail } from '#server/utils/email-service'
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const MIN_PASSWORD_LENGTH = 6
-const MAX_EMAIL_LENGTH = 254
-const MAX_PASSWORD_LENGTH = 128
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000
+
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
+
+const checkRateLimit = (ip: string): boolean => {
+  const now = Date.now()
+  const record = rateLimitStore.get(ip)
+
+  if (!record || now > record.resetTime) {
+    rateLimitStore.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS })
+    return true
+  }
+
+  if (record.count >= RATE_LIMIT_MAX) {
+    return false
+  }
+
+  record.count += 1
+  return true
+}
 
 interface RegisterBody {
   email: string
   password: string
 }
 
-function validateEmail(email: string): boolean {
-  if (!email || typeof email !== 'string') return false
-  if (email.length > MAX_EMAIL_LENGTH) return false
-  return EMAIL_REGEX.test(email)
-}
-
-function validatePassword(password: string): boolean {
-  if (!password || typeof password !== 'string') return false
-  if (password.length < MIN_PASSWORD_LENGTH) return false
-  if (password.length > MAX_PASSWORD_LENGTH) return false
-  return true
-}
-
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
 
   try {
+    const clientIP =
+      (event.node.req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+      event.node.req.socket.remoteAddress ||
+      'unknown'
+
+    if (!checkRateLimit(clientIP)) {
+      throw createError({
+        statusCode: 429,
+        statusMessage: 'Muitas tentativas. Tente novamente em alguns minutos.'
+      })
+    }
+
     const body = await readBody<RegisterBody>(event)
 
     if (!body || typeof body !== 'object') {
@@ -41,14 +58,14 @@ export default defineEventHandler(async (event) => {
     const email = (body.email || '').trim().toLowerCase()
     const password = body.password || ''
 
-    if (!validateEmail(email)) {
+    if (!validarEmail(email)) {
       throw createError({
         statusCode: 400,
         statusMessage: 'E-mail inválido'
       })
     }
 
-    if (!validatePassword(password)) {
+    if (!validarSenha(password)) {
       throw createError({
         statusCode: 400,
         statusMessage: `Senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres`
@@ -89,8 +106,6 @@ export default defineEventHandler(async (event) => {
     if (err.statusCode) {
       throw error
     }
-
-    console.error('Erro no registro:', err.message)
 
     if (err.code === 'auth/email-already-in-use') {
       throw createError({
