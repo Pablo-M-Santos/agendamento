@@ -372,7 +372,7 @@ User (Firebase Auth)
 | # | Problema | Local | Status |
 |---|----------|-------|--------|
 | 1 | **Sem regras de segurança Firestore** | Firebase Console | 🔧 **FIXED** — `firestore.rules` criado com isolamento por `userId` |
-| 2 | **Sem testes automatizados** | Projeto inteiro | 🔴 Aberto |
+| 2 | **Sem testes automatizados** | Projeto inteiro | ✅ **RESOLVIDO** — Vitest + @nuxt/test-utils para unit tests, Playwright para e2e. Cobertura: utils, composables
 
 ### 🟠 Problemas de Alta Prioridade
 
@@ -419,7 +419,6 @@ Os itens abaixo precisam de atenção. Priorizados por impacto:
 
 | Prioridade | Problema | Onde | O que fazer |
 |-----------|----------|------|-------------|
-| **Crítica** | Sem testes automatizados | Projeto inteiro | Instalar Vitest + `@nuxt/test-utils`; Playwright para e2e. Cobertura mínima: composables, utils |
 | **Alta** | Sem rate limiting no login | `useLoginPage.ts` | Adicionar throttling no client ou backend |
 | **Alta** | Paginação de agendamentos | `useAgendamentos.ts:144` | Migrar de `getDocs` para cursor queries com limite (ex: 50 por página) |
 | **Alta** | Acoplamento direto ao Firebase | Composables | Criar interface/repository pattern (`AgendamentoRepository`) para abstrair Firestore |
@@ -583,7 +582,7 @@ pnpm preview
 ## Roadmap
 
 - [ ] **Crítico:** Regras de segurança Firestore
-- [ ] **Crítico:** Suite de testes (Vitest + Playwright)
+- [x] **Crítico:** Suite de testes (Vitest + Playwright)
 - [ ] **Alto:** Paginação de agendamentos (cursor queries)
 - [ ] **Alto:** Rate limiting no backend
 - [ ] **Alto:** Error boundaries
