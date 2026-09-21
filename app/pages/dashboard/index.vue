@@ -6,12 +6,11 @@ import DashboardQuickLinks from '~/components/dashboard/DashboardQuickLinks.vue'
 definePageMeta({ middleware: 'auth', layout: 'app' })
 
 const { user } = useAuth()
-const { listarAgendamentos, atualizarStatus, carregarMais, temMais } = useAgendamentos()
+const { listarAgendamentosCompleto, atualizarStatus } = useAgendamentos()
 const { t } = useAppI18n()
 
 const agendamentos = ref<Agendamento[]>([])
 const carregando = ref(false)
-const carregandoMais = ref(false)
 const isSidebarOpen = ref(false)
 const selectedAgendamento = ref<Agendamento | null>(null)
 const isDetailsModalOpen = ref(false)
@@ -47,15 +46,8 @@ const inicialUsuario = computed(() => {
 const carregar = async () => {
   if (!user.value) return
   carregando.value = true
-  agendamentos.value = await listarAgendamentos()
+  agendamentos.value = await listarAgendamentosCompleto()
   carregando.value = false
-}
-
-const handleCarregarMais = async () => {
-  carregandoMais.value = true
-  const novos = await carregarMais()
-  carregandoMais.value = false
-  agendamentos.value = [...agendamentos.value, ...novos]
 }
 
 watch(
@@ -151,15 +143,6 @@ const statsLate = computed(() =>
         :labels="labelsRecentes"
         @view-item="handleViewItem"
       />
-
-      <button
-        v-if="temMais"
-        @click="handleCarregarMais"
-        :disabled="carregandoMais"
-        class="w-full mt-4 py-3 rounded-xl border border-[#33517F] bg-[#1A2338] text-[#F8FAFC] text-sm font-black uppercase tracking-[0.12em] transition hover:bg-[#233350] disabled:opacity-50"
-      >
-        {{ carregandoMais ? 'Carregando...' : 'Carregar mais' }}
-      </button>
 
       <ScheduleServiceDetailsModal
         v-model="isDetailsModalOpen"

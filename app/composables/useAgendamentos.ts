@@ -141,18 +141,6 @@ export const useAgendamentos = () => {
     return repo.findAll(user.value.uid)
   }
 
-  const carregarMais = async (): Promise<Agendamento[]> => {
-    if (!user.value || !temMais.value || !ultimoDoc.value) return []
-
-    const resultado = await repo.findAllPaginated(user.value.uid, {
-      limite: LIMIT_POR_PAGINA,
-      ultimoDoc: ultimoDoc.value
-    })
-    ultimoDoc.value = resultado.lastDoc
-    temMais.value = resultado.hasMore
-    return resultado.items
-  }
-
   const excluirAgendamento = async (id: string) => {
     await repo.delete(id)
   }
@@ -161,10 +149,8 @@ export const useAgendamentos = () => {
     criarAgendamento,
     listarAgendamentos,
     listarAgendamentosCompleto,
-    carregarMais,
     excluirAgendamento,
     editarAgendamento,
     atualizarStatus,
-    temMais
   }
 }

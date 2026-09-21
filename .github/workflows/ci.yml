@@ -1,15 +1,12 @@
-name: ci
+name: CI
 
-on: push
+on:
+  push:
+  pull_request:
 
 jobs:
   ci:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node: [22]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -18,14 +15,20 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
-      - name: Install node
+      - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 22
           cache: pnpm
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
+
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm run lint
@@ -36,10 +39,9 @@ jobs:
       - name: Unit tests
         run: pnpm run test
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
       - name: E2E tests
-        run: |
-          npx playwright install --with-deps
-          pnpm run dev &
-          sleep 10
-          pnpm run test:e2e
+        run: pnpm run test:e2e
         timeout-minutes: 10
