@@ -6,7 +6,7 @@ let animationFrameId: number | null = null
 let time = 0
 
 const props = defineProps<{
-  scrollYPos: number
+  scrollYPos?: number
 }>()
 
 onMounted(() => {
@@ -30,6 +30,7 @@ onMounted(() => {
     W = canvas.width = window.innerWidth
     H = canvas.height = window.innerHeight
     buildNodes()
+    initParticles()
   }
   window.addEventListener('resize', onResize)
 
@@ -68,7 +69,7 @@ onMounted(() => {
 
   buildNodes()
 
- interface MeshPoint {
+  interface MeshPoint {
     x: number
     y: number
     vx: number
@@ -122,223 +123,211 @@ onMounted(() => {
     }
   ]
 
-  interface FlowLine {
-    y: number 
-    speed: number 
-    phase: number
-    alpha: number 
-    width: number 
-  }
-
-  const flowLines: FlowLine[] = []
-  const LINE_COUNT = 10
-
-  for (let i = 0; i < LINE_COUNT; i++) {
-    flowLines.push({
-      y: (H / (LINE_COUNT + 1)) * (i + 1),
-      speed: 0.006 + Math.random() * 0.008,
-      phase: Math.random() * Math.PI * 2,
-      alpha: 0.06 + Math.random() * 0.06,
-      width: Math.random() > 0.7 ? 0.8 : 0.4
-    })
-  }
-
-  interface Pulse {
+  interface Spark {
     x: number
     y: number
-    r: number
-    maxR: number
+    vx: number
+    vy: number
+    size: number
     alpha: number
-    speed: number
+    maxAlpha: number
   }
 
-  let pulses: Pulse[] = []
-  let lastPulseTime = 0
+  let sparks: Spark[] = []
 
-  const spawnPulse = () => {
-    const activeNodes = nodes.filter((n) => n.active)
-    if (!activeNodes.length) return
-    const n = activeNodes[Math.floor(Math.random() * activeNodes.length)]
-    if (!n) return
-    pulses.push({
-      x: n.px,
-      y: n.py,
-      r: 0,
-      maxR: 60 + Math.random() * 40,
-      alpha: 0.35,
-      speed: 0.6 + Math.random() * 0.4
+  const initParticles = () => {
+    sparks = []
+    const count = Math.floor((W * H) / 18000)
+    for (let i = 0; i < count; i++) {
+      sparks.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -Math.random() * 0.6 - 0.2,
+        size: Math.random() * 1.8 + 0.6,
+        alpha: Math.random() * 0.5,
+        maxAlpha: Math.random() * 0.6 + 0.2
+      })
+    }
+  }
+
+  initParticles()
+
+  interface Ripple {
+    x: number
+    y: number
+    radius: number
+    maxRadius: number
+    alpha: number
+  }
+
+  let ripples: Ripple[] = []
+
+  const triggerRipple = (x: number, y: number) => {
+    if (ripples.length > 5) return
+    ripples.push({
+      x,
+      y,
+      radius: 5,
+      maxRadius: Math.random() * 120 + 80,
+      alpha: 0.4
     })
   }
 
-  const render = (ts: number) => {
-    time += 0.01
-    ctx.clearRect(0, 0, W, H)
-
-    const scroll = Math.min(props.scrollYPos / H, 1)
-    const fade = Math.max(0, 1 - scroll * 1.9)
-
-    if (props.scrollYPos > H * 1.5) {
-      animationFrameId = requestAnimationFrame(render)
-      return
+  setInterval(() => {
+    if (nodes.length > 0) {
+      const randomNode = nodes[Math.floor(Math.random() * nodes.length)]
+      if (randomNode) {
+        triggerRipple(randomNode.x, randomNode.y)
+      }
     }
+  }, 2500)
 
-
+  const render = () => {
+    time += 0.016
     mouse.x += (mouse.tx - mouse.x) * 0.05
     mouse.y += (mouse.ty - mouse.y) * 0.05
 
+    ctx.clearRect(0, 0, W, H)
 
     ctx.fillStyle = '#080D14'
     ctx.fillRect(0, 0, W, H)
 
-   
-    ctx.save()
-    ctx.globalCompositeOperation = 'screen'
+    mesh.forEach((m) => {
+      m.phase += m.phaseSpeed
+      m.x += m.vx + Math.cos(m.phase) * 0.3
+      m.y += m.vy + Math.sin(m.phase) * 0.3
 
-    mesh.forEach((mp) => {
-      mp.phase += mp.phaseSpeed
-      const wobX = Math.sin(mp.phase * 1.3) * W * 0.03
-      const wobY = Math.cos(mp.phase * 0.9) * H * 0.03
-      mp.x += mp.vx
-      mp.y += mp.vy
-      if (mp.x < -mp.radius * 0.2) mp.vx = Math.abs(mp.vx)
-      if (mp.x > W + mp.radius * 0.2) mp.vx = -Math.abs(mp.vx)
-      if (mp.y < -mp.radius * 0.2) mp.vy = Math.abs(mp.vy)
-      if (mp.y > H + mp.radius * 0.2) mp.vy = -Math.abs(mp.vy)
+      if (m.x < -m.radius) m.x = W + m.radius
+      if (m.x > W + m.radius) m.x = -m.radius
+      if (m.y < -m.radius) m.y = H + m.radius
+      if (m.y > H + m.radius) m.y = -m.radius
 
-      const bx = mp.x + wobX + (mouse.x - W / 2) * 0.012
-      const by = mp.y + wobY + (mouse.y - H / 2) * 0.012 - scroll * H * 0.1
+      const grad = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.radius)
+      const [r, g, b] = m.color
+      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.35)`)
+      grad.addColorStop(0.5, `rgba(${r}, ${g}, ${b}, 0.12)`)
+      grad.addColorStop(1, 'rgba(6, 78, 59, 0)')
 
-      const r = mp.radius * (0.92 + Math.sin(mp.phase) * 0.06)
-      const g = ctx.createRadialGradient(bx, by, 0, bx, by, r)
-      const [cr, cg, cb] = mp.color
-      g.addColorStop(0, `rgba(${cr},${cg},${cb},${0.9 * fade})`)
-      g.addColorStop(0.45, `rgba(${cr},${cg},${cb},${0.35 * fade})`)
-      g.addColorStop(0.8, `rgba(${cr},${cg},${cb},${0.08 * fade})`)
-      g.addColorStop(1, `rgba(${cr},${cg},${cb},0)`)
-
+      ctx.fillStyle = grad
       ctx.beginPath()
-      ctx.arc(bx, by, r, 0, Math.PI * 2)
-      ctx.fillStyle = g
+      ctx.arc(m.x, m.y, m.radius, 0, Math.PI * 2)
       ctx.fill()
     })
 
-    ctx.restore()
-
-    flowLines.forEach((line) => {
-      line.phase += line.speed
-      const y = line.y - scroll * H * 0.08
-
-      const brightness = 0.5 + Math.sin(line.phase) * 0.5
-      const a = line.alpha * brightness * fade
-
-      const grad = ctx.createLinearGradient(0, y, W, y)
-      grad.addColorStop(0, `rgba(52,211,153,0)`)
-      grad.addColorStop(0.15, `rgba(52,211,153,${a * 0.4})`)
-      grad.addColorStop(0.35 + Math.sin(line.phase * 0.7) * 0.1, `rgba(52,211,153,${a})`)
-      grad.addColorStop(0.65 + Math.sin(line.phase * 0.5) * 0.1, `rgba(20,184,166,${a * 0.7})`)
-      grad.addColorStop(0.85, `rgba(52,211,153,${a * 0.3})`)
-      grad.addColorStop(1, `rgba(52,211,153,0)`)
-
-      ctx.beginPath()
+    ctx.strokeStyle = 'rgba(52, 211, 153, 0.03)'
+    ctx.lineWidth = 1
+    const gridSpacing = 80
+    ctx.beginPath()
+    for (let x = 0; x <= W; x += gridSpacing) {
+      ctx.moveTo(x, 0)
+      ctx.lineTo(x, H)
+    }
+    for (let y = 0; y <= H; y += gridSpacing) {
       ctx.moveTo(0, y)
       ctx.lineTo(W, y)
-      ctx.strokeStyle = grad
-      ctx.lineWidth = line.width
-      ctx.stroke()
-    })
+    }
+    ctx.stroke()
 
-    nodes.forEach((nd) => {
-      nd.phase += 0.008
-      nd.px = nd.x + Math.sin(nd.phase) * 1.8
-      nd.py = nd.y + Math.cos(nd.phase * 0.7) * 1.4 - scroll * H * 0.04
+    nodes.forEach((n) => {
+      n.phase += 0.03
+      const floatX = Math.sin(n.phase) * 3
+      const floatY = Math.cos(n.phase) * 3
+      n.x = n.px + floatX
+      n.y = n.py + floatY
 
-      const dist = Math.hypot(mouse.x - nd.px, mouse.y - nd.py)
-      const proximity = Math.max(0, 1 - dist / 140)
-
-      const baseAlpha = nd.active
-        ? (nd.alpha * 3.5 + Math.sin(nd.phase * 2) * 0.08) * fade
-        : nd.alpha * fade
-
-      const finalAlpha = baseAlpha + proximity * 0.4 * fade
-
-      if (nd.active && fade > 0.1) {
-        const halo = ctx.createRadialGradient(nd.px, nd.py, 0, nd.px, nd.py, 8)
-       
-        halo.addColorStop(0, `rgba(52,211,153,${0.25 * fade})`)
-        halo.addColorStop(1, `rgba(52,211,153,0)`)
-
-        ctx.beginPath()
-        ctx.arc(nd.px, nd.py, 8, 0, Math.PI * 2)
-        ctx.fillStyle = halo
-        ctx.fill()
+      const dx = mouse.x - n.x
+      const dy = mouse.y - n.y
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      if (dist < 120) {
+        const force = (120 - dist) / 120
+        n.x -= (dx / dist) * force * 15
+        n.y -= (dy / dist) * force * 15
       }
 
+      ctx.fillStyle = n.active ? `rgba(52, 211, 153, ${n.alpha * 1.8})` : `rgba(255, 255, 255, ${n.alpha})`
       ctx.beginPath()
-      ctx.arc(nd.px, nd.py, nd.active ? nd.size * 1.6 : nd.size, 0, Math.PI * 2)
-      ctx.fillStyle = nd.active
-        ? `rgba(52,211,153,${finalAlpha})`
-        : `rgba(20,184,166,${finalAlpha})`
+      ctx.arc(n.x, n.y, n.active ? n.size * 1.5 : n.size, 0, Math.PI * 2)
       ctx.fill()
     })
 
-    if (ts - lastPulseTime > 1800) {
-      spawnPulse()
-      lastPulseTime = ts
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const n1 = nodes[i]
+        const n2 = nodes[j]
+        if (!n1 || !n2) continue
+        const dx = n1.x - n2.x
+        const dy = n1.y - n2.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+
+        if (dist < 110) {
+          const alpha = (1 - dist / 110) * 0.12
+          ctx.strokeStyle = `rgba(52, 211, 153, ${alpha})`
+          ctx.lineWidth = 0.6
+          ctx.beginPath()
+          ctx.moveTo(n1.x, n1.y)
+          ctx.lineTo(n2.x, n2.y)
+          ctx.stroke()
+        }
+      }
     }
 
-    pulses = pulses.filter((p) => p.alpha > 0.005)
-    pulses.forEach((p) => {
-      p.r += p.speed
-      p.alpha *= 0.97
-      if (p.r >= p.maxR) {
-        p.alpha = 0
+    ripples.forEach((rp, idx) => {
+      rp.radius += 1.5
+      rp.alpha *= 0.97
+      if (rp.alpha < 0.01) {
+        ripples.splice(idx, 1)
         return
       }
-      const prog = p.r / p.maxR
+      ctx.strokeStyle = `rgba(52, 211, 153, ${rp.alpha})`
+      ctx.lineWidth = 1.2
       ctx.beginPath()
-      ctx.arc(p.x, p.y - scroll * H * 0.04, p.r, 0, Math.PI * 2)
-      ctx.strokeStyle = `rgba(52,211,153,${p.alpha * (1 - prog) * fade})`
-      ctx.lineWidth = 0.7
+      ctx.arc(rp.x, rp.y, rp.radius, 0, Math.PI * 2)
       ctx.stroke()
     })
 
-    const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.2, W / 2, H / 2, H * 0.9)
-    vig.addColorStop(0, 'rgba(8,13,20,0)')
-    vig.addColorStop(0.65, 'rgba(8,13,20,0.15)')
-    vig.addColorStop(1, `rgba(8,13,20,${0.7 * fade + (1 - fade)})`)
+    sparks.forEach((s) => {
+      s.x += s.vx
+      s.y += s.vy
 
-    ctx.fillStyle = vig
-    ctx.fillRect(0, 0, W, H)
-const btm = ctx.createLinearGradient(0, H * 0.65, 0, H)
+      const mdx = mouse.x - s.x
+      const mdy = mouse.y - s.y
+      const mdist = Math.sqrt(mdx * mdx + mdy * mdy)
+      if (mdist < 100) {
+        s.x -= (mdx / mdist) * 0.8
+        s.y -= (mdy / mdist) * 0.8
+      }
 
-    btm.addColorStop(0, 'rgba(8,13,20,0)')
-    btm.addColorStop(1, 'rgba(8,13,20,1)')
-    ctx.fillStyle = btm
-    ctx.fillRect(0, H * 0.65, W, H * 0.35)
+      if (s.y < 0) {
+        s.y = H + 10
+        s.x = Math.random() * W
+      }
+      if (s.x < 0) s.x = W
+      if (s.x > W) s.x = 0
+
+      ctx.fillStyle = `rgba(52, 211, 153, ${s.maxAlpha})`
+      ctx.beginPath()
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2)
+      ctx.fill()
+    })
 
     animationFrameId = requestAnimationFrame(render)
   }
 
-  animationFrameId = requestAnimationFrame(render)
+  render()
 
   onUnmounted(() => {
     window.removeEventListener('mousemove', onMove)
     window.removeEventListener('resize', onResize)
-    if (animationFrameId) cancelAnimationFrame(animationFrameId)
+    if (animationFrameId) {
+      cancelAnimationFrame(animationFrameId)
+    }
   })
 })
 </script>
 
 <template>
-  <canvas ref="canvasRef" class="canvas-bg" />
+  <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <canvas ref="canvasRef" class="absolute inset-0 w-full h-full block" />
+  </div>
 </template>
-
-<style scoped>
-.canvas-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 1;
-}
-</style>
