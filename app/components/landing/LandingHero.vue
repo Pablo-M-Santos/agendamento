@@ -54,7 +54,6 @@ onUnmounted(() => {
 
     <div class="max-w-[1560px] mx-auto px-5 sm:px-8 lg:px-20 w-full relative z-10">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-center">
-        <!-- Coluna de Texto -->
         <div
           class="flex flex-col items-center lg:items-start text-center lg:text-left z-20 lg:col-span-6 w-full"
         >
@@ -161,7 +160,6 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- Coluna do Card (Direita) -->
         <div
           class="w-full lg:col-span-6 relative flex items-center justify-center observe-animate animate-panel-entry mt-4 lg:mt-0"
         >
@@ -191,9 +189,9 @@ onUnmounted(() => {
               </div>
 
               <div class="space-y-2.5 sm:space-y-3 relative">
-                <!-- CARD COM ANIMAÇÃO INFINITA -->
+
                 <div
-                  class="relative p-3.5 sm:p-4 rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] border border-emerald-500/40 shadow-lg infinite-pulse-card"
+                  class="relative p-3.5 sm:p-4 rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] border border-emerald-500/40 shadow-lg "
                 >
                   <div
                     class="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-sm"
@@ -328,9 +326,7 @@ onUnmounted(() => {
   }
 }
 
-.infinite-pulse-card {
-  animation: cardPulseGlow 3.5s ease-in-out infinite;
-}
+
 
 @keyframes cardPulseGlow {
   0%,
