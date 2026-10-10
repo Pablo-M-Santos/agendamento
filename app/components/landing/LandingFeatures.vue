@@ -47,11 +47,11 @@ const handleMouseMove = (e: MouseEvent) => {
     <div class="features-inner">
       <header class="features-header animate-item">
         <h2 class="features-title">
-          Tudo que sua operação precisa,<br>sem complexidade desnecessária.
+          Controle total da sua operação,<br>sem atrito ou planilhas.
         </h2>
         <p class="features-desc">
-          Do agendamento ao relatório, cada etapa conectada
-          para você focar no que importa: atender bem.
+          Da reserva ao faturamento, uma plataforma unificada
+          projetada para eliminar gargalos e acelerar o seu dia.
         </p>
       </header>
 
@@ -68,8 +68,8 @@ const handleMouseMove = (e: MouseEvent) => {
               <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
             </svg>
           </div>
-          <h3>Agendamento com pagamento integrado</h3>
-          <p>O cliente escolhe o horário e o sistema já solicita — ou confirma — o pagamento. Sem trocas de mensagens, sem esquecimentos.</p>
+          <h3>Agendamento inteligente com pagamento garantido</h3>
+          <p>O cliente agenda e quita o serviço em segundos. Zero trocas de mensagens no WhatsApp, zero horários vagos por esquecimento.</p>
         </div>
 
         <div 
@@ -82,8 +82,8 @@ const handleMouseMove = (e: MouseEvent) => {
               <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
             </svg>
           </div>
-          <h3>Fluxo de caixa em tempo real</h3>
-          <p>Cada entrada registrada automaticamente. Acompanhe o dia sem precisar fechar o caixa manualmente.</p>
+          <h3>Caixa automatizado em tempo real</h3>
+          <p>Cada transação entra direto no sistema. Esqueça o fechamento manual e tenha precisão absoluta sobre o seu fluxo diário.</p>
         </div>
 
         <div 
@@ -96,8 +96,8 @@ const handleMouseMove = (e: MouseEvent) => {
               <path d="M18 20V10M12 20V4M6 20v-6"/>
             </svg>
           </div>
-          <h3>Relatórios que fazem sentido</h3>
-          <p>Faturamento, ticket médio e horários de maior demanda — tudo em um painel que você lê em segundos.</p>
+          <h3>Métricas que impulsionam decisões</h3>
+          <p>Faturamento, horários de pico e ticket médio traduzidos em gráficos limpos que você compreende de relance.</p>
         </div>
       </div>
     </div>
@@ -223,7 +223,6 @@ const handleMouseMove = (e: MouseEvent) => {
   line-height: 1.65;
 }
 
-/* Animações de entrada acionadas pelo Observer */
 .animate-item {
   opacity: 0;
   transform: translateY(25px);
