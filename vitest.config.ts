@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config'
 import path from 'path'
 
 export default defineConfig({
+  root: __dirname,
   test: {
     environment: 'jsdom',
     globals: true,
@@ -9,11 +10,11 @@ export default defineConfig({
     include: ['tests/**/*.{test,spec}.{js,ts}'],
     exclude: ['tests/e2e/**', 'tests/e2e/**/*'],
     resolve: {
-      alias: [
-        { find: /^~(\/|$)/, replacement: path.resolve(__dirname, 'app') },
-        { find: /^~~(\/|$)/, replacement: path.resolve(__dirname, 'app') },
-        { find: '^vue', replacement: path.resolve(__dirname, 'node_modules/vue') },
-      ],
+      alias: {
+        '~': path.resolve(__dirname, 'app'),
+        '~~': path.resolve(__dirname, 'app'),
+        '^vue': path.resolve(__dirname, 'node_modules/vue'),
+      },
     },
     coverage: {
       provider: 'v8',
