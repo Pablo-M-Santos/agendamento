@@ -1,4 +1,3 @@
-import type { Firestore } from 'firebase/firestore'
 import {
   addDoc,
   collection,
@@ -13,6 +12,7 @@ import {
   updateDoc,
   where,
   type DocumentData,
+  type Firestore,
   type QueryDocumentSnapshot
 } from 'firebase/firestore'
 import type { Agendamento } from '~/types/agendamento'
@@ -141,7 +141,7 @@ export class AgendamentoRepository implements IAgendamentoRepository {
 
     return {
       items,
-      lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+      lastDoc: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1]! : null,
       hasMore: snapshot.docs.length === limite
     }
   }

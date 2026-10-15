@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test } from '@playwright/test'
 
 test.describe('Autenticacao', () => {
   test('deve mostrar campos de email e senha no login', async ({ page }) => {

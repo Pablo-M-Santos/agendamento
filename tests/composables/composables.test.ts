@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { validarEmail, validarSenha } from '~/utils/validacao'
+import type { Agendamento } from '~/types/agendamento'
 
 describe('validacao', () => {
   it('validarEmail - email valido', () => {
@@ -41,7 +42,7 @@ describe('useChartData', () => {
 
   it('receitaPorMes retorna array vazio para dados vazios', async () => {
     const { useChartData } = await import('~/composables/useChartData')
-    const { receitaPorMes, mediaMensal } = useChartData({ value: [] } as any)
+    const { receitaPorMes, mediaMensal } = useChartData({ value: [] as Agendamento[] })
 
     expect(receitaPorMes.value).toEqual([])
     expect(mediaMensal.value).toBe(0)
@@ -49,7 +50,7 @@ describe('useChartData', () => {
 
   it('receitaPorDia retorna array vazio para dados vazios', async () => {
     const { useChartData } = await import('~/composables/useChartData')
-    const { receitaPorDia } = useChartData({ value: [] } as any)
+    const { receitaPorDia } = useChartData({ value: [] as Agendamento[] })
 
     expect(receitaPorDia.value).toEqual([])
   })

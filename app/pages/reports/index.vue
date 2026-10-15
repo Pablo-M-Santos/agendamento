@@ -76,10 +76,11 @@ const handleStatusSelect = (status: string) => {
 }
 
 const dadosReceita = computed(() => {
-  if (!mesSelecionado.value) {
+  const mes = mesSelecionado.value
+  if (!mes) {
     return receitaPorMes.value.map((m) => ({ x: m.x, valor: m.valor }))
   }
-  const [mesNum, ano] = mesSelecionado.value.split('/')
+  const [mesNum, ano] = mes.split('/')
   const mesFilter = `${ano}-${mesNum}`
   const diasNoMes = new Date(parseInt(ano), parseInt(mesNum), 0).getDate()
 

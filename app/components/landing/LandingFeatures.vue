@@ -32,72 +32,101 @@ onUnmounted(() => {
 const handleMouseMove = (e: MouseEvent) => {
   const card = e.currentTarget as HTMLElement
   if (!card) return
-  
+
   const rect = card.getBoundingClientRect()
   const x = e.clientX - rect.left
   const y = e.clientY - rect.top
-  
+
   card.style.setProperty('--mouse-x', `${x}px`)
   card.style.setProperty('--mouse-y', `${y}px`)
 }
 </script>
 
 <template>
-  <section ref="sectionRef" id="funcionalidades" class="features" :class="{ 'is-visible': isVisible }">
+  <section
+    ref="sectionRef"
+    id="funcionalidades"
+    class="features"
+    :class="{ 'is-visible': isVisible }"
+  >
     <div class="features-inner">
       <header class="features-header animate-item">
         <h2 class="features-title">
-          Controle total da sua operação,<br>sem atrito ou planilhas.
+          Controle total da sua operação,<br />sem atrito ou planilhas.
         </h2>
         <p class="features-desc">
-          Da reserva ao faturamento, uma plataforma unificada
-          projetada para eliminar gargalos e acelerar o seu dia.
+          Da reserva ao faturamento, uma plataforma unificada projetada para eliminar gargalos e
+          acelerar o seu dia.
         </p>
       </header>
 
       <div class="features-grid">
-        <div 
+        <div
           class="feature-card feature-card--wide spotlight-card animate-item delay-1"
           @mousemove="handleMouseMove"
         >
           <div class="card-glow" />
           <div class="feature-card-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <rect x="3" y="4" width="18" height="18" rx="2"/>
-              <path d="M16 2v4M8 2v4M3 10h18"/>
-              <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <path d="M16 2v4M8 2v4M3 10h18" />
+              <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
             </svg>
           </div>
           <h3>Agendamento inteligente com pagamento garantido</h3>
-          <p>O cliente agenda e quita o serviço em segundos. Zero trocas de mensagens no WhatsApp, zero horários vagos por esquecimento.</p>
+          <p>
+            O cliente agenda e quita o serviço em segundos. Zero trocas de mensagens no WhatsApp,
+            zero horários vagos por esquecimento.
+          </p>
         </div>
 
-        <div 
-          class="feature-card spotlight-card animate-item delay-2"
-          @mousemove="handleMouseMove"
-        >
+        <div class="feature-card spotlight-card animate-item delay-2" @mousemove="handleMouseMove">
           <div class="card-glow" />
           <div class="feature-card-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
             </svg>
           </div>
           <h3>Caixa automatizado em tempo real</h3>
-          <p>Cada transação entra direto no sistema. Esqueça o fechamento manual e tenha precisão absoluta sobre o seu fluxo diário.</p>
+          <p>
+            Cada transação entra direto no sistema. Esqueça o fechamento manual e tenha precisão
+            absoluta sobre o seu fluxo diário.
+          </p>
         </div>
 
-        <div 
-          class="feature-card spotlight-card animate-item delay-3"
-          @mousemove="handleMouseMove"
-        >
+        <div class="feature-card spotlight-card animate-item delay-3" @mousemove="handleMouseMove">
           <div class="card-glow" />
           <div class="feature-card-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M18 20V10M12 20V4M6 20v-6"/>
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M18 20V10M12 20V4M6 20v-6" />
             </svg>
           </div>
           <h3>Métricas que impulsionam decisões</h3>
-          <p>Faturamento, horários de pico e ticket médio traduzidos em gráficos limpos que você compreende de relance.</p>
+          <p>
+            Faturamento, horários de pico e ticket médio traduzidos em gráficos limpos que você
+            compreende de relance.
+          </p>
         </div>
       </div>
     </div>
@@ -108,7 +137,14 @@ const handleMouseMove = (e: MouseEvent) => {
 .features {
   position: relative;
   min-height: 100dvh;
-  background: rgba(8, 13, 20, 0.85);
+
+  background: linear-gradient(
+    180deg,
+    #05080c 0%,
+    rgba(8, 13, 20, 0.92) 20%,
+    rgba(8, 13, 20, 0.85) 100%
+  );
+
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-top: none;
@@ -160,7 +196,10 @@ const handleMouseMove = (e: MouseEvent) => {
   border-radius: 20px;
   padding: 2.25rem;
   overflow: hidden;
-  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  transition:
+    border-color 0.3s,
+    transform 0.3s,
+    box-shadow 0.3s;
 }
 
 .spotlight-card:hover {
@@ -201,7 +240,9 @@ const handleMouseMove = (e: MouseEvent) => {
   justify-content: center;
   color: #34d399;
   margin-bottom: 1.5rem;
-  transition: background 0.3s, border-color 0.3s;
+  transition:
+    background 0.3s,
+    border-color 0.3s;
 }
 
 .spotlight-card:hover .feature-card-icon {
@@ -226,7 +267,9 @@ const handleMouseMove = (e: MouseEvent) => {
 .animate-item {
   opacity: 0;
   transform: translateY(25px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .features.is-visible .animate-item {
@@ -234,9 +277,15 @@ const handleMouseMove = (e: MouseEvent) => {
   transform: translateY(0);
 }
 
-.delay-1 { transition-delay: 0.15s; }
-.delay-2 { transition-delay: 0.3s; }
-.delay-3 { transition-delay: 0.45s; }
+.delay-1 {
+  transition-delay: 0.15s;
+}
+.delay-2 {
+  transition-delay: 0.3s;
+}
+.delay-3 {
+  transition-delay: 0.45s;
+}
 
 @media (max-width: 640px) {
   .features-grid {

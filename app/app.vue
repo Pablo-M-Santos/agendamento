@@ -29,8 +29,8 @@ initTheme()
           <h1 class="text-xl font-black text-[#F8FAFC] mb-2">Algo deu errado</h1>
           <p class="text-sm text-[#94A3B8] mb-6">{{ error?.message || 'Erro desconhecido' }}</p>
           <button
-            @click="handleRetry"
             class="px-6 py-2 rounded-lg bg-[#233350] border border-[#33517F] text-[#F8FAFC] text-sm font-black uppercase tracking-[0.12em] hover:bg-[#2A3A55] transition"
+            @click="handleRetry"
           >
             Tentar novamente
           </button>
