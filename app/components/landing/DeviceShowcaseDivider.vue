@@ -1,20 +1,15 @@
 <template>
-  <section ref="sectionRef" class="relative" style="min-height: 200vh">
+  <section ref="sectionRef" class="relative scroll-section">
     <div class="sticky top-0 flex h-screen flex-col overflow-hidden pt-20 lg:pt-24">
       <!-- Ambient background -->
-      <div class="absolute inset-0 bg-gradient-to-b from-background via-muted/10 to-background" />
+      <!-- Fundo sólido e círculos com blur contínuo -->
+      <div class="absolute inset-0 bg-background" />
       <div
-        class="absolute -top-40 right-0 h-[28rem] w-[28rem] rounded-full bg-primary/5 blur-3xl transition-all duration-700"
-        :style="{
-          opacity: activeStep === 1 ? 0.9 : 0.5,
-          transform: `translateY(${activeStep * 24}px)`
-        }"
+        class="absolute -top-40 right-0 h-[28rem] w-[28rem] rounded-full bg-primary/10 blur-3xl"
       />
       <div
-        class="absolute -bottom-40 left-0 h-[28rem] w-[28rem] rounded-full bg-primary/5 blur-3xl transition-all duration-700"
-        :style="{ opacity: activeStep === 0 ? 0.9 : 0.4 }"
+        class="absolute -bottom-40 left-0 h-[28rem] w-[28rem] rounded-full bg-primary/10 blur-3xl"
       />
-
       <div class="relative z-10 flex flex-1 flex-col pb-12">
         <div class="flex flex-1 items-center">
           <div class="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8">
@@ -78,58 +73,17 @@
                 </div>
               </div>
 
-              <!-- Right: device duo with sequential scroll reveal -->
+              <!-- Right: CSS background image showcase -->
               <div class="relative isolate flex items-center justify-center">
-                <div
-                  class="relative mx-auto flex h-[400px] w-full max-w-[600px] items-center justify-center overflow-visible sm:h-[460px] lg:h-[520px]"
-                >
-                  <!-- iPhone — Mobile (Passo 0) -->
-                  <div
-                    v-if="activeStep === 0"
-                    class="absolute flex items-center justify-center transition-all duration-700 animate-in fade-in zoom-in-95"
-                    :style="{ transform: `scale(${scales.phone})` }"
-                  >
-                    <div class="device device-iphone-14-pro">
-                      <div class="device-frame">
-                        <img
-                          :src="phoneImage"
-                          alt="Pré-visualização do agendamento no celular"
-                          class="device-content h-full w-full object-cover object-top"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div class="device-stripe" />
-                      <div class="device-header" />
-                      <div class="device-sensors" />
-                      <div class="device-btns" />
-                      <div class="device-power" />
-                      <div class="device-home" />
-                    </div>
-                  </div>
+                <div class="showcase-container">
+                  <!-- Celular (Passo 0) -->
+                  <div class="device-mockup phone-bg" :class="{ 'is-active': activeStep === 0 }" />
 
-                  <!-- MacBook — Desktop (Passo 1) -->
+                  <!-- Desktop (Passo 1) -->
                   <div
-                    v-if="activeStep === 1"
-                    class="absolute flex items-center justify-center transition-all duration-700 animate-in fade-in zoom-in-95"
-                    :style="{ transform: `scale(${scales.desktop})` }"
-                  >
-                    <div class="device device-macbook">
-                      <div class="device-frame">
-                        <img
-                          :src="desktopImage"
-                          alt="Pré-visualização do painel no desktop"
-                          class="device-content h-full w-full object-cover object-top"
-                          loading="lazy"
-                        />
-                      </div>
-                      <div class="device-stripe" />
-                      <div class="device-header" />
-                      <div class="device-sensors" />
-                      <div class="device-btns" />
-                      <div class="device-power" />
-                      <div class="device-home" />
-                    </div>
-                  </div>
+                    class="device-mockup desktop-bg"
+                    :class="{ 'is-active': activeStep === 1 }"
+                  />
                 </div>
               </div>
             </div>
@@ -154,10 +108,6 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 const sectionRef = ref<HTMLElement | null>(null)
 const activeStep = ref(0)
 const scrollProgress = ref(0)
-const vw = ref(typeof window !== 'undefined' ? window.innerWidth : 1440)
-
-const phoneImage = '/images/mocks/mobile-agendar.png'
-const desktopImage = '/images/mocks/desktop-dashboard.png'
 
 const steps = [
   {
@@ -199,18 +149,6 @@ const steps = [
 ]
 
 const currentStep = computed(() => steps[activeStep.value] ?? steps[0]!)
-type Device = 'phone' | 'desktop'
-
-const deviceActiveIndex: Record<Device, number> = { phone: 0, desktop: 1 }
-
-// Escalas ajustadas para apenas 2 dispositivos (Celular e Desktop)
-const scales = computed(() => {
-  const w = vw.value
-  if (w >= 1280) return { desktop: 0.85, phone: 0.50 }
-  if (w >= 1024) return { desktop: 0.75, phone: 0.45 }
-  if (w >= 768) return { desktop: 0.62, phone: 0.38 }
-  return { desktop: 0.50, phone: 0.32 }
-})
 
 function jumpToStep(step: number) {
   if (!sectionRef.value) return
@@ -219,37 +157,84 @@ function jumpToStep(step: number) {
   window.scrollTo({ top: sectionTop + ((step + 0.5) / 2) * scrollable, behavior: 'smooth' })
 }
 
-function handleResize() {
-  if (typeof window !== 'undefined') {
-    vw.value = window.innerWidth
-  }
-}
-
 function handleScroll() {
   if (!sectionRef.value) return
   const rect = sectionRef.value.getBoundingClientRect()
   const scrollable = sectionRef.value.offsetHeight - window.innerHeight
   const progress = Math.max(0, Math.min(1, -rect.top / scrollable))
   scrollProgress.value = progress
-  // Como são apenas 2 passos (0 e 1), multiplicamos por 2
   activeStep.value = Math.min(1, Math.floor(progress * 2))
 }
 
 onMounted(async () => {
   await nextTick()
-  window.addEventListener('resize', handleResize, { passive: true })
   window.addEventListener('scroll', handleScroll, { passive: true })
   handleScroll()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
   window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
 <style scoped>
-/* Step text — sai pra cima, entra de baixo */
+.scroll-section {
+  min-height: 200vh;
+}
+
+.showcase-container {
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  height: 400px;
+  width: 100%;
+  max-width: 650px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .showcase-container {
+    height: 460px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .showcase-container {
+    height: 520px;
+  }
+}
+
+/* Base dos elementos que recebem as fotos via background */
+.device-mockup {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+  pointer-events: none;
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.device-mockup.is-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+  z-index: 50;
+}
+
+/* Atribuindo as imagens diretamente no CSS */
+.phone-bg {
+  background-image: url('/mobile-agendar.png');
+}
+
+.desktop-bg {
+  background-image: url('/desktop-dashboard.png');
+}
+
+/* Transições dos textos */
 .step-enter-active {
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: 0.04s;
@@ -266,7 +251,6 @@ onUnmounted(() => {
   transform: translateY(-10px);
 }
 
-/* Features — mesmo comportamento, delay ligeiramente maior */
 .step-delay-enter-active {
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: 0.12s;
