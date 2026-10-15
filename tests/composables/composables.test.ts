@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { validarEmail, validarSenha } from '../../app/utils/validacao'
-import type { Agendamento } from '~/types/agendamento'
+import type { Agendamento } from '../../app/types/agendamento'
 
 describe('validacao', () => {
   it('validarEmail - email valido', () => {
@@ -22,26 +22,26 @@ describe('validacao', () => {
 
 describe('useAgendamentos', () => {
   it('deve ser importavel', async () => {
-    const module = await import('~/composables/useAgendamentos')
+    const module = await import('../../app/composables/useAgendamentos')
     expect(module.useAgendamentos).toBeDefined()
   })
 })
 
 describe('useReportsPage', () => {
   it('deve ser importavel', async () => {
-    const module = await import('~/composables/useReportsPage')
+    const module = await import('../../app/composables/useReportsPage')
     expect(module.useReportsPage).toBeDefined()
   })
 })
 
 describe('useChartData', () => {
   it('deve ser importavel', async () => {
-    const module = await import('~/composables/useChartData')
+    const module = await import('../../app/composables/useChartData')
     expect(module.useChartData).toBeDefined()
   })
 
   it('receitaPorMes retorna array vazio para dados vazios', async () => {
-    const { useChartData } = await import('~/composables/useChartData')
+    const { useChartData } = await import('../../app/composables/useChartData')
     const { receitaPorMes, mediaMensal } = useChartData({ value: [] as Agendamento[] })
 
     expect(receitaPorMes.value).toEqual([])
@@ -49,7 +49,7 @@ describe('useChartData', () => {
   })
 
   it('receitaPorDia retorna array vazio para dados vazios', async () => {
-    const { useChartData } = await import('~/composables/useChartData')
+    const { useChartData } = await import('../../app/composables/useChartData')
     const { receitaPorDia } = useChartData({ value: [] as Agendamento[] })
 
     expect(receitaPorDia.value).toEqual([])

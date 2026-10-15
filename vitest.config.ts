@@ -9,14 +9,11 @@ export default defineConfig({
     include: ['tests/**/*.{test,spec}.{js,ts}'],
     exclude: ['tests/e2e/**', 'tests/e2e/**/*'],
     resolve: {
-      alias: {
-        '~': path.resolve(__dirname, 'app'),
-        '~/': path.resolve(__dirname, 'app'),
-        '~~': path.resolve(__dirname, 'app'),
-        '~~/': path.resolve(__dirname, 'app'),
-        '^vue': path.resolve(__dirname, 'node_modules/vue'),
-        '~/utils': path.resolve(__dirname, 'app/utils'),
-      },
+      alias: [
+        { find: /^~(\/|$)/, replacement: path.resolve(__dirname, 'app') },
+        { find: /^~~(\/|$)/, replacement: path.resolve(__dirname, 'app') },
+        { find: '^vue', replacement: path.resolve(__dirname, 'node_modules/vue') },
+      ],
     },
     coverage: {
       provider: 'v8',
