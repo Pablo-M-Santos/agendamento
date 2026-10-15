@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validarEmail, validarSenha } from '~/utils/validacao'
+import { validarEmail, validarSenha } from '../../app/utils/validacao'
 import type { Agendamento } from '~/types/agendamento'
 
 describe('validacao', () => {

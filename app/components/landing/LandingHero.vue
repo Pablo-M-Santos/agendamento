@@ -44,7 +44,7 @@ onUnmounted(() => {
   <section
     class="relative min-h-[90vh] lg:min-h-dvh flex items-center py-16 sm:py-20 lg:py-24 overflow-hidden bg-[#080D14]"
   >
-    <LandingBackground :scrollYPos="scrollYPos" />
+    <LandingBackground :scroll-y-pos="scrollYPos" />
 
     <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
       <div

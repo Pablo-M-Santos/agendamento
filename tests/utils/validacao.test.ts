@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { validarEmail, validarSenha, EMAIL_REGEX, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MAX_EMAIL_LENGTH } from '~/utils/validacao'
+import { validarEmail, validarSenha, EMAIL_REGEX, MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MAX_EMAIL_LENGTH } from '../../app/utils/validacao'
 
 describe('validarEmail', () => {
   beforeEach(() => { vi.clearAllMocks() })

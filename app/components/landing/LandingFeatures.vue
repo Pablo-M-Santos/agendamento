@@ -44,8 +44,8 @@ const handleMouseMove = (e: MouseEvent) => {
 
 <template>
   <section
-    ref="sectionRef"
     id="funcionalidades"
+    ref="sectionRef"
     class="features"
     :class="{ 'is-visible': isVisible }"
   >
@@ -136,7 +136,7 @@ const handleMouseMove = (e: MouseEvent) => {
 <style scoped>
 .features {
   position: relative;
-  min-height: 100dvh;
+  min-height: 85dvh;
 
   background: linear-gradient(
     180deg,

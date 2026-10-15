@@ -11,9 +11,11 @@ export default defineConfig({
     resolve: {
       alias: {
         '~': path.resolve(__dirname, 'app'),
+        '~/': path.resolve(__dirname, 'app'),
         '~~': path.resolve(__dirname, 'app'),
+        '~~/': path.resolve(__dirname, 'app'),
         '^vue': path.resolve(__dirname, 'node_modules/vue'),
-        '~~/': path.resolve(__dirname, 'app')
+        '~/utils': path.resolve(__dirname, 'app/utils'),
       },
     },
     coverage: {

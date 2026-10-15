@@ -66,9 +66,9 @@ const toggleMobileMenu = () => {
 
         <!-- Botão Mobile (Visível abaixo de 1024px) -->
         <button
-          @click="toggleMobileMenu"
           class="lg:hidden p-2.5 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-colors focus:outline-none"
           aria-label="Abrir menu"
+          @click="toggleMobileMenu"
         >
           <svg
             v-if="!isMobileMenuOpen"
@@ -114,8 +114,8 @@ const toggleMobileMenu = () => {
             v-for="link in navLinks"
             :key="link.name"
             :href="link.href"
-            @click="isMobileMenuOpen = false"
             class="text-slate-300 hover:text-white hover:bg-white/5 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center justify-between"
+            @click="isMobileMenuOpen = false"
           >
             <span>{{ link.name }}</span>
             <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,8 +126,8 @@ const toggleMobileMenu = () => {
         <div class="pt-3 border-t border-white/10 flex flex-col gap-3">
           <NuxtLink
             to="/register"
-            @click="isMobileMenuOpen = false"
             class="w-full py-3 rounded-xl font-bold text-sm bg-emerald-400 text-slate-950 hover:bg-emerald-300 transition-all shadow-md shadow-emerald-400/20 flex items-center justify-center gap-2"
+            @click="isMobileMenuOpen = false"
           >
             <span>Acessar Plataforma</span>
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

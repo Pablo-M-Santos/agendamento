@@ -2,6 +2,10 @@
 import LandingHeader from '~/components/landing/LandingHeader.vue'
 import LandingHero from '~/components/landing/LandingHero.vue'
 import LandingFeatures from '~/components/landing/LandingFeatures.vue'
+import SystemModules from '~/components/landing/SystemModules.vue'
+import SocialProof from '~/components/landing/SocialProof.vue'
+import RoleSimulator from '~/components/landing/RoleSimulator.vue'
+import DeviceShowcaseDivider from '~/components/landing/DeviceShowcaseDivider.vue'
 </script>
 
 <template>
@@ -13,5 +17,9 @@ import LandingFeatures from '~/components/landing/LandingFeatures.vue'
     <LandingHero />
 
     <LandingFeatures />
+    <DeviceShowcaseDivider />
+    <SystemModules />
+    <SocialProof />
+    <RoleSimulator />
   </div>
 </template>

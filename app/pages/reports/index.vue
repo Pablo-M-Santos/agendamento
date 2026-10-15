@@ -80,9 +80,9 @@ const dadosReceita = computed(() => {
   if (!mes) {
     return receitaPorMes.value.map((m) => ({ x: m.x, valor: m.valor }))
   }
-  const [mesNum, ano] = mes.split('/')
+  const [mesNum, ano] = mes.split('/') as [string, string]
   const mesFilter = `${ano}-${mesNum}`
-  const diasNoMes = new Date(parseInt(ano), parseInt(mesNum), 0).getDate()
+  const diasNoMes = new Date(parseInt(ano, 10), parseInt(mesNum, 10), 0).getDate()
 
   const mapa = new Map<string, number>()
   for (let dia = 1; dia <= diasNoMes; dia++) {

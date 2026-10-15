@@ -3,11 +3,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 let animationFrameId: number | null = null
-let time = 0
-
-const props = defineProps<{
-  scrollYPos?: number
-}>()
 
 onMounted(() => {
   const canvas = canvasRef.value
@@ -161,7 +156,7 @@ onMounted(() => {
     alpha: number
   }
 
-  let ripples: Ripple[] = []
+  const ripples: Ripple[] = []
 
   const triggerRipple = (x: number, y: number) => {
     if (ripples.length > 5) return
@@ -184,7 +179,6 @@ onMounted(() => {
   }, 2500)
 
   const render = () => {
-    time += 0.016
     mouse.x += (mouse.tx - mouse.x) * 0.05
     mouse.y += (mouse.ty - mouse.y) * 0.05
 
