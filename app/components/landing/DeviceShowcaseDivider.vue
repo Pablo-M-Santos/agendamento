@@ -1,15 +1,8 @@
 <template>
   <section ref="sectionRef" class="relative scroll-section">
     <div class="sticky top-0 flex h-screen flex-col overflow-hidden pt-20 lg:pt-24">
-      <!-- Ambient background -->
-      <!-- Fundo sólido e círculos com blur contínuo -->
       <div class="absolute inset-0 bg-background" />
-      <div
-        class="absolute -top-40 right-0 h-[28rem] w-[28rem] rounded-full bg-primary/10 blur-3xl"
-      />
-      <div
-        class="absolute -bottom-40 left-0 h-[28rem] w-[28rem] rounded-full bg-primary/10 blur-3xl"
-      />
+
       <div class="relative z-10 flex flex-1 flex-col pb-12">
         <div class="flex flex-1 items-center">
           <div class="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8">
@@ -73,17 +66,64 @@
                 </div>
               </div>
 
-              <!-- Right: CSS background image showcase -->
+              <!-- Right: CSS background image showcase com balões flutuantes animados -->
               <div class="relative isolate flex items-center justify-center">
                 <div class="showcase-container">
                   <!-- Celular (Passo 0) -->
-                  <div class="device-mockup phone-bg" :class="{ 'is-active': activeStep === 0 }" />
+                  <div class="device-mockup phone-bg" :class="{ 'is-active': activeStep === 0 }">
+                    <div class="floating-badge badge-phone-1">
+                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <UIcon name="lucide:zap" class="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p class="text-xs font-bold leading-tight">Super Rápido</p>
+                        <p class="text-[10px] text-muted-foreground">Menos de 1 min</p>
+                      </div>
+                    </div>
+
+                    <div class="floating-badge badge-phone-2">
+                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <UIcon name="lucide:wallet" class="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p class="text-xs font-bold leading-tight">Pix e Cartão</p>
+                        <p class="text-[10px] text-muted-foreground">Pagamento seguro</p>
+                      </div>
+                    </div>
+
+                    <div class="floating-badge badge-phone-3">
+                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <UIcon name="lucide:bell-ring" class="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p class="text-xs font-bold leading-tight">Lembrete WhatsApp</p>
+                        <p class="text-[10px] text-muted-foreground">Zero faltas</p>
+                      </div>
+                    </div>
+                  </div>
 
                   <!-- Desktop (Passo 1) -->
-                  <div
-                    class="device-mockup desktop-bg"
-                    :class="{ 'is-active': activeStep === 1 }"
-                  />
+                  <div class="device-mockup desktop-bg" :class="{ 'is-active': activeStep === 1 }">
+                    <div class="floating-badge badge-desk-1">
+                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <UIcon name="lucide:trending-up" class="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p class="text-xs font-bold leading-tight">+40% Faturamento</p>
+                        <p class="text-[10px] text-muted-foreground">Relatórios em tempo real</p>
+                      </div>
+                    </div>
+
+                    <div class="floating-badge badge-desk-2">
+                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <UIcon name="lucide:shield-check" class="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p class="text-xs font-bold leading-tight">Gestão Segura</p>
+                        <p class="text-[10px] text-muted-foreground">Múltiplos profissionais</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -179,59 +219,116 @@ onUnmounted(() => {
 
 <style scoped>
 .scroll-section {
-  min-height: 200vh;
+  min-height: 300vh;
 }
 
 .showcase-container {
   position: relative;
   margin: 0 auto;
   display: flex;
-  height: 400px;
+  height: 480px;
   width: 100%;
-  max-width: 650px;
+  max-width: 750px;
   align-items: center;
   justify-content: center;
 }
 
-@media (min-width: 640px) {
-  .showcase-container {
-    height: 460px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .showcase-container {
-    height: 520px;
-  }
-}
-
-/* Base dos elementos que recebem as fotos via background */
 .device-mockup {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
   background-repeat: no-repeat;
   background-position: center;
-  background-size: contain;
+  background-size: 100% 100%; 
   opacity: 0;
-  transform: scale(0.95) translateY(10px);
   pointer-events: none;
-  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .device-mockup.is-active {
   opacity: 1;
-  transform: scale(1) translateY(0);
+  transform: translate(-50%, -50%) scale(1);
   pointer-events: auto;
   z-index: 50;
 }
 
-/* Atribuindo as imagens diretamente no CSS */
 .phone-bg {
+  width: 487px;
+  height: 752px;
   background-image: url('/mobile-agendar.png');
 }
 
 .desktop-bg {
+  width: 800px;
+  height: 550px;
   background-image: url('/desktop-dashboard.png');
+}
+
+/* Keyframes para a animação contínua de flutuação (subir e descer) */
+@keyframes floatAnimation {
+  0%, 100% {  
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Estilização e transição dos balões flutuantes */
+.floating-badge {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: hsl(var(--card) / 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid hsl(var(--border) / 0.6);
+  border-radius: 1rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(15px) scale(0.9);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 60;
+}
+
+/* Quando o dispositivo está ativo, o balão aparece e inicia a animação contínua de flutuação */
+.device-mockup.is-active .floating-badge {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  animation: floatAnimation 4s ease-in-out infinite;
+}
+
+/* Atrasos individuais para cada balão flutuar de forma descentralizada/orgânica */
+.badge-phone-1 {
+  top: 15%;
+  left: -130px;
+  animation-delay: 0s !important;
+}
+
+.badge-phone-2 {
+  top: 45%;
+  right: -130px;
+  animation-delay: 1.2s !important;
+}
+
+.badge-phone-3 {
+  bottom: 15%;
+  left: -120px;
+  animation-delay: 2.4s !important;
+}
+
+.badge-desk-1 {
+  top: 15%;
+  left: -90px;
+  animation-delay: 0s !important;
+}
+
+.badge-desk-2 {
+  bottom: 20%;
+  right: -90px;
+  animation-delay: 1.8s !important;
 }
 
 /* Transições dos textos */

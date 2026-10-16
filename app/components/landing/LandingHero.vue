@@ -12,31 +12,25 @@ const handleScroll = () => {
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true })
 
-  const options = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.15
-  }
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible')
+        } else {
+          entry.target.classList.remove('is-visible')
+        }
+      })
+    },
+    { root: null, rootMargin: '0px', threshold: 0.15 }
+  )
 
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible')
-      } else {
-        entry.target.classList.remove('is-visible')
-      }
-    })
-  }, options)
-
-  const elements = document.querySelectorAll('.observe-animate')
-  elements.forEach((el) => observer?.observe(el))
+  document.querySelectorAll('.observe-animate').forEach((el) => observer?.observe(el))
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
-  if (observer) {
-    observer.disconnect()
-  }
+  observer?.disconnect()
 })
 </script>
 
@@ -46,255 +40,140 @@ onUnmounted(() => {
   >
     <LandingBackground :scroll-y-pos="scrollYPos" />
 
-    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
-      <div
-        class="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[800px] sm:w-[1200px] h-[500px] sm:h-[700px] rounded-full bg-gradient-to-tr from-emerald-500/10 via-teal-500/5 to-transparent blur-[140px] sm:blur-[180px]"
-      />
-    </div>
-
     <div class="max-w-[1560px] mx-auto px-5 sm:px-8 lg:px-20 w-full relative z-10">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-20 items-center">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+
+        <!-- Left: Copy -->
         <div
-          class="flex flex-col items-center lg:items-start text-center lg:text-left z-20 lg:col-span-6 w-full"
+          class="flex flex-col items-center lg:items-start text-center lg:text-left lg:col-span-6"
         >
-          <div class="flex items-center gap-3 mb-5 sm:mb-6 observe-animate animate-step-1">
-            <div class="h-[1px] w-8 bg-emerald-400/60 hidden lg:block" />
-            <span
-              class="text-[11px] sm:text-xs font-mono font-medium text-emerald-400 tracking-widest uppercase"
-            >
+          <!-- Label -->
+          <div class="flex items-center gap-3 mb-5 sm:mb-6 observe-animate anim-1">
+            <div class="h-px w-6 bg-emerald-400/50 hidden lg:block" />
+            <span class="text-[11px] font-mono font-medium text-emerald-400 tracking-widest uppercase">
               Agenda & Gestão para Autônomos
             </span>
           </div>
 
+          <!-- Heading -->
           <h1
-            class="text-3xl sm:text-4xl xl:text-[3.1rem] font-extrabold tracking-[-0.03em] text-white mb-5 sm:mb-6 leading-[1.15] lg:leading-[1.12] observe-animate animate-step-2"
+            class="text-3xl sm:text-4xl xl:text-[3.1rem] font-extrabold tracking-[-0.03em] text-white mb-5 sm:mb-6 leading-[1.15] lg:leading-[1.12] observe-animate anim-2"
           >
-            Controle total da sua <br class="hidden sm:inline" />
-            <span class="text-shimmer-sweep relative inline-block"
-              >agenda e dos seus clientes.</span
-            >
+            Controle total da sua<br class="hidden sm:inline" />
+            <span class="text-shimmer-sweep inline-block">agenda e dos seus clientes.</span>
           </h1>
 
+          <!-- Subtitle -->
           <p
-            class="text-sm sm:text-base lg:text-lg text-slate-400 mb-7 sm:mb-8 max-w-[580px] leading-relaxed font-light observe-animate animate-step-3"
+            class="text-sm sm:text-base lg:text-lg text-slate-400 mb-8 max-w-[520px] leading-relaxed font-light observe-animate anim-3"
           >
             A solução simples, gratuita e confiável para profissionais organizarem horários,
-            acompanharem atendimentos e gerenciarem o caixa do dia a dia sem complicações.
+            acompanharem atendimentos e gerenciarem o caixa sem complicações.
           </p>
 
+          <!-- CTAs -->
           <div
-            class="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-3.5 sm:gap-4 mb-8 sm:mb-10 w-full sm:w-auto observe-animate animate-step-4"
+            class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mb-10 w-full sm:w-auto observe-animate anim-4"
           >
             <NuxtLink
               to="/register"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl font-bold text-sm sm:text-base bg-emerald-400 text-slate-950 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 shadow-xl shadow-emerald-500/10 group"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl font-bold text-sm bg-emerald-400 text-slate-950 hover:bg-emerald-300 active:scale-[0.98] transition-all duration-200 group"
             >
-              <span>Criar conta grátis</span>
-              <svg
-                class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2.5"
-                  d="M14 5l7 7m0 0l-7 7m7-7H3"
-                />
+              Criar conta grátis
+              <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
             </NuxtLink>
 
             <NuxtLink
               to="/"
-              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium text-sm sm:text-base text-slate-300 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/[0.04] transition-all duration-200 backdrop-blur-sm"
+              class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-medium text-sm text-slate-400 hover:text-white border border-white/10 hover:border-white/20 transition-all duration-200"
             >
-              <svg
-                class="w-4 h-4 text-emerald-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              <svg class="w-4 h-4 text-emerald-400/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>Entrar no sistema</span>
+              Entrar no sistema
             </NuxtLink>
           </div>
 
+          <!-- Stats -->
           <div
-            class="grid grid-cols-3 gap-3 sm:gap-6 pt-6 border-t border-white/10 w-full max-w-[580px] observe-animate animate-step-5"
+            class="flex items-center gap-6 pt-6 border-t border-white/[0.08] observe-animate anim-5"
           >
             <div>
-              <span class="block text-lg sm:text-xl font-bold text-white tracking-tight"
-                >Prática</span
-              >
-              <span class="text-[11px] sm:text-xs text-slate-400 font-medium"
-                >Otimizada para celular</span
-              >
+              <span class="block text-base font-bold text-white">Prática</span>
+              <span class="text-xs text-slate-500">Otimizada para celular</span>
             </div>
+            <div class="w-px h-8 bg-white/10" />
             <div>
-              <span class="block text-lg sm:text-xl font-bold text-emerald-400 tracking-tight"
-                >Histórico</span
-              >
-              <span class="text-[11px] sm:text-xs text-slate-400 font-medium"
-                >Controle de clientes</span
-              >
+              <span class="block text-base font-bold text-emerald-400">Histórico</span>
+              <span class="text-xs text-slate-500">Controle de clientes</span>
             </div>
+            <div class="w-px h-8 bg-white/10" />
             <div>
-              <span class="block text-lg sm:text-xl font-bold text-white tracking-tight"
-                >Relatórios</span
-              >
-              <span class="text-[11px] sm:text-xs text-slate-400 font-medium">Métricas e PDF</span>
+              <span class="block text-base font-bold text-white">Relatórios</span>
+              <span class="text-xs text-slate-500">Métricas e PDF</span>
             </div>
           </div>
         </div>
 
+        <!-- Right: Card preview -->
         <div
-          class="w-full lg:col-span-6 relative flex items-center justify-center observe-animate animate-panel-entry mt-4 lg:mt-0"
+          class="w-full lg:col-span-6 flex items-center justify-center observe-animate anim-panel mt-4 lg:mt-0"
         >
-          <div class="relative w-full max-w-[540px]">
-            <div
-              class="absolute -inset-2 sm:-inset-4 -z-10 rounded-3xl blur-[40px] sm:blur-[60px] bg-emerald-500/15"
-            />
+          <div class="relative w-full max-w-[460px]">
 
-            <div
-              class="rounded-2xl border border-white/15 bg-[#0D1522]/95 backdrop-blur-2xl p-4 sm:p-7 shadow-2xl relative overflow-hidden"
-            >
-              <div
-                class="flex items-center justify-between pb-3 sm:pb-4 mb-4 sm:mb-5 border-b border-white/10"
-              >
-                <div class="flex items-center gap-2.5">
-                  <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                  <span
-                    class="text-[11px] sm:text-xs font-bold tracking-wider text-slate-200 uppercase"
-                    >Agenda do Dia</span
-                  >
+            <!-- Subtle ambient glow -->
+            <div class="absolute -inset-6 -z-10 rounded-3xl bg-emerald-500/10 blur-[60px]" />
+
+            <div class="rounded-2xl border border-white/10 bg-[#0D1522]/90 backdrop-blur-xl p-5 sm:p-6 shadow-2xl">
+
+              <!-- Card header -->
+              <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.08]">
+                <div class="flex items-center gap-2">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Agenda — Hoje</span>
                 </div>
-                <span
-                  class="text-[11px] sm:text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                >
-                  5 Atendimentos
-                </span>
+                <span class="text-xs text-slate-500">5 atendimentos</span>
               </div>
 
-              <div class="space-y-2.5 sm:space-y-3 relative">
+              <!-- Appointment rows -->
+              <div class="space-y-1.5">
 
-                <div
-                  class="relative p-3.5 sm:p-4 rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] border border-emerald-500/40 shadow-lg "
-                >
-                  <div
-                    class="absolute -top-2.5 right-4 px-2.5 py-0.5 rounded-full bg-emerald-400 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-sm"
-                  >
-                    Em Andamento
-                  </div>
-
-                  <div class="flex items-center justify-between gap-3 mb-2">
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="text-[11px] sm:text-xs font-black text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30"
-                      >
-                        14:30
-                      </span>
-                      <h3 class="text-white font-bold text-sm sm:text-base">
-                        Maria Eduarda Santos
-                      </h3>
-                    </div>
-                    <span class="text-sm sm:text-base font-black text-emerald-300">R$ 180,00</span>
-                  </div>
-                  <p
-                    class="text-[11px] sm:text-xs text-slate-400 flex items-center gap-1.5 truncate"
-                  >
-                    <svg
-                      class="w-3.5 h-3.5 text-slate-500 shrink-0"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                    </svg>
-                    <span class="truncate">Rua das Flores, 142 — Casa 04</span>
-                  </p>
+                <!-- Active -->
+                <div class="flex items-center gap-3 px-3 py-3 rounded-lg border-l-2 border-emerald-400 bg-white/[0.05]">
+                  <span class="text-[11px] font-mono font-bold text-emerald-400 w-10 shrink-0">14:30</span>
+                  <span class="text-sm text-white font-semibold flex-1 truncate">Maria Eduarda Santos</span>
+                  <span class="text-sm font-bold text-emerald-300 shrink-0">R$ 180</span>
                 </div>
 
-                <div
-                  class="p-3 sm:p-3.5 rounded-xl bg-white/[0.03] border border-white/10 opacity-90 observe-animate animate-slide-up-2"
-                >
-                  <div class="flex items-center justify-between gap-3 mb-1">
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="text-[11px] sm:text-xs font-bold text-slate-300 bg-white/10 px-2 py-0.5 rounded"
-                      >
-                        16:00
-                      </span>
-                      <h3 class="text-slate-200 font-semibold text-xs sm:text-sm">
-                        Carlos Henrique Lima
-                      </h3>
-                    </div>
-                    <span class="text-xs sm:text-sm font-bold text-slate-200">R$ 250,00</span>
-                  </div>
-                  <p class="text-[10px] sm:text-[11px] text-slate-500">
-                    Av. Central, 800 • Manutenção Preventiva
-                  </p>
+                <!-- Next -->
+                <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg">
+                  <span class="text-[11px] font-mono text-slate-400 w-10 shrink-0">16:00</span>
+                  <span class="text-sm text-slate-300 flex-1 truncate">Carlos Henrique Lima</span>
+                  <span class="text-sm text-slate-300 shrink-0">R$ 250</span>
                 </div>
 
-                <div
-                  class="p-2.5 sm:p-3 rounded-xl bg-white/[0.02] border border-white/5 opacity-60 observe-animate animate-slide-up-3"
-                >
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="text-[10px] sm:text-[11px] font-medium text-slate-400 bg-white/5 px-2 py-0.5 rounded"
-                      >
-                        17:30
-                      </span>
-                      <span class="text-slate-300 text-[11px] sm:text-xs font-medium"
-                        >Ana Beatriz Souza</span
-                      >
-                    </div>
-                    <span class="text-[11px] sm:text-xs text-slate-400 font-medium">R$ 120,00</span>
-                  </div>
+                <!-- Later -->
+                <div class="flex items-center gap-3 px-3 py-2.5 rounded-lg opacity-50">
+                  <span class="text-[11px] font-mono text-slate-500 w-10 shrink-0">17:30</span>
+                  <span class="text-sm text-slate-400 flex-1 truncate">Ana Beatriz Souza</span>
+                  <span class="text-sm text-slate-500 shrink-0">R$ 120</span>
                 </div>
 
-                <div
-                  class="p-2 sm:p-2.5 rounded-xl bg-white/[0.01] border border-white/[0.03] opacity-35 observe-animate animate-slide-up-4 hidden sm:block"
-                >
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2">
-                      <span class="text-[10px] text-slate-500 px-1.5 py-0.5">19:00</span>
-                      <span class="text-slate-400 text-xs">Marcos Vinicius</span>
-                    </div>
-                    <span class="text-xs text-slate-500">R$ 90,00</span>
-                  </div>
-                </div>
               </div>
 
-              <div
-                class="mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-white/10 flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 font-medium"
-              >
-                <span>Filtros e busca em tempo real</span>
-                <span class="text-emerald-400 hover:underline cursor-pointer"
-                  >Ver histórico completo &rarr;</span
-                >
+              <!-- Card footer -->
+              <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                <span class="text-xs text-slate-500">Total do dia</span>
+                <span class="text-sm font-bold text-white">R$ 640,00</span>
               </div>
+
             </div>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -318,106 +197,30 @@ onUnmounted(() => {
 }
 
 @keyframes lightSweep {
-  0% {
-    background-position: 250% center;
-  }
-  100% {
-    background-position: -50% center;
-  }
-}
-
-
-
-@keyframes cardPulseGlow {
-  0%,
-  100% {
-    border-color: rgba(52, 211, 153, 0.4);
-    box-shadow:
-      0 10px 25px -5px rgba(0, 0, 0, 0.3),
-      0 0 15px rgba(52, 211, 153, 0.1);
-    transform: translateY(0);
-  }
-  50% {
-    border-color: rgba(52, 211, 153, 0.8);
-    box-shadow:
-      0 14px 30px -5px rgba(0, 0, 0, 0.4),
-      0 0 25px rgba(52, 211, 153, 0.22);
-    transform: translateY(-2px);
-  }
+  0%   { background-position: 250% center; }
+  100% { background-position: -50% center; }
 }
 
 .observe-animate {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(20px);
   transition: none;
 }
 
-.observe-animate.is-visible.animate-step-1 {
-  animation: fadeInUpStep 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+.observe-animate.is-visible.anim-1 { animation: fadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.10s both; }
+.observe-animate.is-visible.anim-2 { animation: fadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+.observe-animate.is-visible.anim-3 { animation: fadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both; }
+.observe-animate.is-visible.anim-4 { animation: fadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.48s both; }
+.observe-animate.is-visible.anim-5 { animation: fadeUp 1.1s cubic-bezier(0.16, 1, 0.3, 1) 0.60s both; }
+.observe-animate.is-visible.anim-panel { animation: fadeRight 1.3s cubic-bezier(0.16, 1, 0.3, 1) 0.28s both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.observe-animate.is-visible.animate-step-2 {
-  animation: fadeInUpStep 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
-}
-
-.observe-animate.is-visible.animate-step-3 {
-  animation: fadeInUpStep 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
-}
-
-.observe-animate.is-visible.animate-step-4 {
-  animation: fadeInUpStep 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
-}
-
-.observe-animate.is-visible.animate-step-5 {
-  animation: fadeInUpStep 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
-}
-
-.observe-animate.is-visible.animate-panel-entry {
-  animation: fadeInRightPanel 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
-}
-
-.observe-animate.is-visible.animate-slide-up-2 {
-  animation: fadeInUpSoft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.65s both;
-}
-
-.observe-animate.is-visible.animate-slide-up-3 {
-  animation: fadeInUpSoft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
-}
-
-.observe-animate.is-visible.animate-slide-up-4 {
-  animation: fadeInUpSoft 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.95s both;
-}
-
-@keyframes fadeInUpStep {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeInRightPanel {
-  from {
-    opacity: 0;
-    transform: translateX(40px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes fadeInUpSoft {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes fadeRight {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 </style>
