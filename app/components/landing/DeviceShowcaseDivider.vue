@@ -1,27 +1,26 @@
 <template>
   <section ref="sectionRef" class="relative scroll-section">
-    <div class="sticky top-0 flex h-screen flex-col overflow-hidden pt-20 lg:pt-24">
-      <div class="absolute inset-0 bg-background" />
+    <div class="sticky top-0 flex h-screen flex-col overflow-hidden pt-20 lg:pt-24 text-white">
+      <div class="absolute inset-0 bg-transition-layer" />
 
       <div class="relative z-10 flex flex-1 flex-col pb-12">
         <div class="flex flex-1 items-center">
           <div class="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-8">
             <div class="grid items-center gap-10 lg:grid-cols-[5fr_7fr] lg:gap-12">
-              <!-- Left: animated step text -->
               <div class="space-y-6">
                 <Transition name="step" mode="out-in">
                   <div :key="activeStep" class="space-y-4">
                     <div
-                      class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary"
+                      class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3.5 py-1 text-xs font-mono font-medium text-emerald-400 border border-emerald-500/20"
                     >
                       <UIcon :name="currentStep.icon" class="h-4 w-4" />
                       <span>{{ currentStep.tag }}</span>
                     </div>
                     <h2
-                      class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
+                      class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-white"
                       v-html="currentStep.title"
                     />
-                    <p class="text-lg leading-relaxed text-muted-foreground">
+                    <p class="text-lg leading-relaxed text-slate-400">
                       {{ currentStep.desc }}
                     </p>
                   </div>
@@ -32,31 +31,30 @@
                     <div
                       v-for="feat in currentStep.features"
                       :key="feat.title"
-                      class="flex items-start gap-3 rounded-xl border bg-card/50 p-4"
+                      class="flex items-start gap-3 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-md p-4"
                     >
                       <div
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10"
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400"
                       >
-                        <UIcon :name="feat.icon" class="h-5 w-5 text-primary" />
+                        <UIcon :name="feat.icon" class="h-5 w-5" />
                       </div>
                       <div class="space-y-1">
-                        <h3 class="font-semibold">{{ feat.title }}</h3>
-                        <p class="text-sm text-muted-foreground">{{ feat.desc }}</p>
+                        <h3 class="font-semibold text-white">{{ feat.title }}</h3>
+                        <p class="text-sm text-slate-400">{{ feat.desc }}</p>
                       </div>
                     </div>
                   </div>
                 </Transition>
 
-                <!-- Step jump buttons -->
                 <div class="flex flex-wrap items-center gap-2">
                   <button
                     v-for="(step, i) in steps"
                     :key="i"
-                    class="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-500"
+                    class="flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all duration-300"
                     :class="
                       i === activeStep
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'bg-muted/60 text-muted-foreground hover:bg-muted'
+                        ? 'bg-emerald-400 text-slate-950 font-semibold shadow-lg shadow-emerald-500/20'
+                        : 'bg-white/5 text-slate-400 hover:bg-white/10 border border-white/5'
                     "
                     @click="jumpToStep(i)"
                   >
@@ -66,61 +64,68 @@
                 </div>
               </div>
 
-              <!-- Right: CSS background image showcase com balões flutuantes animados -->
               <div class="relative isolate flex items-center justify-center">
                 <div class="showcase-container">
-                  <!-- Celular (Passo 0) -->
                   <div class="device-mockup phone-bg" :class="{ 'is-active': activeStep === 0 }">
                     <div class="floating-badge badge-phone-1">
-                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <div
+                        class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400"
+                      >
                         <UIcon name="lucide:zap" class="h-4 w-4" />
                       </div>
                       <div>
-                        <p class="text-xs font-bold leading-tight">Super Rápido</p>
-                        <p class="text-[10px] text-muted-foreground">Menos de 1 min</p>
+                        <p class="text-xs font-bold leading-tight text-white">Super Rápido</p>
+                        <p class="text-[10px] text-slate-400">Menos de 1 min</p>
                       </div>
                     </div>
 
                     <div class="floating-badge badge-phone-2">
-                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <div
+                        class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400"
+                      >
                         <UIcon name="lucide:wallet" class="h-4 w-4" />
                       </div>
                       <div>
-                        <p class="text-xs font-bold leading-tight">Pix e Cartão</p>
-                        <p class="text-[10px] text-muted-foreground">Pagamento seguro</p>
+                        <p class="text-xs font-bold leading-tight text-white">Pix e Cartão</p>
+                        <p class="text-[10px] text-slate-400">Pagamento seguro</p>
                       </div>
                     </div>
 
                     <div class="floating-badge badge-phone-3">
-                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <div
+                        class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400"
+                      >
                         <UIcon name="lucide:bell-ring" class="h-4 w-4" />
                       </div>
                       <div>
-                        <p class="text-xs font-bold leading-tight">Lembrete WhatsApp</p>
-                        <p class="text-[10px] text-muted-foreground">Zero faltas</p>
+                        <p class="text-xs font-bold leading-tight text-white">Lembrete WhatsApp</p>
+                        <p class="text-[10px] text-slate-400">Zero faltas</p>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Desktop (Passo 1) -->
                   <div class="device-mockup desktop-bg" :class="{ 'is-active': activeStep === 1 }">
                     <div class="floating-badge badge-desk-1">
-                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <div
+                        class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400"
+                      >
                         <UIcon name="lucide:trending-up" class="h-4 w-4" />
                       </div>
                       <div>
-                        <p class="text-xs font-bold leading-tight">+40% Faturamento</p>
-                        <p class="text-[10px] text-muted-foreground">Relatórios em tempo real</p>
+                        <p class="text-xs font-bold leading-tight text-white">+40% Faturamento</p>
+                        <p class="text-[10px] text-slate-400">Relatórios em tempo real</p>
                       </div>
                     </div>
 
                     <div class="floating-badge badge-desk-2">
-                      <div class="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <div
+                        class="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400"
+                      >
                         <UIcon name="lucide:shield-check" class="h-4 w-4" />
                       </div>
                       <div>
-                        <p class="text-xs font-bold leading-tight">Gestão Segura</p>
-                        <p class="text-[10px] text-muted-foreground">Múltiplos profissionais</p>
+                        <p class="text-xs font-bold leading-tight text-white">Gestão Segura</p>
+                        <p class="text-[10px] text-slate-400">Múltiplos profissionais</p>
                       </div>
                     </div>
                   </div>
@@ -130,10 +135,9 @@
           </div>
         </div>
 
-        <!-- Scroll progress bar -->
-        <div class="h-px w-full bg-border">
+        <div class="h-px w-full bg-white/10">
           <div
-            class="h-full bg-primary transition-[width] duration-150 ease-out"
+            class="h-full bg-emerald-400 transition-[width] duration-150 ease-out"
             :style="{ width: `${scrollProgress * 100}%` }"
           />
         </div>
@@ -153,7 +157,7 @@ const steps = [
   {
     tag: 'Celular',
     icon: 'lucide:smartphone',
-    title: 'Agende na palma<br><span class="text-primary">da mão</span>',
+    title: 'Agende na palma<br><span class="text-emerald-400">da mão</span>',
     desc: 'Seus clientes escolhem, confirmam e pagam pelo celular em menos de um minuto. Sem mensagens, sem ligações.',
     features: [
       {
@@ -171,7 +175,7 @@ const steps = [
   {
     tag: 'Desktop',
     icon: 'lucide:laptop',
-    title: 'Painel completo<br><span class="text-primary">no computador</span>',
+    title: 'Painel completo<br><span class="text-emerald-400">no computador</span>',
     desc: 'Relatórios, controle financeiro e gestão de múltiplos profissionais — tudo no painel de administração.',
     features: [
       {
@@ -222,6 +226,25 @@ onUnmounted(() => {
   min-height: 300vh;
 }
 
+.bg-transition-layer {
+  position: absolute;
+  inset: 0;
+  background-color: #080D14; /* section toda sólida */
+}
+
+.bg-transition-layer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 160px;           /* curto — só costura o topo */
+  background: linear-gradient(
+    180deg,
+    #C8DBE6 0%,            /* ← mesmo valor exato */
+    #080D14 100%
+  );
+}
 .showcase-container {
   position: relative;
   margin: 0 auto;
@@ -240,7 +263,7 @@ onUnmounted(() => {
   transform: translate(-50%, -50%) scale(0.95);
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 100% 100%; 
+  background-size: 100% 100%;
   opacity: 0;
   pointer-events: none;
   transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
@@ -265,9 +288,9 @@ onUnmounted(() => {
   background-image: url('/desktop-dashboard.png');
 }
 
-/* Keyframes para a animação contínua de flutuação (subir e descer) */
 @keyframes floatAnimation {
-  0%, 100% {  
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -275,32 +298,31 @@ onUnmounted(() => {
   }
 }
 
-/* Estilização e transição dos balões flutuantes */
 .floating-badge {
   position: absolute;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  background: hsl(var(--card) / 0.85);
+  background: #0a111c;
   backdrop-filter: blur(12px);
-  border: 1px solid hsl(var(--border) / 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 1rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.4),
+    0 8px 10px -6px rgba(0, 0, 0, 0.3);
   opacity: 0;
   transform: translateY(15px) scale(0.9);
   transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 60;
 }
 
-/* Quando o dispositivo está ativo, o balão aparece e inicia a animação contínua de flutuação */
 .device-mockup.is-active .floating-badge {
   opacity: 1;
   transform: translateY(0) scale(1);
   animation: floatAnimation 4s ease-in-out infinite;
 }
 
-/* Atrasos individuais para cada balão flutuar de forma descentralizada/orgânica */
 .badge-phone-1 {
   top: 15%;
   left: -130px;
@@ -331,7 +353,6 @@ onUnmounted(() => {
   animation-delay: 1.8s !important;
 }
 
-/* Transições dos textos */
 .step-enter-active {
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   transition-delay: 0.04s;

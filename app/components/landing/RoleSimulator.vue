@@ -83,7 +83,6 @@ onUnmounted(() => {
     <div class="ambient-glow" aria-hidden="true" />
 
     <div class="deck-inner">
-      <!-- Cabeçalho -->
       <header class="section-header animate-item">
         <span class="section-tag">Simulador Interativo</span>
         <h2 class="section-title">Escolha o perfil e veja o poder do sistema.</h2>
@@ -93,7 +92,6 @@ onUnmounted(() => {
         </p>
       </header>
 
-      <!-- Deck de Cartas estilo "Yu-Gi-Oh / Seleção de Personagem" -->
       <div class="cards-deck-container animate-item delay-1">
         <div
           v-for="(card, index) in cards"
@@ -155,7 +153,6 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <!-- Painel de Resumo Inferior (Holograma/Terminal de Métricas do Card Ativo) -->
       <div :key="selectedCard" class="projection-panel animate-fade">
         <div class="projection-top">
           <div class="projection-title-group">
@@ -167,7 +164,6 @@ onUnmounted(() => {
           <p class="projection-desc">{{ cards[selectedCard]?.desc }}</p>
         </div>
 
-        <!-- Métricas em Linha -->
         <div class="projection-metrics-grid">
           <div
             v-for="(metric, mIdx) in cards[selectedCard]?.metrics"
@@ -190,12 +186,12 @@ onUnmounted(() => {
 .deck-section {
   position: relative;
   min-height: 95dvh;
-  background: linear-gradient(180deg, #080d14 0%, #0b121e 50%, #0d1726 100%);
-
+  background: linear-gradient(180deg, #080D14 0%, #0b121e 50%, #0d1726 100%);
   z-index: 30;
   padding: 8rem 1.5rem;
   overflow: hidden;
 }
+
 .ambient-glow {
   position: absolute;
   top: 40%;
@@ -220,26 +216,28 @@ onUnmounted(() => {
 }
 
 .section-header {
-  max-width: 600px;
+  max-width: 650px;
   margin-bottom: 3.5rem;
+  text-align: left;
 }
 
 .section-tag {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  display: inline-block;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
   color: #34d399;
   background: rgba(52, 211, 153, 0.1);
   padding: 0.35rem 0.85rem;
   border-radius: 9999px;
+  margin-bottom: 1rem;
   border: 1px solid rgba(52, 211, 153, 0.2);
-  display: inline-block;
-  margin-bottom: 1.25rem;
 }
 
 .section-title {
-  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-size: clamp(2rem, 4vw, 2.8rem);
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.025em;
@@ -253,120 +251,116 @@ onUnmounted(() => {
   line-height: 1.7;
 }
 
-/* DECK DE CARTAS (ESTILO YU-GI-OH / DECK TECNOLÓGICO) */
 .cards-deck-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 20px;
   margin-bottom: 2.5rem;
-  perspective: 1000px;
 }
 
 .deck-card {
   position: relative;
-  background: rgba(12, 20, 34, 0.7);
+  background: #0d1522;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
   border-radius: 20px;
-  padding: 1.75rem;
-  min-height: 240px;
+  padding: 2rem 1.75rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow: hidden;
+  min-height: 220px;
 }
 
-/* Estado inativo/apagado */
-.deck-card.is-dimmed {
-  opacity: 0.45;
-  filter: grayscale(40%);
-  transform: scale(0.96) translateY(5px);
+.deck-card:hover {
+  border-color: rgba(52, 211, 153, 0.4);
+  transform: translateY(-4px);
 }
 
-.deck-card.is-dimmed:hover {
-  opacity: 0.8;
-  filter: grayscale(0%);
-  transform: scale(0.98) translateY(0);
-  border-color: rgba(52, 211, 153, 0.25);
-}
-
-/* Estado Ativo/Selecionado */
 .deck-card.is-selected {
-  opacity: 1;
-  filter: grayscale(0%);
-  transform: scale(1.03) translateY(-8px);
-  background: linear-gradient(
-    145deg,
-    rgba(52, 211, 153, 0.15) 0%,
-    rgba(12, 20, 34, 0.9) 60%,
-    rgba(8, 13, 20, 0.95) 100%
-  );
-  border-color: rgba(52, 211, 153, 0.6);
-  box-shadow:
-    0 20px 40px -15px rgba(0, 0, 0, 0.7),
-    0 0 25px rgba(52, 211, 153, 0.18);
+  background: linear-gradient(135deg, #111e32 0%, #0d1726 100%);
+  border-color: #34d399;
+  box-shadow: 0 15px 35px -10px rgba(52, 211, 153, 0.25);
+  transform: translateY(-6px);
+}
+
+.deck-card.is-dimmed {
+  opacity: 0.65;
 }
 
 .card-top-type {
+  font-family: monospace;
   font-size: 0.7rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.1em;
   color: #64748b;
-  font-family: monospace;
+  margin-bottom: 1rem;
 }
 
 .deck-card.is-selected .card-top-type {
   color: #34d399;
 }
 
+.card-body-content {
+  margin-bottom: 1.5rem;
+}
+
 .card-avatar-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: rgba(52, 211, 153, 0.08);
-  border: 1px solid rgba(52, 211, 153, 0.2);
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #94a3b8;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.deck-card.is-selected .card-avatar-icon {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.3);
   color: #34d399;
-  margin-bottom: 1.25rem;
 }
 
 .card-role-title {
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: #ffffff;
   margin-bottom: 0.25rem;
+  letter-spacing: -0.01em;
 }
 
 .card-role-sub {
-  font-size: 0.825rem;
+  font-size: 0.85rem;
   color: #94a3b8;
 }
 
 .card-footer-indicator {
-  font-size: 0.75rem;
+  font-family: monospace;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #475569;
-  padding-top: 1rem;
+  color: #64748b;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 1rem;
 }
 
 .deck-card.is-selected .card-footer-indicator {
   color: #34d399;
 }
 
-/* PAINEL DE PROJEÇÃO INFERIOR */
 .projection-panel {
-  background: linear-gradient(135deg, rgba(12, 20, 34, 0.85) 0%, rgba(8, 13, 20, 0.95) 100%);
-  border: 1px solid rgba(52, 211, 153, 0.25);
-  backdrop-filter: blur(20px);
+  background: #0b121e;
+  border: 1px solid rgba(52, 211, 153, 0.2);
   border-radius: 24px;
   padding: 2.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  position: relative;
+  overflow: hidden;
 }
 
 .projection-top {
@@ -374,14 +368,15 @@ onUnmounted(() => {
 }
 
 .projection-badge {
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  display: inline-block;
+  font-family: monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   color: #34d399;
   background: rgba(52, 211, 153, 0.1);
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
-  display: inline-block;
   margin-bottom: 0.75rem;
 }
 
@@ -389,67 +384,66 @@ onUnmounted(() => {
   font-size: 1.5rem;
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.25;
+  letter-spacing: -0.02em;
   margin-bottom: 0.5rem;
+  line-height: 1.3;
 }
 
 .projection-desc {
-  font-size: 0.975rem;
+  font-size: 0.95rem;
   color: #94a3b8;
-  line-height: 1.65;
+  line-height: 1.6;
+  max-width: 800px;
 }
 
 .projection-metrics-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 16px;
 }
 
 .metric-pill-card {
   background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .metric-label {
   font-size: 0.8rem;
-  color: #64748b;
-  display: block;
-  margin-bottom: 0.5rem;
+  color: #94a3b8;
 }
 
 .metric-value-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
 }
 
 .metric-val {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #f8fafc;
-  letter-spacing: -0.02em;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
 }
 
 .metric-badge {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #34d399;
-  background: rgba(52, 211, 153, 0.1);
+  font-size: 0.7rem;
+  font-weight: 600;
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
 }
 
-/* Animações */
 .animate-item {
   opacity: 0;
   transform: translateY(25px);
-  transition:
-    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .deck-section.is-visible .animate-item {
@@ -458,10 +452,14 @@ onUnmounted(() => {
 }
 
 .delay-1 {
-  transition-delay: 0.15s;
+  transition-delay: 0.2s;
 }
 
-@keyframes fadeIn {
+.animate-fade {
+  animation: fadeInPanel 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInPanel {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -472,11 +470,7 @@ onUnmounted(() => {
   }
 }
 
-.animate-fade {
-  animation: fadeIn 0.35s ease forwards;
-}
-
-@media (max-width: 868px) {
+@media (max-width: 900px) {
   .cards-deck-container,
   .projection-metrics-grid {
     grid-template-columns: 1fr;

@@ -15,7 +15,6 @@ import DeviceShowcaseDivider from '~/components/landing/DeviceShowcaseDivider.vu
     <LandingHeader />
 
     <LandingHero />
-
     <LandingFeatures />
     <DeviceShowcaseDivider />
     <SystemModules />
