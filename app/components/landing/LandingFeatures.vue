@@ -145,12 +145,8 @@ const handleMouseMove = (e: MouseEvent) => {
 
 <style scoped>
 .features {
-  background: linear-gradient(
-    180deg,
-    #F8FAFC 0%,
-    #C8DBE6 100%    /* ← ponto de encontro */
-  );
-  padding: 8rem 1.5rem 4rem; /* ← reduzi o padding-bottom para encolher a faixa plana */
+  background: #f8fafc;
+  min-height: 75vh;
 }
 
 .features-inner {

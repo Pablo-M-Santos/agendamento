@@ -64,15 +64,19 @@ onUnmounted(() => {
 
 <template>
   <section
+    id="home"
     ref="heroRef"
     @mousemove="handleMouseMove"
     class="relative min-h-[95vh] lg:min-h-dvh flex flex-col justify-center items-center py-20 lg:py-28 overflow-hidden bg-[#F8FAFC] text-slate-900"
   >
     <LandingBackground :scroll-y-pos="scrollYPos" />
 
-    <div class="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 w-full relative z-10 flex flex-col items-center text-center">
-      
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md mb-6 observe-animate anim-1">
+    <div
+      class="max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-12 w-full relative z-10 flex flex-col items-center text-center"
+    >
+      <div
+        class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 backdrop-blur-md mb-6 observe-animate anim-1"
+      >
         <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
         <span class="text-xs font-mono font-medium text-emerald-700 tracking-wider uppercase">
           Agenda & Gestão Inteligente para Autônomos
@@ -89,7 +93,8 @@ onUnmounted(() => {
       <p
         class="text-base sm:text-lg lg:text-xl text-slate-600 mb-10 max-w-[680px] leading-relaxed font-light observe-animate anim-3"
       >
-        Diga adeus às planilhas e anotações perdidas. Acompanhe atendimentos em tempo real, organize horários e tenha relatórios claros na palma da mão.
+        Diga adeus às planilhas e anotações perdidas. Acompanhe atendimentos em tempo real, organize
+        horários e tenha relatórios claros na palma da mão.
       </p>
 
       <div
@@ -106,7 +111,12 @@ onUnmounted(() => {
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M14 5l7 7m0 0l-7 7m7-7H3"
+            />
           </svg>
         </NuxtLink>
 
@@ -114,38 +124,99 @@ onUnmounted(() => {
           to="/"
           class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 rounded-xl font-medium text-sm text-slate-700 hover:text-slate-900 border border-slate-300 hover:border-slate-400 bg-white shadow-sm transition-all duration-200"
         >
-          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            class="w-4 h-4 text-emerald-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
           Acessar demonstração
         </NuxtLink>
       </div>
 
-      <div class="flex flex-wrap items-center justify-center gap-8 text-xs text-slate-500 mb-16 observe-animate anim-5">
+      <div
+        class="flex flex-wrap items-center justify-center gap-8 text-xs text-slate-500 mb-16 observe-animate anim-5"
+      >
         <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <svg
+            class="w-4 h-4 text-emerald-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
           100% Gratuito para começar
         </div>
         <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <svg
+            class="w-4 h-4 text-emerald-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
           Sem necessidade de cartão
         </div>
         <div class="flex items-center gap-2">
-          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <svg
+            class="w-4 h-4 text-emerald-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
           Otimizado para Mobile & Desktop
         </div>
       </div>
 
       <div class="relative w-full max-w-[960px] perspective-container observe-animate anim-panel">
-        
         <Transition name="badge-pop">
           <div
             v-if="activeBadge === 1"
             class="hidden md:flex absolute -left-10 top-8 z-30 items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white/90 backdrop-blur-xl shadow-xl pointer-events-none"
           >
-            <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <div
+              class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600"
+            >
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
             </div>
             <div class="text-left">
               <span class="block text-xs font-semibold text-slate-900">+ R$ 640,00</span>
@@ -181,18 +252,29 @@ onUnmounted(() => {
               <span class="text-xs font-mono text-slate-400 ml-2">app.suaagenda.com</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium">Hoje</span>
+              <span
+                class="text-xs px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium"
+                >Hoje</span
+              >
               <span class="text-xs text-slate-500">5 Agendamentos</span>
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="md:col-span-2 space-y-2.5">
-              <span class="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider block mb-2">Linha do Tempo</span>
-              
-              <div class="flex items-center justify-between p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50">
+              <span
+                class="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider block mb-2"
+                >Linha do Tempo</span
+              >
+
+              <div
+                class="flex items-center justify-between p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50"
+              >
                 <div class="flex items-center gap-3">
-                  <span class="text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded">14:30</span>
+                  <span
+                    class="text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-2 py-1 rounded"
+                    >14:30</span
+                  >
                   <div>
                     <h4 class="text-sm font-semibold text-slate-900">Maria Eduarda Santos</h4>
                     <p class="text-xs text-slate-500">Corte & Escova</p>
@@ -201,9 +283,13 @@ onUnmounted(() => {
                 <span class="text-sm font-bold text-emerald-700">R$ 180</span>
               </div>
 
-              <div class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/50">
+              <div
+                class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 bg-slate-50/50"
+              >
                 <div class="flex items-center gap-3">
-                  <span class="text-xs font-mono text-slate-500 bg-slate-200/60 px-2 py-1 rounded">16:00</span>
+                  <span class="text-xs font-mono text-slate-500 bg-slate-200/60 px-2 py-1 rounded"
+                    >16:00</span
+                  >
                   <div>
                     <h4 class="text-sm font-medium text-slate-700">Carlos Henrique Lima</h4>
                     <p class="text-xs text-slate-400">Barba & Cabelo</p>
@@ -213,12 +299,24 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50/50 flex flex-col justify-between">
+            <div
+              class="p-4 rounded-xl border border-slate-100 bg-slate-50/50 flex flex-col justify-between"
+            >
               <div>
-                <span class="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider block mb-3">Resumo Financeiro</span>
+                <span
+                  class="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider block mb-3"
+                  >Resumo Financeiro</span
+                >
                 <span class="text-2xl font-bold text-slate-900 block mb-1">R$ 640,00</span>
                 <span class="text-xs text-emerald-600 flex items-center gap-1 font-medium">
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
                   +24% vs. semana passada
                 </span>
               </div>
@@ -226,14 +324,14 @@ onUnmounted(() => {
                 <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
                   <div class="bg-emerald-500 h-full w-[70%]" />
                 </div>
-                <span class="text-[10px] text-slate-500 mt-1 block text-right">70% da meta diária</span>
+                <span class="text-[10px] text-slate-500 mt-1 block text-right"
+                  >70% da meta diária</span
+                >
               </div>
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
   </section>
 </template>

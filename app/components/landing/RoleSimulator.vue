@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, watch } from 'vue'
 
 const sectionRef = ref<HTMLElement | null>(null)
-const isVisible = ref(false)
+const { isVisible } = useSectionReveal(sectionRef)
 const selectedCard = ref(0)
+const tabRefs = ref<HTMLElement[]>([])
 
 const cards = [
   {
@@ -47,29 +48,64 @@ const cards = [
   }
 ]
 
-let observer: IntersectionObserver | null = null
+// Linhas de métrica com count-up cancelável (conteúdo final sempre idêntico ao original)
+const simulatorCards = reactive(
+  cards.map((card) => ({
+    ...card,
+    rows: card.metrics.map((metric, mIndex) => ({
+      label: metric.label,
+      badge: metric.badge,
+      count: useCountUp(metric.value, { duration: 1100, delay: mIndex * 120 })
+    }))
+  }))
+)
 
-onMounted(() => {
-  observer = new IntersectionObserver(
-    (entries) => {
-      const entry = entries[0]
-      if (entry && entry.isIntersecting) {
-        isVisible.value = true
-        if (observer && sectionRef.value) {
-          observer.unobserve(sectionRef.value)
-        }
-      }
-    },
-    { threshold: 0.15 }
-  )
+const selectCard = (index: number) => {
+  if (selectedCard.value === index) return
+  selectedCard.value = index
+}
 
-  if (sectionRef.value) {
-    observer.observe(sectionRef.value)
+const setTabRef = (el: Element | unknown, index: number) => {
+  if (el instanceof HTMLElement) tabRefs.value[index] = el
+}
+
+const onSelectorKeydown = (event: KeyboardEvent) => {
+  const total = cards.length
+  let next: number | null = null
+
+  switch (event.key) {
+    case 'ArrowDown':
+    case 'ArrowRight':
+      next = (selectedCard.value + 1) % total
+      break
+    case 'ArrowUp':
+    case 'ArrowLeft':
+      next = (selectedCard.value - 1 + total) % total
+      break
+    case 'Home':
+      next = 0
+      break
+    case 'End':
+      next = total - 1
+      break
+    default:
+      return
   }
-})
 
-onUnmounted(() => {
-  if (observer) observer.disconnect()
+  event.preventDefault()
+  selectCard(next)
+  tabRefs.value[next]?.focus()
+}
+
+// Count-ups das métricas da perspectiva ativa, ao revelar e ao trocar de perfil
+const runActiveCounts = () => {
+  const active = simulatorCards[selectedCard.value]
+  if (!active) return
+  active.rows.forEach((row) => row.count.run())
+}
+
+watch([isVisible, selectedCard], ([visible]) => {
+  if (visible) runActiveCounts()
 })
 </script>
 
@@ -80,8 +116,6 @@ onUnmounted(() => {
     class="deck-section"
     :class="{ 'is-visible': isVisible }"
   >
-    <div class="ambient-glow" aria-hidden="true" />
-
     <div class="deck-inner">
       <header class="section-header animate-item">
         <span class="section-tag">Simulador Interativo</span>
@@ -92,23 +126,33 @@ onUnmounted(() => {
         </p>
       </header>
 
-      <div class="cards-deck-container animate-item delay-1">
+      <div class="simulator animate-item delay-1">
+        <!-- Seletor acessível de perspectivas (tablist com teclado) -->
         <div
-          v-for="(card, index) in cards"
-          :key="card.id"
-          class="deck-card"
-          :class="{ 'is-selected': selectedCard === index, 'is-dimmed': selectedCard !== index }"
-          @click="selectedCard = index"
+          class="role-selector"
+          role="tablist"
+          aria-orientation="vertical"
+          aria-label="Perspectivas do simulador"
+          @keydown="onSelectorKeydown"
         >
-          <div class="card-glow-overlay" />
-          <div class="card-top-type">CARD {{ index + 1 }}</div>
-
-          <div class="card-body-content">
-            <div class="card-avatar-icon">
+          <button
+            v-for="(card, index) in simulatorCards"
+            :id="`role-tab-${index}`"
+            :key="card.id"
+            :ref="(el) => setTabRef(el, index)"
+            class="role-tab"
+            type="button"
+            role="tab"
+            aria-controls="role-panel"
+            :aria-selected="selectedCard === index"
+            :tabindex="selectedCard === index ? 0 : -1"
+            @click="selectCard(index)"
+          >
+            <span class="role-icon" aria-hidden="true">
               <svg
                 v-if="card.icon === 'chart'"
-                width="28"
-                height="28"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -118,8 +162,8 @@ onUnmounted(() => {
               </svg>
               <svg
                 v-else-if="card.icon === 'user'"
-                width="28"
-                height="28"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -130,8 +174,8 @@ onUnmounted(() => {
               </svg>
               <svg
                 v-else
-                width="28"
-                height="28"
+                width="22"
+                height="22"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -141,39 +185,167 @@ onUnmounted(() => {
                   d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
                 />
               </svg>
+            </span>
+            <span class="role-tab-info">
+              <span class="role-tab-title">{{ card.role }}</span>
+              <span class="role-tab-sub">{{ card.subtitle }}</span>
+            </span>
+            <span v-if="selectedCard === index" class="role-tab-flag" aria-hidden="true">
+              ATIVO
+            </span>
+          </button>
+        </div>
+
+        <!-- Painel: viewport do produto + conteúdo real da perspectiva -->
+        <div
+          id="role-panel"
+          class="simulator-panel"
+          role="tabpanel"
+          :aria-labelledby="`role-tab-${selectedCard}`"
+          tabindex="0"
+        >
+          <div class="viewport-frame" aria-hidden="true">
+            <div class="viewport-chrome">
+              <div class="chrome-dots">
+                <span class="dot red" />
+                <span class="dot yellow" />
+                <span class="dot green" />
+              </div>
+              <span class="chrome-tag">{{ simulatorCards[selectedCard]?.role }}</span>
             </div>
 
-            <h3 class="card-role-title">{{ card.role }}</h3>
-            <p class="card-role-sub">{{ card.subtitle }}</p>
+            <div class="viewport-stage">
+              <Transition name="viewport" mode="out-in">
+                <div :key="selectedCard" class="viewport-content">
+                  <!-- Empreendedor: painel executivo -->
+                  <div v-if="selectedCard === 0" class="vp vp-executive">
+                    <div class="vp-toolbar">
+                      <span class="vp-title">Painel do Proprietário</span>
+                      <span class="live-pill"><span class="live-dot" /> Ao vivo</span>
+                    </div>
+                    <div class="vp-chart">
+                      <svg
+                        viewBox="0 0 400 120"
+                        preserveAspectRatio="none"
+                        role="presentation"
+                        class="exec-svg"
+                      >
+                        <defs>
+                          <linearGradient id="execFill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#4FD1C5" stop-opacity="0.25" />
+                            <stop offset="100%" stop-color="#4FD1C5" stop-opacity="0" />
+                          </linearGradient>
+                        </defs>
+                        <path
+                          d="M0 96 C 44 88, 74 74, 110 80 S 176 52, 214 62 S 280 70, 316 44 S 368 30, 400 36 L400 120 L0 120 Z"
+                          fill="url(#execFill)"
+                        />
+                        <path
+                          d="M0 96 C 44 88, 74 74, 110 80 S 176 52, 214 62 S 280 70, 316 44 S 368 30, 400 36"
+                          fill="none"
+                          stroke="#4FD1C5"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <div class="vp-chips">
+                      <span class="vp-chip step" style="--i: 0">Faturamento</span>
+                      <span class="vp-chip step" style="--i: 1">Comissões</span>
+                      <span class="vp-chip step" style="--i: 2">Caixa</span>
+                    </div>
+                  </div>
+
+                  <!-- Equipe: agenda multi-profissional -->
+                  <div v-else-if="selectedCard === 1" class="vp vp-team">
+                    <div class="vp-toolbar">
+                      <span class="vp-title">Agenda da Equipe</span>
+                      <span class="vp-meta">Hoje</span>
+                    </div>
+                    <div class="lanes">
+                      <div class="lane step" style="--i: 0">
+                        <span class="lane-name">Ana</span>
+                        <div class="lane-track">
+                          <span class="blk em" style="left: 4%; width: 26%">Corte</span>
+                          <span class="blk teal" style="left: 42%; width: 30%">Avaliação</span>
+                        </div>
+                      </div>
+                      <div class="lane step" style="--i: 1">
+                        <span class="lane-name">Carlos</span>
+                        <div class="lane-track">
+                          <span class="blk teal" style="left: 12%; width: 32%">Consulta</span>
+                          <span class="blk em" style="left: 58%; width: 24%">Retoque</span>
+                        </div>
+                      </div>
+                      <div class="lane step" style="--i: 2">
+                        <span class="lane-name">Bia</span>
+                        <div class="lane-track">
+                          <span class="blk em" style="left: 22%; width: 22%">Manicure</span>
+                          <span class="blk mute" style="left: 64%; width: 14%">Livre</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="lane-times step" style="--i: 3">
+                      <span>08:00</span>
+                      <span>12:00</span>
+                      <span>17:00</span>
+                    </div>
+                  </div>
+
+                  <!-- Cliente: reserva no celular -->
+                  <div v-else class="vp vp-customer">
+                    <div class="phone step" style="--i: 0">
+                      <div class="phone-notch" />
+                      <div class="phone-body">
+                        <span class="phone-title">Novo agendamento</span>
+                        <div class="phone-step" style="--i: 1">
+                          <span class="step-num">1</span>
+                          <span class="step-label">Serviço</span>
+                          <span class="step-value">Corte</span>
+                        </div>
+                        <div class="phone-step" style="--i: 2">
+                          <span class="step-num">2</span>
+                          <span class="step-label">Horário</span>
+                          <span class="step-value">14:30</span>
+                        </div>
+                        <div class="phone-step" style="--i: 3">
+                          <span class="step-num">3</span>
+                          <span class="step-label">Pagamento</span>
+                          <span class="step-value">PIX • R$ 180,00</span>
+                        </div>
+                        <div class="phone-cta" style="--i: 4">Confirmar agendamento</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Transition>
+            </div>
           </div>
 
-          <div class="card-footer-indicator">
-            <span>{{ selectedCard === index ? 'ATIVO' : 'SELECIONAR' }}</span>
-          </div>
-        </div>
-      </div>
+          <!-- Conteúdo real da perspectiva (preservado do original) -->
+          <div class="projection-panel">
+            <div class="projection-top">
+              <div class="projection-title-group">
+                <span class="projection-badge"
+                  >PERSPECTIVA DO {{ simulatorCards[selectedCard]?.role.toUpperCase() }}</span
+                >
+                <h3 class="projection-headline">{{ simulatorCards[selectedCard]?.headline }}</h3>
+              </div>
+              <p class="projection-desc">{{ simulatorCards[selectedCard]?.desc }}</p>
+            </div>
 
-      <div :key="selectedCard" class="projection-panel animate-fade">
-        <div class="projection-top">
-          <div class="projection-title-group">
-            <span class="projection-badge"
-              >PERSPECTIVA DO {{ cards[selectedCard]?.role.toUpperCase() }}</span
-            >
-            <h3 class="projection-headline">{{ cards[selectedCard]?.headline }}</h3>
-          </div>
-          <p class="projection-desc">{{ cards[selectedCard]?.desc }}</p>
-        </div>
-
-        <div class="projection-metrics-grid">
-          <div
-            v-for="(metric, mIdx) in cards[selectedCard]?.metrics"
-            :key="mIdx"
-            class="metric-pill-card"
-          >
-            <span class="metric-label">{{ metric.label }}</span>
-            <div class="metric-value-row">
-              <span class="metric-val">{{ metric.value }}</span>
-              <span class="metric-badge">{{ metric.badge }}</span>
+            <div class="projection-metrics-grid">
+              <div
+                v-for="(row, mIdx) in simulatorCards[selectedCard]?.rows"
+                :key="mIdx"
+                class="metric-pill-card"
+              >
+                <span class="metric-label">{{ row?.label }}</span>
+                <div class="metric-value-row">
+                  <span class="metric-val">{{ row?.count.display }}</span>
+                  <span class="metric-badge">{{ row?.badge }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -186,26 +358,10 @@ onUnmounted(() => {
 .deck-section {
   position: relative;
   min-height: 95dvh;
-  background: linear-gradient(180deg, #080D14 0%, #0b121e 50%, #0d1726 100%);
+  background: linear-gradient(180deg, #080d14 0%, #0b121e 50%, #0d1726 100%);
   z-index: 30;
   padding: 8rem 1.5rem;
-  overflow: hidden;
-}
-
-.ambient-glow {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80vw;
-  height: 500px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(52, 211, 153, 0.05) 0%,
-    rgba(15, 23, 42, 0) 70%
-  );
-  pointer-events: none;
-  z-index: 1;
+  overflow: clip;
 }
 
 .deck-inner {
@@ -251,64 +407,58 @@ onUnmounted(() => {
   line-height: 1.7;
 }
 
-.cards-deck-container {
+/* --- Simulador: seletor + painel --- */
+.simulator {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 2.5rem;
+  grid-template-columns: minmax(260px, 4fr) minmax(0, 8fr);
+  gap: 2.5rem;
+  align-items: start;
 }
 
-.deck-card {
-  position: relative;
-  background: #0d1522;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 2rem 1.75rem;
-  cursor: pointer;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+.role-selector {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 220px;
+  gap: 12px;
 }
 
-.deck-card:hover {
-  border-color: rgba(52, 211, 153, 0.4);
-  transform: translateY(-4px);
+.role-tab {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.1rem 1.25rem;
+  background: rgba(13, 21, 34, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  transition:
+    border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.deck-card.is-selected {
-  background: linear-gradient(135deg, #111e32 0%, #0d1726 100%);
-  border-color: #34d399;
-  box-shadow: 0 15px 35px -10px rgba(52, 211, 153, 0.25);
-  transform: translateY(-6px);
+.role-tab:hover {
+  border-color: rgba(52, 211, 153, 0.35);
+  transform: translateX(4px);
 }
 
-.deck-card.is-dimmed {
-  opacity: 0.65;
+.role-tab:focus-visible {
+  outline: 2px solid rgba(52, 211, 153, 0.65);
+  outline-offset: 3px;
 }
 
-.card-top-type {
-  font-family: monospace;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  color: #64748b;
-  margin-bottom: 1rem;
+.role-tab[aria-selected='true'] {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.14) 0%, rgba(11, 18, 30, 0.95) 60%);
+  border-color: rgba(52, 211, 153, 0.55);
+  box-shadow: 0 12px 28px -12px rgba(52, 211, 153, 0.25);
 }
 
-.deck-card.is-selected .card-top-type {
-  color: #34d399;
-}
-
-.card-body-content {
-  margin-bottom: 1.5rem;
-}
-
-.card-avatar-icon {
-  width: 44px;
-  height: 44px;
+.role-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -316,55 +466,382 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   color: #94a3b8;
-  margin-bottom: 1rem;
   transition: all 0.3s ease;
 }
 
-.deck-card.is-selected .card-avatar-icon {
+.role-tab[aria-selected='true'] .role-icon {
   background: rgba(52, 211, 153, 0.15);
   border-color: rgba(52, 211, 153, 0.3);
   color: #34d399;
 }
 
-.card-role-title {
-  font-size: 1.15rem;
+.role-tab-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.role-tab-title {
+  font-size: 1rem;
   font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.25rem;
+  color: #f8fafc;
   letter-spacing: -0.01em;
 }
 
-.card-role-sub {
-  font-size: 0.85rem;
+.role-tab-sub {
+  font-size: 0.8rem;
   color: #94a3b8;
 }
 
-.card-footer-indicator {
+.role-tab-flag {
+  margin-left: auto;
   font-family: monospace;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #64748b;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  padding-top: 1rem;
+  letter-spacing: 0.1em;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
 }
 
-.deck-card.is-selected .card-footer-indicator {
+/* --- Viewport do produto --- */
+.viewport-frame {
+  background: rgba(11, 18, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.viewport-chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chrome-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.dot.red {
+  background: #ef4444;
+}
+.dot.yellow {
+  background: #f59e0b;
+}
+.dot.green {
+  background: #10b981;
+}
+
+.chrome-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: #34d399;
 }
 
-.projection-panel {
-  background: #0b121e;
-  border: 1px solid rgba(52, 211, 153, 0.2);
-  border-radius: 24px;
-  padding: 2.5rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+.viewport-stage {
   position: relative;
+  height: 300px;
+  overflow: hidden;
+  padding: 1.35rem;
+}
+
+.viewport-content {
+  display: block;
+}
+
+/* Transição de estado entre perspectivas */
+.viewport-enter-active {
+  transition:
+    opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.viewport-leave-active {
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.viewport-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.viewport-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.vp {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.vp-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vp-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.vp-meta {
+  font-family: monospace;
+  font-size: 0.68rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #4fd1c5;
+  background: rgba(79, 209, 197, 0.1);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4fd1c5;
+}
+
+/* Cascata de entrada dos elementos do preview ativo */
+.step {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: stepIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+@keyframes stepIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Empreendedor */
+.vp-chart {
+  height: 130px;
+}
+
+.exec-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.vp-chips {
+  display: flex;
+  gap: 10px;
+}
+
+.vp-chip {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #a5b4fc;
+  background: rgba(79, 209, 197, 0.08);
+  border: 1px solid rgba(79, 209, 197, 0.25);
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+}
+
+/* Equipe */
+.lanes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lane {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.lane-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.lane-track {
+  position: relative;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.blk {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 0.64rem;
+  font-weight: 600;
+  white-space: nowrap;
   overflow: hidden;
 }
 
+.blk.em {
+  background: rgba(52, 211, 153, 0.22);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  color: #d1fae5;
+}
+
+.blk.teal {
+  background: rgba(79, 209, 197, 0.16);
+  border: 1px solid rgba(79, 209, 197, 0.4);
+  color: #ccfbf1;
+}
+
+.blk.mute {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: #64748b;
+}
+
+.lane-times {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 68px;
+  font-family: monospace;
+  font-size: 0.64rem;
+  color: #475569;
+}
+
+/* Cliente */
+.vp-customer {
+  align-items: center;
+}
+
+.phone {
+  width: min(260px, 100%);
+  background: #0d1522;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 26px;
+  padding: 0.75rem;
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.8);
+}
+
+.phone-notch {
+  width: 72px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0.15rem auto 0.75rem;
+}
+
+.phone-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.phone-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 0.2rem;
+}
+
+.phone-step {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: stepIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+.step-num {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(52, 211, 153, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #6ee7b7;
+  font-size: 0.62rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+
+.step-value {
+  margin-left: auto;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.phone-cta {
+  margin-top: 0.25rem;
+  text-align: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #052e24;
+  background: #34d399;
+  border-radius: 10px;
+  padding: 0.6rem;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: stepIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+/* --- Painel de projeção (conteúdo real) --- */
+.projection-panel {
+  background: rgba(11, 18, 30, 0.9);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 22px;
+  padding: 2rem;
+}
+
 .projection-top {
-  margin-bottom: 2rem;
+  margin-bottom: 1.75rem;
 }
 
 .projection-badge {
@@ -381,7 +858,7 @@ onUnmounted(() => {
 }
 
 .projection-headline {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.02em;
@@ -425,10 +902,11 @@ onUnmounted(() => {
 }
 
 .metric-val {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
 }
 
 .metric-badge {
@@ -438,12 +916,16 @@ onUnmounted(() => {
   border-radius: 6px;
   background: rgba(52, 211, 153, 0.1);
   color: #34d399;
+  white-space: nowrap;
 }
 
+/* --- Entrada da seção --- */
 .animate-item {
   opacity: 0;
   transform: translateY(25px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .deck-section.is-visible .animate-item {
@@ -455,23 +937,32 @@ onUnmounted(() => {
   transition-delay: 0.2s;
 }
 
-.animate-fade {
-  animation: fadeInPanel 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes fadeInPanel {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @media (max-width: 900px) {
-  .cards-deck-container,
+  .deck-section {
+    padding: 5rem 1.25rem;
+  }
+
+  .simulator {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .role-selector {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    gap: 10px;
+  }
+
+  .role-tab {
+    flex: 0 0 auto;
+    min-width: 220px;
+  }
+
+  .role-tab:hover {
+    transform: none;
+  }
+
   .projection-metrics-grid {
     grid-template-columns: 1fr;
   }

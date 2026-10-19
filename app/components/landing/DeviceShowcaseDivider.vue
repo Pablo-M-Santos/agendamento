@@ -1,6 +1,21 @@
 <template>
   <section ref="sectionRef" class="relative scroll-section">
     <div class="sticky top-0 flex h-screen flex-col overflow-hidden pt-20 lg:pt-24 text-white">
+      <div class="wave-top" aria-hidden="true">
+        <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            class="wave-path wave-back"
+            d="M0,50 C180,90 360,10 540,50 C720,90 900,10 1080,50 C1260,90 1380,70 1440,55 L1440,0 L0,0 Z"
+            fill="#10B981"
+            opacity="1"
+          />
+          <path
+            class="wave-path wave-front"
+            d="M0,62 C200,100 400,22 600,62 C800,100 1000,18 1200,62 C1320,82 1400,58 1440,66 L1440,0 L0,0 Z"
+            fill="#f8fafc"
+          />
+        </svg>
+      </div>
       <div class="absolute inset-0 bg-transition-layer" />
 
       <div class="relative z-10 flex flex-1 flex-col pb-12">
@@ -229,22 +244,9 @@ onUnmounted(() => {
 .bg-transition-layer {
   position: absolute;
   inset: 0;
-  background-color: #080D14; /* section toda sólida */
+  background-color: #080d14;
 }
 
-.bg-transition-layer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 160px;           /* curto — só costura o topo */
-  background: linear-gradient(
-    180deg,
-    #C8DBE6 0%,            /* ← mesmo valor exato */
-    #080D14 100%
-  );
-}
 .showcase-container {
   position: relative;
   margin: 0 auto;
@@ -383,5 +385,68 @@ onUnmounted(() => {
 .step-delay-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+.wave-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+  height: 100px;
+}
+
+.wave-top svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #080d14;
+}
+
+@keyframes waveBack {
+  0% {
+    d: path(
+      'M0,50 C180,90 360,10 540,50 C720,90 900,10 1080,50 C1260,90 1380,70 1440,55 L1440,0 L0,0 Z'
+    );
+  }
+  50% {
+    d: path(
+      'M0,40 C180,10 360,88 540,42 C720,0 900,88 1080,42 C1260,0 1380,30 1440,45 L1440,0 L0,0 Z'
+    );
+  }
+  100% {
+    d: path(
+      'M0,50 C180,90 360,10 540,50 C720,90 900,10 1080,50 C1260,90 1380,70 1440,55 L1440,0 L0,0 Z'
+    );
+  }
+}
+
+@keyframes waveFront {
+  0% {
+    d: path(
+      'M0,62 C200,100 400,22 600,62 C800,100 1000,18 1200,62 C1320,82 1400,58 1440,66 L1440,0 L0,0 Z'
+    );
+  }
+  50% {
+    d: path(
+      'M0,52 C200,20 400,98 600,50 C800,20 1000,96 1200,50 C1320,30 1400,74 1440,56 L1440,0 L0,0 Z'
+    );
+  }
+  100% {
+    d: path(
+      'M0,62 C200,100 400,22 600,62 C800,100 1000,18 1200,62 C1320,82 1400,58 1440,66 L1440,0 L0,0 Z'
+    );
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wave-back {
+    animation: waveBack 7s ease-in-out infinite;
+  }
+  .wave-front {
+    animation: waveFront 5s ease-in-out infinite;
+  }
 }
 </style>

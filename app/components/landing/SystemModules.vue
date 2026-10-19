@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, type ComponentPublicInstance } from 'vue'
 
 const sectionRef = ref<HTMLElement | null>(null)
-const isVisible = ref(false)
+const { isVisible } = useSectionReveal(sectionRef)
 const activeTab = ref(0)
+const chapterRefs = ref<HTMLElement[]>([])
 
 const modules = [
   {
     id: 0,
     title: 'Gestão Unificada',
+    headline: 'Agenda, equipe e serviços em uma só tela.',
     subtitle:
       'Controle centralizado de horários, profissionais e serviços em uma única interface fluida.',
     metrics: ['26.000+ Agendamentos', '99.9% Uptime', 'Zero Faltas']
@@ -16,54 +18,78 @@ const modules = [
   {
     id: 1,
     title: 'Dashboard Analítico',
+    headline: 'O faturamento do dia, ao vivo.',
     subtitle: 'Métricas de faturamento e fluxo de caixa processadas e exibidas em tempo real.',
     metrics: ['R$ 148k+ Movimentados', '+24% Produtividade', 'Relatórios Automáticos']
   },
   {
     id: 2,
     title: 'Módulo de Clientes',
+    headline: 'Cada cliente com nome, histórico e preferência.',
     subtitle:
       'Histórico de atendimento, preferências e CRM integrado para fidelizar seus pacientes ou clientes.',
     metrics: ['4.8/5 Satisfação Média', 'Retenção Elevada', 'Lembretes via WhatsApp']
   }
 ]
 
-let observer: IntersectionObserver | null = null
+const agendaSlots = [
+  { time: '09:00', label: 'Corte • Camila R.', kind: 'filled' },
+  { time: '10:00', label: 'Horário livre', kind: 'free' },
+  { time: '11:00', label: 'Avaliação • João M.', kind: 'outline' },
+  { time: '14:00', label: 'Manicure • Ana P.', kind: 'filled' },
+  { time: '15:00', label: 'Horário livre', kind: 'free' }
+]
+
+const crmRows = [
+  { initials: 'CR', name: 'Camila Rocha', chip: 'Recorrente' },
+  { initials: 'JM', name: 'João Martins', chip: 'WhatsApp • lembrete enviado' },
+  { initials: 'AP', name: 'Ana Paula', chip: 'Primeiro agendamento' },
+  { initials: 'RS', name: 'Ricardo Souza', chip: 'Fidelidade' }
+]
+
+const chartBars = [46, 62, 38, 78, 55, 88, 66]
+
+let chapterObserver: IntersectionObserver | null = null
+
+const setChapterRef = (el: Element | ComponentPublicInstance | null, index: number) => {
+  if (el instanceof HTMLElement) chapterRefs.value[index] = el
+}
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+const goToChapter = (index: number) => {
+  activeTab.value = index
+  const el = chapterRefs.value[index]
+  if (!el) return
+  el.scrollIntoView({
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    block: 'center'
+  })
+}
 
 onMounted(() => {
-  observer = new IntersectionObserver(
+  if (typeof IntersectionObserver === 'undefined') return
+
+  chapterObserver = new IntersectionObserver(
     (entries) => {
-      const entry = entries[0]
-      if (entry && entry.isIntersecting) {
-        isVisible.value = true
-        if (observer && sectionRef.value) {
-          observer.unobserve(sectionRef.value)
-        }
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        const index = Number((entry.target as HTMLElement).dataset.index)
+        if (!Number.isNaN(index)) activeTab.value = index
       }
     },
-    { threshold: 0.15 }
+    { rootMargin: '-40% 0px -40% 0px', threshold: 0 }
   )
 
-  if (sectionRef.value) {
-    observer.observe(sectionRef.value)
-  }
+  chapterRefs.value.forEach((el) => el && chapterObserver?.observe(el))
 })
 
 onUnmounted(() => {
-  if (observer) observer.disconnect()
+  if (chapterObserver) chapterObserver.disconnect()
 })
-
-const handleMouseMove = (e: MouseEvent) => {
-  const card = e.currentTarget as HTMLElement
-  if (!card) return
-
-  const rect = card.getBoundingClientRect()
-  const x = e.clientX - rect.left
-  const y = e.clientY - rect.top
-
-  card.style.setProperty('--mouse-x', `${x}px`)
-  card.style.setProperty('--mouse-y', `${y}px`)
-}
 </script>
 
 <template>
@@ -73,18 +99,6 @@ const handleMouseMove = (e: MouseEvent) => {
     class="modules-section"
     :class="{ 'is-visible': isVisible }"
   >
-    <!-- Luz ambiente de fundo -->
-    <div class="gradient-ambient-glow" aria-hidden="true" />
-
-    <!-- Camada de Estrelas e Espaço Sutil -->
-    <div class="stars-container" aria-hidden="true">
-      <div class="stars-layer stars-small" />
-      <div class="stars-layer stars-medium" />
-
-      <!-- Cometa Suave / Estrela Cadente Branca (Disparo Imediato) -->
-      <div class="subtle-comet" />
-    </div>
-
     <div class="modules-inner">
       <header class="modules-header animate-item">
         <h2 class="modules-title">Arquitetura pensada para<br />a sua autonomia.</h2>
@@ -94,55 +108,158 @@ const handleMouseMove = (e: MouseEvent) => {
         </p>
       </header>
 
-      <!-- Layout em Grid: Abas à esquerda e Preview interativo à direita -->
-      <div class="modules-container animate-item delay-1">
-        <!-- Navegação / Abas -->
-        <div class="modules-tabs">
+      <div class="journey animate-item delay-1">
+        <!-- Coluna esquerda: espinha de capítulos (scroll narrative) -->
+        <div class="journey-chapters">
+          <div class="spine" aria-hidden="true">
+            <span
+              class="spine-fill"
+              :style="{ height: ((activeTab + 1) / modules.length) * 100 + '%' }"
+            />
+          </div>
+
           <button
             v-for="(mod, index) in modules"
             :key="mod.id"
-            class="tab-button"
+            :ref="(el) => setChapterRef(el, index)"
+            :data-index="index"
+            class="chapter"
             :class="{ active: activeTab === index }"
-            @click="activeTab = index"
+            :aria-current="activeTab === index ? 'step' : undefined"
+            aria-controls="module-stage-viewport"
+            type="button"
+            @click="goToChapter(index)"
           >
-            <span class="tab-number">0{{ index + 1 }}</span>
-            <div class="tab-info">
-              <h3>{{ mod.title }}</h3>
-              <p>{{ mod.subtitle }}</p>
+            <span class="chapter-number">0{{ index + 1 }}</span>
+            <div class="chapter-info">
+              <h3 class="chapter-title">{{ mod.title }}</h3>
+              <p class="chapter-headline">{{ mod.headline }}</p>
+              <p class="chapter-subtitle">{{ mod.subtitle }}</p>
             </div>
           </button>
         </div>
 
-        <!-- Vitrine / Preview Interativo -->
-        <div class="modules-preview spotlight-card" @mousemove="handleMouseMove">
-          <div class="card-glow" />
-
-          <div class="preview-header">
-            <div class="preview-dots">
-              <span class="dot red" />
-              <span class="dot yellow" />
-              <span class="dot green" />
-            </div>
-            <span class="preview-tag">{{ modules[activeTab]?.title }}</span>
-          </div>
-
-          <div class="preview-body">
-            <div class="preview-main-content animate-fade">
-              <h4>{{ modules[activeTab]?.title }} em Ação</h4>
-              <p>{{ modules[activeTab]?.subtitle }}</p>
+        <!-- Coluna direita: palco sticky com previews reais do produto -->
+        <div class="journey-stage">
+          <div id="module-stage-viewport" class="stage-frame">
+            <div class="stage-chrome" aria-hidden="true">
+              <div class="preview-dots">
+                <span class="dot red" />
+                <span class="dot yellow" />
+                <span class="dot green" />
+              </div>
+              <span class="preview-tag">{{ modules[activeTab]?.title }}</span>
             </div>
 
-            <div class="preview-metrics">
+            <div class="stage-viewport" aria-hidden="true">
+              <!-- Preview 1: Agenda de agendamentos -->
+              <div class="preview preview-agenda" :class="{ 'is-active': activeTab === 0 }">
+                <div class="mock-toolbar layer" style="--i: 0">
+                  <span class="mock-toolbar-title">Esta semana</span>
+                  <span class="mock-toolbar-meta">Outubro</span>
+                </div>
+                <div class="agenda-days layer" style="--i: 1">
+                  <span
+                    v-for="(day, d) in ['Seg', 'Ter', 'Qua', 'Qui', 'Sex']"
+                    :key="day"
+                    class="agenda-day"
+                    :class="{ active: d === 2 }"
+                  >
+                    {{ day }}
+                  </span>
+                </div>
+                <div class="agenda-slots">
+                  <div
+                    v-for="(slot, sIndex) in agendaSlots"
+                    :key="slot.time"
+                    class="agenda-slot layer"
+                    :style="{ '--i': 2 + sIndex }"
+                  >
+                    <span class="slot-time">{{ slot.time }}</span>
+                    <span class="slot-block" :class="slot.kind">{{ slot.label }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Preview 2: Dashboard analítico -->
+              <div class="preview preview-analytics" :class="{ 'is-active': activeTab === 1 }">
+                <div class="mock-toolbar layer" style="--i: 0">
+                  <span class="mock-toolbar-title">Fluxo de caixa</span>
+                  <span class="live-pill"><span class="live-dot" /> Tempo real</span>
+                </div>
+                <div class="chart-area layer" style="--i: 1">
+                  <svg
+                    class="chart-svg"
+                    viewBox="0 0 400 140"
+                    preserveAspectRatio="none"
+                    role="presentation"
+                  >
+                    <defs>
+                      <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#34d399" stop-opacity="0.28" />
+                        <stop offset="100%" stop-color="#34d399" stop-opacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      class="chart-area-fill"
+                      d="M0 112 C 36 104, 60 88, 92 92 S 150 58, 188 66 S 252 84, 288 58 S 352 34, 400 42 L400 140 L0 140 Z"
+                      fill="url(#chartFill)"
+                    />
+                    <path
+                      class="chart-line"
+                      pathLength="1"
+                      d="M0 112 C 36 104, 60 88, 92 92 S 150 58, 188 66 S 252 84, 288 58 S 352 34, 400 42"
+                      fill="none"
+                      stroke="#34d399"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
+                <div class="chart-bars layer" style="--i: 2">
+                  <span
+                    v-for="(height, bIndex) in chartBars"
+                    :key="bIndex"
+                    class="chart-bar"
+                    :style="{ height: height + '%', '--i': bIndex }"
+                  />
+                </div>
+                <p class="chart-caption layer" style="--i: 3">Últimos 7 dias</p>
+              </div>
+
+              <!-- Preview 3: CRM de clientes -->
+              <div class="preview preview-crm" :class="{ 'is-active': activeTab === 2 }">
+                <div class="mock-toolbar layer" style="--i: 0">
+                  <span class="mock-toolbar-title">Base de clientes</span>
+                  <span class="mock-search">Buscar cliente…</span>
+                </div>
+                <div class="crm-list">
+                  <div
+                    v-for="(row, rIndex) in crmRows"
+                    :key="row.name"
+                    class="crm-row layer"
+                    :style="{ '--i': 1 + rIndex }"
+                  >
+                    <span class="crm-avatar">{{ row.initials }}</span>
+                    <span class="crm-name">{{ row.name }}</span>
+                    <span class="crm-chip">{{ row.chip }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="stage-metrics">
               <div
                 v-for="(metric, mIndex) in modules[activeTab]?.metrics"
                 :key="mIndex"
                 class="metric-pill"
               >
                 <svg
-                  class="w-4 h-4 text-emerald-400"
+                  class="metric-check"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
+                  aria-hidden="true"
                 >
                   <path
                     stroke-linecap="round"
@@ -170,112 +287,9 @@ const handleMouseMove = (e: MouseEvent) => {
 
   z-index: 30;
   padding: 8rem 1.5rem;
-  overflow: hidden;
+  overflow: clip;
 }
 
-.gradient-ambient-glow {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70vw;
-  height: 400px;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(52, 211, 153, 0.05) 0%,
-    rgba(15, 23, 42, 0) 70%
-  );
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* --- CAMADA DE ESTRELAS --- */
-.stars-container {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.stars-layer {
-  position: absolute;
-  inset: 0;
-  background-repeat: repeat;
-}
-
-.stars-small {
-  background-image:
-    radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.75), rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 150px 80px, rgba(52, 211, 153, 0.6), rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 280px 120px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
-    radial-gradient(1.5px 1.5px at 420px 200px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 600px 60px, rgba(52, 211, 153, 0.5), rgba(0, 0, 0, 0)),
-    radial-gradient(1px 1px at 730px 180px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0));
-  background-size: 950px 350px;
-  opacity: 0.55;
-  animation: starsTwinkle 8s ease-in-out infinite alternate;
-}
-
-.stars-medium {
-  background-image:
-    radial-gradient(2px 2px at 90px 140px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 340px 260px, rgba(52, 211, 153, 0.7), rgba(0, 0, 0, 0)),
-    radial-gradient(2px 2px at 680px 40px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0));
-  background-size: 1000px 400px;
-  opacity: 0.4;
-  animation: starsTwinkle 11s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes starsTwinkle {
-  0% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.65;
-  }
-  100% {
-    opacity: 0.35;
-  }
-}
-
-/* --- COMETA ÚNICO BRANCO DISPARANDO IMEDIATAMENTE NO MOUNT --- */
-.subtle-comet {
-  position: absolute;
-  top: -5%;
-  right: -5%;
-  width: 160px;
-  height: 1.5px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.3) 45%,
-    transparent 100%
-  );
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.85));
-  border-radius: 999px;
-  opacity: 0;
-  transform: rotate(-32deg);
-  pointer-events: none;
-  animation: subtleCometPass 12s cubic-bezier(0.25, 1, 0.35, 1) infinite;
-}
-
-@keyframes subtleCometPass {
-  0% {
-    transform: translateX(0) translateY(0) rotate(-32deg);
-    opacity: 0.95;
-  }
-  15% {
-    transform: translateX(-125vw) translateY(100vh) rotate(-32deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateX(-125vw) translateY(100vh) rotate(-32deg);
-    opacity: 0;
-  }
-}
-
-/* --- ESTILOS DO CONTEÚDO --- */
 .modules-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -303,115 +317,134 @@ const handleMouseMove = (e: MouseEvent) => {
   line-height: 1.7;
 }
 
-.modules-container {
+/* --- JORNADA: capítulos à esquerda + palco sticky à direita --- */
+.journey {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 3rem;
-  align-items: center;
+  grid-template-columns: minmax(320px, 1fr) minmax(0, 1.15fr);
+  gap: 4rem;
+  align-items: start;
 }
 
-.modules-tabs {
+.journey-chapters {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
 }
 
-.tab-button {
+/* Espinha luminosa que acompanha o capítulo ativo */
+.spine {
+  position: absolute;
+  left: 0;
+  top: 8vh;
+  bottom: 8vh;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.spine-fill {
+  display: block;
+  width: 100%;
+  background: linear-gradient(180deg, #34d399, #10b981);
+  border-radius: 999px;
+  transition: height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.chapter {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 1.25rem;
-  padding: 1.5rem;
-  background: rgba(12, 20, 34, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
+  min-height: 72vh;
+  padding: 2rem 0 2rem 2.5rem;
+  background: none;
+  border: none;
   text-align: left;
   cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  color: inherit;
+  opacity: 0.45;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.tab-button:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(52, 211, 153, 0.12) 0%,
-    rgba(13, 23, 38, 0.85) 50%,
-    rgba(8, 13, 20, 0.95) 100%
-  );
-  border-color: rgba(52, 211, 153, 0.35);
-  transform: translateX(6px);
-  box-shadow:
-    0 10px 25px -8px rgba(0, 0, 0, 0.5),
-    0 0 15px rgba(52, 211, 153, 0.08);
+.chapter:hover,
+.chapter:focus-visible {
+  opacity: 0.85;
 }
 
-.tab-button.active {
-  background: linear-gradient(
-    135deg,
-    rgba(52, 211, 153, 0.18) 0%,
-    rgba(11, 18, 30, 0.95) 60%,
-    rgba(8, 13, 20, 0.98) 100%
-  );
-  border-color: rgba(52, 211, 153, 0.5);
-  box-shadow: 0 12px 30px -10px rgba(52, 211, 153, 0.15);
+.chapter.active {
+  opacity: 1;
 }
 
-.tab-number {
+.chapter:focus-visible {
+  outline: 2px solid rgba(52, 211, 153, 0.6);
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
+.chapter-number {
+  flex-shrink: 0;
+  font-family: monospace;
   font-size: 0.85rem;
   font-weight: 700;
   color: #34d399;
   background: rgba(16, 185, 129, 0.1);
   padding: 0.25rem 0.6rem;
   border-radius: 8px;
+  transition:
+    background 0.35s ease,
+    color 0.35s ease;
 }
 
-.tab-info h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
+.chapter.active .chapter-number {
+  background: rgba(52, 211, 153, 0.18);
+  color: #6ee7b7;
+}
+
+.chapter-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: #f8fafc;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
-.tab-info p {
-  font-size: 0.875rem;
+.chapter-headline {
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #34d399;
+  margin-bottom: 0.75rem;
+}
+
+.chapter-subtitle {
+  font-size: 0.925rem;
   color: #94a3b8;
-  line-height: 1.5;
+  line-height: 1.6;
+  max-width: 420px;
 }
 
-.modules-preview {
-  position: relative;
-  background: rgba(12, 20, 34, 0.8);
+/* --- PALCO STICKY --- */
+.journey-stage {
+  position: sticky;
+  top: 110px;
+  align-self: start;
+}
+
+.stage-frame {
+  background: rgba(12, 20, 34, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
   border-radius: 24px;
-  padding: 2.5rem;
-  min-height: 380px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
   overflow: hidden;
-  transition: all 0.4s ease;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.7);
 }
 
-.modules-preview:hover {
-  background: linear-gradient(
-    145deg,
-    rgba(52, 211, 153, 0.1) 0%,
-    rgba(11, 18, 30, 0.9) 50%,
-    rgba(8, 13, 20, 0.95) 100%
-  );
-  border-color: rgba(52, 211, 153, 0.35);
-  box-shadow:
-    0 20px 40px -15px rgba(0, 0, 0, 0.6),
-    0 0 25px rgba(52, 211, 153, 0.08);
-}
-
-.preview-header {
+.stage-chrome {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 2rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 1rem;
 }
 
 .preview-dots {
@@ -444,26 +477,291 @@ const handleMouseMove = (e: MouseEvent) => {
   background: rgba(52, 211, 153, 0.1);
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
+  transition: color 0.35s ease;
 }
 
-.preview-main-content h4 {
-  font-size: 1.5rem;
+.stage-viewport {
+  position: relative;
+  height: clamp(320px, 44vh, 420px);
+  overflow: hidden;
+}
+
+.preview {
+  position: absolute;
+  inset: 0;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+  transition:
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.preview.is-active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Revelação em cascata dos elementos dentro do preview ativo */
+.layer {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+.preview.is-active .layer {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mock-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mock-toolbar-title {
+  font-size: 0.85rem;
   font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 0.75rem;
+  color: #e2e8f0;
+  letter-spacing: -0.01em;
 }
 
-.preview-main-content p {
-  font-size: 1rem;
+.mock-toolbar-meta {
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Preview 1: agenda */
+.agenda-days {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.agenda-day {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: #94a3b8;
-  line-height: 1.6;
+  padding: 0.4rem 0;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.preview-metrics {
+.agenda-day.active {
+  color: #052e24;
+  background: #34d399;
+  border-color: #34d399;
+}
+
+.agenda-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.agenda-slot {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  align-items: center;
+  gap: 12px;
+}
+
+.slot-time {
+  font-family: monospace;
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+.slot-block {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.55rem 0.85rem;
+  border-radius: 10px;
+}
+
+.slot-block.filled {
+  color: #ecfdf5;
+  background: rgba(52, 211, 153, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.slot-block.outline {
+  color: #a5f3fc;
+  background: rgba(79, 209, 197, 0.08);
+  border: 1px solid rgba(79, 209, 197, 0.3);
+}
+
+.slot-block.free {
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  font-weight: 500;
+}
+
+/* Preview 2: analytics */
+.live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.chart-area {
+  flex: 1;
+  min-height: 0;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.chart-area-fill {
+  opacity: 0;
+  transition: opacity 0.6s ease 0.35s;
+}
+
+.preview-analytics.is-active .chart-area-fill {
+  opacity: 1;
+}
+
+.chart-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.preview-analytics.is-active .chart-line {
+  animation: drawChartLine 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+
+@keyframes drawChartLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 56px;
+}
+
+.chart-bar {
+  flex: 1;
+  border-radius: 4px 4px 2px 2px;
+  background: linear-gradient(180deg, rgba(52, 211, 153, 0.85), rgba(16, 185, 129, 0.35));
+  transform: scaleY(0.04);
+  transform-origin: bottom;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(0.25s + var(--i, 0) * 60ms);
+}
+
+.preview-analytics.is-active .chart-bar {
+  transform: scaleY(1);
+}
+
+.chart-caption {
+  font-family: monospace;
+  font-size: 0.68rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Preview 3: CRM */
+.mock-search {
+  font-size: 0.72rem;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+}
+
+.crm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.crm-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.7rem 0.85rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.crm-avatar {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #6ee7b7;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.crm-name {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.crm-chip {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.22rem 0.6rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+/* Métricas reais do módulo ativo */
+.stage-metrics {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 2rem;
+  gap: 10px;
+  padding: 1.25rem 1.5rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .metric-pill {
@@ -474,28 +772,19 @@ const handleMouseMove = (e: MouseEvent) => {
   border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 0.5rem 1rem;
   border-radius: 12px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 500;
   color: #e2e8f0;
 }
 
-.card-glow {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    400px circle at var(--mouse-x) var(--mouse-y),
-    rgba(52, 211, 153, 0.08),
-    transparent 80%
-  );
-  opacity: 0;
-  transition: opacity 0.3s;
+.metric-check {
+  width: 16px;
+  height: 16px;
+  color: #34d399;
+  flex-shrink: 0;
 }
 
-.modules-preview:hover .card-glow {
-  opacity: 1;
-}
-
+/* --- Entrada da seção --- */
 .animate-item {
   opacity: 0;
   transform: translateY(25px);
@@ -513,24 +802,35 @@ const handleMouseMove = (e: MouseEvent) => {
   transition-delay: 0.2s;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade {
-  animation: fadeIn 0.4s ease forwards;
-}
-
 @media (max-width: 968px) {
-  .modules-container {
+  .modules-section {
+    padding: 5rem 1.25rem;
+  }
+
+  .journey {
     grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* No mobile o palco fica sticky no topo e os capítulos rolam sob ele */
+  .journey-stage {
+    order: -1;
+    top: 88px;
+    z-index: 3;
+  }
+
+  .stage-viewport {
+    height: clamp(300px, 42vh, 380px);
+  }
+
+  .chapter {
+    min-height: 55vh;
+    padding-left: 2rem;
+  }
+
+  .spine {
+    top: 4vh;
+    bottom: 4vh;
   }
 }
 </style>
