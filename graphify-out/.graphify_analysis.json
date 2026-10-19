@@ -1,0 +1,863 @@
+{
+  "communities": {
+    "0": [
+      "app_components_dashboard_dashboardrecentservicessection",
+      "app_components_dashboard_dashboardrecentservicessection_datelocale",
+      "app_components_dashboard_dashboardrecentservicessection_emit",
+      "app_components_dashboard_dashboardrecentservicessection_formatardata",
+      "app_components_dashboard_dashboardrecentservicessection_formatarhora",
+      "app_components_profile_profileusercard",
+      "app_components_profile_profileusercard_avatarloaderror",
+      "app_components_profile_profileusercard_props",
+      "app_components_schedule_scheduleappointmentslist",
+      "app_components_schedule_scheduleappointmentslist_emit",
+      "app_components_schedule_scheduleappointmentslist_gethora",
+      "app_components_schedule_scheduleappointmentslist_props",
+      "app_components_schedule_scheduleappointmentslist_t",
+      "app_composables_useagendamentos",
+      "app_composables_useagendamentos_useagendamentos",
+      "app_composables_useauth",
+      "app_composables_useauth_authresult",
+      "app_composables_useauth_authsession",
+      "app_composables_useauth_loginmethod",
+      "app_composables_useauth_useauth",
+      "app_composables_usechartdata",
+      "app_composables_usechartdata_donutsegment",
+      "app_composables_usechartdata_trendpoint",
+      "app_composables_usechartdata_usechartdata",
+      "app_composables_usereportspage",
+      "app_composables_usereportspage_usereportspage",
+      "app_composables_useschedulepage",
+      "app_composables_useschedulepage_useschedulepage",
+      "app_plugins_firebase_client",
+      "app_repositories_agendamentorepository",
+      "app_repositories_agendamentorepository_agendamentoinput",
+      "app_repositories_agendamentorepository_agendamentorepository",
+      "app_repositories_agendamentorepository_agendamentorepository_constructor",
+      "app_repositories_agendamentorepository_agendamentorepository_count",
+      "app_repositories_agendamentorepository_agendamentorepository_create",
+      "app_repositories_agendamentorepository_agendamentorepository_delete",
+      "app_repositories_agendamentorepository_agendamentorepository_findall",
+      "app_repositories_agendamentorepository_agendamentorepository_findallpaginated",
+      "app_repositories_agendamentorepository_agendamentorepository_parsedate",
+      "app_repositories_agendamentorepository_agendamentorepository_update",
+      "app_repositories_agendamentorepository_agendamentorepository_updatestatus",
+      "app_repositories_agendamentorepository_agendamentoupdate",
+      "app_repositories_agendamentorepository_iagendamentorepository",
+      "app_repositories_agendamentorepository_iagendamentorepository_count",
+      "app_repositories_agendamentorepository_iagendamentorepository_create",
+      "app_repositories_agendamentorepository_iagendamentorepository_delete",
+      "app_repositories_agendamentorepository_iagendamentorepository_findall",
+      "app_repositories_agendamentorepository_iagendamentorepository_findallpaginated",
+      "app_repositories_agendamentorepository_iagendamentorepository_update",
+      "app_repositories_agendamentorepository_iagendamentorepository_updatestatus",
+      "app_repositories_agendamentorepository_limit_por_pagina",
+      "app_repositories_agendamentorepository_paginatedresult",
+      "app_types_agendamento",
+      "app_types_agendamento_agendamento",
+      "node_modules_vue_index_computed",
+      "node_modules_vue_index_nexttick",
+      "node_modules_vue_index_ref",
+      "node_modules_vue_index_watch",
+      "ref_date_fns",
+      "ref_firebase",
+      "tests_composables_composables_test"
+    ],
+    "1": [
+      "eslint_config",
+      "nuxt_eslint_config",
+      "package",
+      "package_name",
+      "package_overrides_vue",
+      "package_overrides_vue_compiler_sfc",
+      "package_overrides_vue_reactivity",
+      "package_overrides_vue_runtime_core",
+      "package_overrides_vue_runtime_dom",
+      "package_overrides_vue_server_renderer",
+      "package_overrides_vue_shared",
+      "package_packagemanager",
+      "package_pnpm",
+      "package_pnpm_overrides",
+      "package_private",
+      "package_type",
+      "playwright_config",
+      "ref_devices_css",
+      "ref_eslint",
+      "ref_eslint_config_prettier",
+      "ref_eslint_plugin_prettier",
+      "ref_firebase_admin",
+      "ref_iconify_json_lucide",
+      "ref_iconify_json_material_symbols",
+      "ref_iconify_json_simple_icons",
+      "ref_jsdom",
+      "ref_nuxt",
+      "ref_nuxt_eslint",
+      "ref_nuxt_test_utils",
+      "ref_nuxt_ui",
+      "ref_playwright",
+      "ref_playwright_test",
+      "ref_prettier",
+      "ref_tailwindcss",
+      "ref_types_nodemailer",
+      "ref_typescript",
+      "ref_unplugin_icons",
+      "ref_vitest_coverage_v8",
+      "ref_vue_tsc",
+      "server_utils_firebase_admin",
+      "server_utils_firebase_admin_checkifuserexists",
+      "server_utils_firebase_admin_createfirebaseuser",
+      "server_utils_firebase_admin_generateemailverificationlink",
+      "server_utils_firebase_admin_getfirebaseadminapp",
+      "server_utils_firebase_admin_getfirebaseauth",
+      "tests_e2e_login_spec"
+    ],
+    "2": [
+      "app_components_modalagendamento",
+      "app_components_modalagendamento_cliente",
+      "app_components_modalagendamento_dataheaderformat",
+      "app_components_modalagendamento_datelocale",
+      "app_components_modalagendamento_emit",
+      "app_components_modalagendamento_endereco",
+      "app_components_modalagendamento_erros",
+      "app_components_modalagendamento_fechar",
+      "app_components_modalagendamento_handlesalvar",
+      "app_components_modalagendamento_horarios",
+      "app_components_modalagendamento_horaselecionada",
+      "app_components_modalagendamento_materialpronto",
+      "app_components_modalagendamento_numerocasa",
+      "app_components_modalagendamento_observacoes",
+      "app_components_modalagendamento_onclienteinput",
+      "app_components_modalagendamento_onenderecoinput",
+      "app_components_modalagendamento_onnumerocasainput",
+      "app_components_modalagendamento_onobservacoesinput",
+      "app_components_modalagendamento_onvalorblur",
+      "app_components_modalagendamento_onvalorinput",
+      "app_components_modalagendamento_pegarhorariomaisproximo",
+      "app_components_modalagendamento_props",
+      "app_components_modalagendamento_servicoconcluido",
+      "app_components_modalagendamento_t_language",
+      "app_components_modalagendamento_validarformulario",
+      "app_components_modalagendamento_valor",
+      "app_components_schedule_scheduleservicedetailsmodal",
+      "app_components_schedule_scheduleservicedetailsmodal_bloquearscroll",
+      "app_components_schedule_scheduleservicedetailsmodal_editar",
+      "app_components_schedule_scheduleservicedetailsmodal_emit",
+      "app_components_schedule_scheduleservicedetailsmodal_fechar",
+      "app_components_schedule_scheduleservicedetailsmodal_formatardatahora",
+      "app_components_schedule_scheduleservicedetailsmodal_liberarscroll",
+      "app_components_schedule_scheduleservicedetailsmodal_props",
+      "app_components_schedule_scheduleservicedetailsmodal_t",
+      "app_components_schedule_scheduleservicedetailsmodal_togglestatus",
+      "app_types_agendamento_agendamentoform",
+      "app_utils_formatarvalor",
+      "app_utils_formatarvalor_formatarvalor",
+      "app_utils_formatarvalor_parsevalor",
+      "app_utils_formatarvalor_valorvalido"
+    ],
+    "3": [
+      "app_pages_dashboard_index",
+      "app_pages_dashboard_index_agendamentos",
+      "app_pages_dashboard_index_carregando",
+      "app_pages_dashboard_index_carregar",
+      "app_pages_dashboard_index_handletogglestatus",
+      "app_pages_dashboard_index_handleviewitem",
+      "app_pages_dashboard_index_hoje",
+      "app_pages_dashboard_index_inicialusuario",
+      "app_pages_dashboard_index_isdetailsmodalopen",
+      "app_pages_dashboard_index_isgooglelogin",
+      "app_pages_dashboard_index_issidebaropen",
+      "app_pages_dashboard_index_labelsrecentes",
+      "app_pages_dashboard_index_listaragendamentoscompleto_atualizarstatus",
+      "app_pages_dashboard_index_primeironomegoogle",
+      "app_pages_dashboard_index_saudacaodashboard",
+      "app_pages_dashboard_index_selectedagendamento",
+      "app_pages_dashboard_index_statscompleted",
+      "app_pages_dashboard_index_statslate",
+      "app_pages_dashboard_index_statsopen",
+      "app_pages_dashboard_index_statstotal",
+      "app_pages_dashboard_index_t",
+      "app_pages_dashboard_index_toggleservicoconcluido",
+      "app_pages_dashboard_index_ultimosservicos",
+      "app_pages_dashboard_index_user"
+    ],
+    "4": [
+      "app_components_bottomnav",
+      "app_components_bottomnav_isactive",
+      "app_components_bottomnav_route",
+      "app_components_dashboard_dashboardquicklinks",
+      "app_components_dashboard_dashboardquicklinks_t",
+      "app_components_dashboard_dashboardstatscards",
+      "app_components_dashboard_dashboardstatscards_t",
+      "app_components_dashboard_dashboardtopbar",
+      "app_components_dashboard_dashboardtopbar_avatarloaderror",
+      "app_components_dashboard_dashboardtopbar_emit",
+      "app_components_dashboard_dashboardtopbar_props",
+      "app_components_reports_reportsactionableinsights",
+      "app_components_reports_reportsexportbutton",
+      "app_components_reports_reportspageheader",
+      "app_components_reports_reportssummarycards",
+      "app_components_reports_reportssummarycards_formatcurrency",
+      "app_components_schedule_scheduleheader",
+      "app_components_schedule_scheduleheader_datelocale",
+      "app_components_schedule_scheduleheader_emit",
+      "app_components_schedule_scheduleheader_t",
+      "node_modules_vue_router_index",
+      "node_modules_vue_router_index_useroute",
+      "ref_heroicons_vue"
+    ],
+    "5": [
+      "app_components_dashboardsidebar",
+      "app_components_dashboardsidebar_avatarloaderror",
+      "app_components_dashboardsidebar_close",
+      "app_components_dashboardsidebar_displayname",
+      "app_components_dashboardsidebar_emit",
+      "app_components_dashboardsidebar_handlelogout",
+      "app_components_dashboardsidebar_initials",
+      "app_components_dashboardsidebar_isactive",
+      "app_components_dashboardsidebar_isdesktop",
+      "app_components_dashboardsidebar_links",
+      "app_components_dashboardsidebar_props",
+      "app_components_dashboardsidebar_route",
+      "app_components_dashboardsidebar_t",
+      "app_components_dashboardsidebar_toast",
+      "app_components_dashboardsidebar_updatebreakpoint",
+      "app_components_dashboardsidebar_user_logout",
+      "app_pages_schedule_index",
+      "app_pages_schedule_index_dataselecionada_ismodalopen_agendamentoparaeditar_isdetalhesopen_agendamentodetalhes_diascarrossel_agendamentosfiltrados_agendamentoalvoidnodia_quantidadepordia_abrirmodal_abrirdetalhes_abriredicaopelosdetalhes_handlesalvaragendamento_toggleservicoconcluido_mesanterior_proximomes",
+      "app_pages_schedule_index_inicialusuario",
+      "app_pages_schedule_index_issidebaropen",
+      "app_pages_schedule_index_saudacaoagenda",
+      "app_pages_schedule_index_t",
+      "app_pages_schedule_index_user"
+    ],
+    "6": [
+      "app_composables_useusersettings",
+      "app_composables_useusersettings_applanguage",
+      "app_composables_useusersettings_default_settings",
+      "app_composables_useusersettings_usersettings",
+      "app_composables_useusersettings_useusersettings",
+      "app_pages_profile_index",
+      "app_pages_profile_index_activesavingsection",
+      "app_pages_profile_index_handleselectlanguage",
+      "app_pages_profile_index_inicial",
+      "app_pages_profile_index_languagefeedback",
+      "app_pages_profile_index_languageoptions",
+      "app_pages_profile_index_languagevalue",
+      "app_pages_profile_index_onlanguageselect",
+      "app_pages_profile_index_provedorconta",
+      "app_pages_profile_index_settings_settingssaving_availablelanguages_savelanguage",
+      "app_pages_profile_index_t",
+      "app_pages_profile_index_uidcurto",
+      "app_pages_profile_index_user_logout",
+      "app_pages_profile_index_useremail",
+      "app_pages_profile_index_username",
+      "app_pages_profile_index_voltar"
+    ],
+    "7": [
+      "app_pages_reports_index",
+      "app_pages_reports_index_buildstatusdonut_buildcompletiontrend_receitatotal_ticketmedio_receitapormes_mediamensal_statuspordia_comparacaoperiodo",
+      "app_pages_reports_index_dadosreceita",
+      "app_pages_reports_index_donutsegments",
+      "app_pages_reports_index_exporting",
+      "app_pages_reports_index_gerarpdfrelatorio_compartilharoubaixarpdf",
+      "app_pages_reports_index_handleexportarpdf",
+      "app_pages_reports_index_handlestatusselect",
+      "app_pages_reports_index_inicialusuario",
+      "app_pages_reports_index_issidebaropen",
+      "app_pages_reports_index_mesesdisponiveis",
+      "app_pages_reports_index_messelecionado",
+      "app_pages_reports_index_opcoesstatus",
+      "app_pages_reports_index_periodoselecionado_filtrostatus_carregando_totalagendamentos_totalfinalizados_totalnaoconcluidos_totalmaterialpronto_taxaconclusao_materialresumo_topclientes_volumeporhorario_agendamentosfiltrados",
+      "app_pages_reports_index_saudacaorelatorios",
+      "app_pages_reports_index_t",
+      "app_pages_reports_index_toast",
+      "app_pages_reports_index_trendpontos",
+      "app_pages_reports_index_user"
+    ],
+    "8": [
+      "app_components_charts_heatmapchart",
+      "app_components_charts_heatmapchart_cell",
+      "app_components_charts_heatmapchart_getcor",
+      "app_components_charts_heatmapchart_max",
+      "app_components_charts_heatmapchart_props",
+      "app_components_charts_heatmapchart_temdados",
+      "app_components_schedule_scheduledayscarousel",
+      "app_components_schedule_scheduledayscarousel_carouselref",
+      "app_components_schedule_scheduledayscarousel_centralizardataselecionada",
+      "app_components_schedule_scheduledayscarousel_datelocale",
+      "app_components_schedule_scheduledayscarousel_ehoje",
+      "app_components_schedule_scheduledayscarousel_emit",
+      "app_components_schedule_scheduledayscarousel_getdialetra",
+      "app_components_schedule_scheduledayscarousel_getquantidadepordia",
+      "app_components_schedule_scheduledayscarousel_handleclickdia",
+      "app_components_schedule_scheduledayscarousel_props",
+      "app_components_schedule_scheduledayscarousel_reagendarcentralizacao",
+      "node_modules_vue_index_onbeforeunmount"
+    ],
+    "9": [
+      "app_composables_useloginpage",
+      "app_composables_useloginpage_useloginpage",
+      "app_composables_useregisterpage",
+      "app_composables_useregisterpage_useregisterpage",
+      "app_utils_validacao",
+      "app_utils_validacao_email_regex",
+      "app_utils_validacao_max_email_length",
+      "app_utils_validacao_max_password_length",
+      "app_utils_validacao_min_password_length",
+      "app_utils_validacao_validaremail",
+      "app_utils_validacao_validarsenha",
+      "node_modules_vue_index_reactive",
+      "ref_path",
+      "ref_vitest",
+      "tests_setup",
+      "tests_smoke_test",
+      "tests_utils_validacao_test",
+      "vitest_config"
+    ],
+    "10": [
+      "ref_nodemailer",
+      "ref_resend",
+      "server_utils_email_service",
+      "server_utils_email_service_getverificationemailhtml",
+      "server_utils_email_service_sendverificationemail",
+      "server_utils_email_service_sendverificationemailparams",
+      "server_utils_gmail",
+      "server_utils_gmail_gettransporter",
+      "server_utils_gmail_sendgmailverificationemail",
+      "server_utils_gmail_sendverificationemailparams",
+      "server_utils_mailpit",
+      "server_utils_mailpit_gettransporter",
+      "server_utils_mailpit_sendemail",
+      "server_utils_mailpit_sendemailparams",
+      "server_utils_resend",
+      "server_utils_resend_getresendinstance",
+      "server_utils_resend_sendresendverificationemail",
+      "server_utils_resend_sendverificationemailparams"
+    ],
+    "11": [
+      "package_dependencies",
+      "package_dependencies_apexcharts",
+      "package_dependencies_date_fns",
+      "package_dependencies_devices_css",
+      "package_dependencies_firebase",
+      "package_dependencies_firebase_admin",
+      "package_dependencies_heroicons_vue",
+      "package_dependencies_iconify_json_lucide",
+      "package_dependencies_iconify_json_simple_icons",
+      "package_dependencies_jspdf",
+      "package_dependencies_jspdf_autotable",
+      "package_dependencies_nodemailer",
+      "package_dependencies_nuxt",
+      "package_dependencies_nuxt_ui",
+      "package_dependencies_resend",
+      "package_dependencies_tailwindcss",
+      "package_dependencies_vue3_apexcharts"
+    ],
+    "12": [
+      "package_devdependencies",
+      "package_devdependencies_eslint",
+      "package_devdependencies_eslint_config_prettier",
+      "package_devdependencies_eslint_plugin_prettier",
+      "package_devdependencies_iconify_json_material_symbols",
+      "package_devdependencies_jsdom",
+      "package_devdependencies_nuxt_eslint",
+      "package_devdependencies_nuxt_test_utils",
+      "package_devdependencies_playwright",
+      "package_devdependencies_playwright_test",
+      "package_devdependencies_prettier",
+      "package_devdependencies_types_nodemailer",
+      "package_devdependencies_typescript",
+      "package_devdependencies_unplugin_icons",
+      "package_devdependencies_vitest",
+      "package_devdependencies_vitest_coverage_v8",
+      "package_devdependencies_vue_tsc"
+    ],
+    "13": [
+      "app_components_charts_linechart",
+      "app_components_charts_linechart_gridlines",
+      "app_components_charts_linechart_innerheight",
+      "app_components_charts_linechart_maxvalue",
+      "app_components_charts_linechart_mediapordia",
+      "app_components_charts_linechart_padding",
+      "app_components_charts_linechart_pathareatotal",
+      "app_components_charts_linechart_pathlineconcluidos",
+      "app_components_charts_linechart_pathlinetotal",
+      "app_components_charts_linechart_point",
+      "app_components_charts_linechart_pontosmapeados",
+      "app_components_charts_linechart_props",
+      "app_components_charts_linechart_totalpontos",
+      "app_components_charts_linechart_xlabels"
+    ],
+    "14": [
+      "app_composables_usereportpdf",
+      "app_composables_usereportpdf_formatardata",
+      "app_composables_usereportpdf_gerarpdfparams",
+      "app_composables_usereportpdf_materialtexto",
+      "app_composables_usereportpdf_period_label",
+      "app_composables_usereportpdf_status_label",
+      "app_composables_usereportpdf_statustexto",
+      "app_composables_usereportpdf_usereportpdf",
+      "app_composables_usereportspage_reportsperiod",
+      "app_composables_usereportspage_statusfilter",
+      "ref_jspdf",
+      "ref_jspdf_autotable"
+    ],
+    "15": [
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_scripts_lint",
+      "package_scripts_postinstall",
+      "package_scripts_preview",
+      "package_scripts_test",
+      "package_scripts_test_coverage",
+      "package_scripts_test_e2e",
+      "package_scripts_test_e2e_ui",
+      "package_scripts_test_watch",
+      "package_scripts_typecheck"
+    ],
+    "16": [
+      "app_components_auth_authpasswordinput",
+      "app_components_auth_authpasswordinput_ariadescribedby",
+      "app_components_auth_authpasswordinput_emit",
+      "app_components_auth_authpasswordinput_inputtype",
+      "app_components_auth_authpasswordinput_props",
+      "app_middleware_auth",
+      "app_pages_register_index",
+      "app_pages_register_index_email_password_loading_showpassword_errors_isformvalid_validatefield_registerwithemail_registerwithgoogle",
+      "app_pages_register_index_emailariadescribedby",
+      "node_modules_vue_index"
+    ],
+    "17": [
+      "app_composables_useappi18n",
+      "app_composables_useappi18n_dict",
+      "app_composables_useappi18n_dictionaries",
+      "app_composables_useappi18n_useappi18n",
+      "app_i18n_en_us",
+      "app_i18n_en_us_enus",
+      "app_i18n_es_es",
+      "app_i18n_es_es_eses",
+      "app_i18n_pt_br",
+      "app_i18n_pt_br_ptbr"
+    ],
+    "18": [
+      "app_components_canvas_financialbackground",
+      "app_components_canvas_financialbackground_canvasref",
+      "app_components_canvas_financialbackground_dust",
+      "app_components_landing_landingfeatures",
+      "app_components_landing_landingfeatures_handlemousemove",
+      "app_components_landing_landingfeatures_isvisible",
+      "app_components_landing_landingfeatures_sectionref",
+      "node_modules_vue_index_onmounted",
+      "node_modules_vue_index_onunmounted"
+    ],
+    "19": [
+      "app_components_landing_landinghero",
+      "app_components_landing_landinghero_activebadge",
+      "app_components_landing_landinghero_handlemousemove",
+      "app_components_landing_landinghero_handlescroll",
+      "app_components_landing_landinghero_heroref",
+      "app_components_landing_landinghero_mousex",
+      "app_components_landing_landinghero_mousey",
+      "app_components_landing_landinghero_scrollypos",
+      "app_components_landing_landinghero_startbadgeloop"
+    ],
+    "20": [
+      "app_pages_auth_action",
+      "app_pages_auth_action_auth",
+      "app_pages_auth_action_haserror",
+      "app_pages_auth_action_loading",
+      "app_pages_auth_action_message",
+      "app_pages_auth_action_mode",
+      "app_pages_auth_action_oobcode",
+      "app_pages_auth_action_route",
+      "app_pages_auth_action_verifyemailaction"
+    ],
+    "21": [
+      "app_components_landing_deviceshowcasedivider",
+      "app_components_landing_deviceshowcasedivider_activestep",
+      "app_components_landing_deviceshowcasedivider_currentstep",
+      "app_components_landing_deviceshowcasedivider_handlescroll",
+      "app_components_landing_deviceshowcasedivider_jumptostep",
+      "app_components_landing_deviceshowcasedivider_scrollprogress",
+      "app_components_landing_deviceshowcasedivider_sectionref",
+      "app_components_landing_deviceshowcasedivider_steps"
+    ],
+    "22": [
+      "app_components_charts_donutchart",
+      "app_components_charts_donutchart_arcos",
+      "app_components_charts_donutchart_circunferencia",
+      "app_components_charts_donutchart_props",
+      "app_components_charts_donutchart_raio",
+      "app_components_charts_donutchart_segment",
+      "app_components_charts_donutchart_total"
+    ],
+    "23": [
+      "ref",
+      "ref_h3",
+      "ref_server",
+      "server_api_auth_register_post",
+      "server_api_auth_register_post_checkratelimit",
+      "server_api_auth_register_post_ratelimitstore",
+      "server_api_auth_register_post_registerbody"
+    ],
+    "24": [
+      "ref_github_nuxt_renovate_config_nuxt",
+      "renovate",
+      "renovate_extends",
+      "renovate_lockfilemaintenance",
+      "renovate_lockfilemaintenance_enabled",
+      "renovate_packagerules",
+      "renovate_postupdateoptions"
+    ],
+    "25": [
+      "app_app",
+      "app_app_handleretry",
+      "app_app_initauth",
+      "app_app_inittheme",
+      "app_app_initusersettings",
+      "app_app_retry"
+    ],
+    "26": [
+      "app_components_charts_apex_apexhorizontalbarschart",
+      "app_components_charts_apex_apexhorizontalbarschart_baritem",
+      "app_components_charts_apex_apexhorizontalbarschart_chartoptions",
+      "app_components_charts_apex_apexhorizontalbarschart_props",
+      "app_components_charts_apex_apexhorizontalbarschart_series",
+      "app_components_charts_apex_apexhorizontalbarschart_total"
+    ],
+    "27": [
+      "app_components_charts_apex_apexmovementmapchart",
+      "app_components_charts_apex_apexmovementmapchart_chartoptions",
+      "app_components_charts_apex_apexmovementmapchart_houritem",
+      "app_components_charts_apex_apexmovementmapchart_props",
+      "app_components_charts_apex_apexmovementmapchart_series",
+      "ref_vue3_apexcharts"
+    ],
+    "28": [
+      "app_components_landing_socialproof",
+      "app_components_landing_socialproof_handlemousemove",
+      "app_components_landing_socialproof_isvisible",
+      "app_components_landing_socialproof_sectionref",
+      "app_components_landing_socialproof_stats",
+      "app_components_landing_socialproof_testimonials"
+    ],
+    "29": [
+      "app_components_landing_systemmodules",
+      "app_components_landing_systemmodules_activetab",
+      "app_components_landing_systemmodules_handlemousemove",
+      "app_components_landing_systemmodules_isvisible",
+      "app_components_landing_systemmodules_modules",
+      "app_components_landing_systemmodules_sectionref"
+    ],
+    "30": [
+      "app_components_charts_apex_apexdonutchart",
+      "app_components_charts_apex_apexdonutchart_chartoptions",
+      "app_components_charts_apex_apexdonutchart_props",
+      "app_components_charts_apex_apexdonutchart_segment",
+      "ref_apexcharts"
+    ],
+    "31": [
+      "app_components_charts_apex_apexhourlybarschart",
+      "app_components_charts_apex_apexhourlybarschart_chartoptions",
+      "app_components_charts_apex_apexhourlybarschart_columnitem",
+      "app_components_charts_apex_apexhourlybarschart_props",
+      "app_components_charts_apex_apexhourlybarschart_series"
+    ],
+    "32": [
+      "app_components_charts_apex_apexperiodcomparisonchart",
+      "app_components_charts_apex_apexperiodcomparisonchart_chartoptions",
+      "app_components_charts_apex_apexperiodcomparisonchart_periodpoint",
+      "app_components_charts_apex_apexperiodcomparisonchart_props",
+      "app_components_charts_apex_apexperiodcomparisonchart_series"
+    ],
+    "33": [
+      "app_components_charts_apex_apexstatusstackedchart",
+      "app_components_charts_apex_apexstatusstackedchart_chartoptions",
+      "app_components_charts_apex_apexstatusstackedchart_props",
+      "app_components_charts_apex_apexstatusstackedchart_series",
+      "app_components_charts_apex_apexstatusstackedchart_statuspoint"
+    ],
+    "34": [
+      "app_components_charts_apex_apextrendchart",
+      "app_components_charts_apex_apextrendchart_chartoptions",
+      "app_components_charts_apex_apextrendchart_point",
+      "app_components_charts_apex_apextrendchart_props",
+      "app_components_charts_apex_apextrendchart_series"
+    ],
+    "35": [
+      "app_components_landing_landingheader",
+      "app_components_landing_landingheader_ismobilemenuopen",
+      "app_components_landing_landingheader_navlinks",
+      "app_components_landing_landingheader_togglemobilemenu",
+      "app_pages_index"
+    ],
+    "36": [
+      "app_components_landing_rolesimulator",
+      "app_components_landing_rolesimulator_cards",
+      "app_components_landing_rolesimulator_isvisible",
+      "app_components_landing_rolesimulator_sectionref",
+      "app_components_landing_rolesimulator_selectedcard"
+    ],
+    "37": [
+      "app_components_schedule_scheduleconfirmdeletemodal",
+      "app_components_schedule_scheduleconfirmdeletemodal_emit",
+      "app_components_schedule_scheduleconfirmdeletemodal_t"
+    ],
+    "38": [
+      "ref_nuxt_tsconfig_server_json",
+      "server_tsconfig",
+      "server_tsconfig_extends"
+    ],
+    "39": [
+      "tsconfig",
+      "tsconfig_files",
+      "tsconfig_references"
+    ],
+    "40": [
+      "app_components_profile_profilepageheader",
+      "app_components_profile_profilepageheader_emit"
+    ],
+    "41": [
+      "app_components_profile_profilesettingscard",
+      "app_components_profile_profilesettingscard_emit"
+    ],
+    "42": [
+      "app_composables_usetheme",
+      "app_composables_usetheme_usetheme"
+    ],
+    "43": [
+      "app_utils_formatartelefone",
+      "app_utils_formatartelefone_formatartelefone"
+    ],
+    "44": [
+      "vercel",
+      "vercel_rewrites"
+    ],
+    "45": [
+      "app_app_config"
+    ],
+    "46": [
+      "app_components_auth_authpageshell"
+    ],
+    "47": [
+      "app_components_profile_profileaccountinfocard"
+    ],
+    "48": [
+      "app_layouts_app"
+    ],
+    "49": [
+      "app_middleware_legacy_routes_global"
+    ],
+    "50": [
+      "app_plugins_initauth_client"
+    ],
+    "51": [
+      "nuxt_config"
+    ],
+    "52": [
+      "tailwind_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.06557377049180328,
+    "1": 0.04734299516908213,
+    "2": 0.06707317073170732,
+    "3": 0.09057971014492754,
+    "4": 0.08695652173913043,
+    "5": 0.09486166007905138,
+    "6": 0.10476190476190476,
+    "7": 0.10526315789473684,
+    "8": 0.12418300653594772,
+    "9": 0.20915032679738563,
+    "10": 0.1830065359477124,
+    "11": 0.11764705882352941,
+    "12": 0.11764705882352941,
+    "13": 0.14285714285714285,
+    "14": 0.21212121212121213,
+    "15": 0.16666666666666666,
+    "16": 0.2,
+    "17": 0.26666666666666666,
+    "18": 0.25,
+    "19": 0.2222222222222222,
+    "20": 0.2222222222222222,
+    "21": 0.25,
+    "22": 0.2857142857142857,
+    "23": 0.2857142857142857,
+    "24": 0.2857142857142857,
+    "25": 0.3333333333333333,
+    "26": 0.3333333333333333,
+    "27": 0.3333333333333333,
+    "28": 0.3333333333333333,
+    "29": 0.3333333333333333,
+    "30": 0.4,
+    "31": 0.4,
+    "32": 0.4,
+    "33": 0.4,
+    "34": 0.4,
+    "35": 0.4,
+    "36": 0.4,
+    "37": 0.6666666666666666,
+    "38": 0.6666666666666666,
+    "39": 0.6666666666666666,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0,
+    "45": 1.0,
+    "46": 1.0,
+    "47": 1.0,
+    "48": 1.0,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0
+  },
+  "gods": [
+    {
+      "id": "app_types_agendamento_agendamento",
+      "label": "Agendamento",
+      "degree": 16
+    },
+    {
+      "id": "app_repositories_agendamentorepository_agendamentorepository",
+      "label": "AgendamentoRepository",
+      "degree": 13
+    },
+    {
+      "id": "app_composables_useagendamentos_useagendamentos",
+      "label": "useAgendamentos()",
+      "degree": 13
+    },
+    {
+      "id": "ref_date_fns",
+      "label": "date-fns",
+      "degree": 13
+    },
+    {
+      "id": "package_scripts",
+      "label": "scripts",
+      "degree": 12
+    },
+    {
+      "id": "ref_firebase",
+      "label": "firebase",
+      "degree": 11
+    },
+    {
+      "id": "ref_heroicons_vue",
+      "label": "@heroicons/vue",
+      "degree": 11
+    },
+    {
+      "id": "app_repositories_agendamentorepository_iagendamentorepository",
+      "label": "IAgendamentoRepository",
+      "degree": 10
+    },
+    {
+      "id": "ref_vue3_apexcharts",
+      "label": "vue3-apexcharts",
+      "degree": 9
+    },
+    {
+      "id": "app_composables_useauth_useauth",
+      "label": "useAuth()",
+      "degree": 8
+    }
+  ],
+  "surprises": [
+    {
+      "source": "useAgendamentos()",
+      "target": "AgendamentoRepository",
+      "source_files": [
+        "app/composables/useAgendamentos.ts",
+        "app/repositories/AgendamentoRepository.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "useAgendamentos()",
+      "target": "useAuth()",
+      "source_files": [
+        "app/composables/useAgendamentos.ts",
+        "app/composables/useAuth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "useReportsPage()",
+      "target": "useAgendamentos()",
+      "source_files": [
+        "app/composables/useReportsPage.ts",
+        "app/composables/useAgendamentos.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "useSchedulePage()",
+      "target": "useAgendamentos()",
+      "source_files": [
+        "app/composables/useSchedulePage.ts",
+        "app/composables/useAgendamentos.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    },
+    {
+      "source": "useReportsPage()",
+      "target": "useAuth()",
+      "source_files": [
+        "app/composables/useReportsPage.ts",
+        "app/composables/useAuth.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `date-fns` connect `node_modules_vue_index_ref` to `package.json`, `ModalAgendamento.vue`, `@heroicons/vue`, `profile/index.vue`, `reports/index.vue`, `ScheduleDaysCarousel.vue`, `useReportPdf.ts`?",
+      "why": "High betweenness centrality (0.157) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `devices.css`, `eslint`, `eslint-plugin-prettier` to the rest of the system?",
+      "why": "21 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `node_modules_vue_index_ref` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06557377049180328 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `firebase` connect `node_modules_vue_index_ref` to `useLoginPage.ts`, `action.vue`, `profile/index.vue`, `package.json`?",
+      "why": "High betweenness centrality (0.095) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `package.json` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.04734299516908213 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `@heroicons/vue` connect `@heroicons/vue` to `package.json`, `DashboardSidebar.vue`?",
+      "why": "High betweenness centrality (0.083) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `ModalAgendamento.vue` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.06707317073170732 - nodes in this community are weakly interconnected."
+    }
+  ]
+}
