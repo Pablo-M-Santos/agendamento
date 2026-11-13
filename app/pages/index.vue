@@ -6,6 +6,7 @@ import SystemModules from '~/components/landing/SystemModules.vue'
 import SocialProof from '~/components/landing/SocialProof.vue'
 import RoleSimulator from '~/components/landing/RoleSimulator.vue'
 import DeviceShowcaseDivider from '~/components/landing/DeviceShowcaseDivider.vue'
+import LandingFooter from '~/components/landing/LandingFooter.vue'
 </script>
 
 <template>
@@ -20,5 +21,6 @@ import DeviceShowcaseDivider from '~/components/landing/DeviceShowcaseDivider.vu
     <SystemModules />
     <SocialProof />
     <RoleSimulator />
+    <LandingFooter />
   </div>
 </template>
