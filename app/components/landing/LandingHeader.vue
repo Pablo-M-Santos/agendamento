@@ -4,6 +4,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const isMobileMenuOpen = ref(false)
 const isScrolled = ref(false)
 const activeSectionId = ref('')
+const isLightBackground = ref(false)
 const toggleRef = ref<HTMLButtonElement | null>(null)
 
 const navLinks = [
@@ -41,6 +42,8 @@ const handleScroll = () => {
 
 let spyObserver: IntersectionObserver | null = null
 const visibleIds = new Set<string>()
+let lightSectionObserver: IntersectionObserver | null = null
+const visibleLightSectionIds = new Set<string>()
 
 onMounted(() => {
   handleScroll()
@@ -68,6 +71,21 @@ onMounted(() => {
   )
 
   targets.forEach((el) => spyObserver?.observe(el))
+
+  lightSectionObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) visibleLightSectionIds.add(entry.target.id)
+        else visibleLightSectionIds.delete(entry.target.id)
+      }
+      isLightBackground.value = visibleLightSectionIds.size > 0
+    },
+    { rootMargin: '-80px 0px -60% 0px', threshold: 0 }
+  )
+  ;['home', 'funcionalidades', 'depoimentos']
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => el !== null)
+    .forEach((el) => lightSectionObserver?.observe(el))
 })
 
 onUnmounted(() => {
@@ -75,13 +93,20 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
   document.removeEventListener('keydown', handleKeydown)
   if (spyObserver) spyObserver.disconnect()
+  if (lightSectionObserver) lightSectionObserver.disconnect()
 })
 </script>
 
 <template>
   <header
     class="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-lg transition-colors duration-300"
-    :class="isScrolled ? 'bg-[#080D14]/95 border-white/10' : 'bg-[#080D14]/80 border-white/5'"
+    :class="
+      isLightBackground
+        ? 'bg-white border-slate-200/80 shadow-sm'
+        : isScrolled
+          ? 'bg-[#080D14]/95 border-white/10'
+          : 'bg-[#080D14]/80 border-white/5'
+    "
   >
     <div
       class="max-w-[1560px] mx-auto px-5 sm:px-8 lg:px-20 h-20 grid grid-cols-[auto_1fr_auto] items-center gap-4 lg:gap-6"
@@ -97,8 +122,11 @@ onUnmounted(() => {
         >
           <img src="/logo.png" alt="AgendaPro" class="w-full h-full object-contain" />
         </span>
-        <span class="text-lg font-extrabold tracking-tight text-white">
-          Agenda<span class="text-emerald-400">Pro</span>
+        <span
+          class="text-lg font-extrabold tracking-tight transition-colors duration-300"
+          :class="isLightBackground ? 'text-slate-900' : 'text-white'"
+        >
+          Agenda<span class="text-emerald-500">Pro</span>
         </span>
       </a>
 
@@ -113,7 +141,13 @@ onUnmounted(() => {
           :href="link.href"
           class="hdr-focus relative px-3.5 py-2 rounded-lg text-sm font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-emerald-400 after:transition-all after:duration-300 after:ease-out hover:after:w-full focus-visible:after:w-full motion-reduce:after:transition-none"
           :class="
-            isActive(link.href) ? 'text-white after:w-full' : 'text-slate-400 hover:text-white'
+            isActive(link.href)
+              ? isLightBackground
+                ? 'text-slate-900 after:w-full'
+                : 'text-white after:w-full'
+              : isLightBackground
+                ? 'text-slate-600 hover:text-slate-900'
+                : 'text-slate-400 hover:text-white'
           "
           :aria-current="isActive(link.href) ? 'location' : undefined"
         >
@@ -123,12 +157,21 @@ onUnmounted(() => {
 
       <!-- Ações: separador visual entre navegação e autenticação -->
       <div class="flex items-center gap-2 sm:gap-3 justify-self-end">
-        <span aria-hidden="true" class="hidden sm:block w-px h-5 bg-white/10 mr-1" />
+        <span
+          aria-hidden="true"
+          class="hidden sm:block w-px h-5 mr-1 transition-colors duration-300"
+          :class="isLightBackground ? 'bg-slate-200' : 'bg-white/10'"
+        />
 
         <!-- Login: ação secundária -->
         <NuxtLink
           to="/"
-          class="hdr-focus inline-flex items-center justify-center h-11 px-3.5 sm:px-4 rounded-xl text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/[0.06] transition-colors duration-200"
+          class="hdr-focus inline-flex items-center justify-center h-11 px-3.5 sm:px-4 rounded-xl text-sm font-semibold transition-colors duration-200"
+          :class="
+            isLightBackground
+              ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
+          "
         >
           Entrar
         </NuxtLink>
@@ -159,7 +202,12 @@ onUnmounted(() => {
         <button
           ref="toggleRef"
           type="button"
-          class="hdr-focus lg:hidden ml-0.5 w-11 h-11 rounded-xl bg-white/5 border border-white/10 text-slate-300 hover:text-white hover:bg-white/10 transition-colors duration-200 flex items-center justify-center"
+          class="hdr-focus lg:hidden ml-0.5 w-11 h-11 rounded-xl border transition-colors duration-200 flex items-center justify-center"
+          :class="
+            isLightBackground
+              ? 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+              : 'bg-white/5 border-white/10 text-slate-300 hover:text-white hover:bg-white/10'
+          "
           :aria-expanded="isMobileMenuOpen"
           aria-controls="mobile-menu"
           :aria-label="isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'"
@@ -211,7 +259,10 @@ onUnmounted(() => {
       <div
         v-show="isMobileMenuOpen"
         id="mobile-menu"
-        class="lg:hidden bg-[#080D14]/98 backdrop-blur-2xl border-b border-white/10 px-5 sm:px-8 max-h-[calc(100dvh-5rem)] overflow-y-auto shadow-2xl"
+        class="lg:hidden backdrop-blur-2xl border-b px-5 sm:px-8 max-h-[calc(100dvh-5rem)] overflow-y-auto shadow-2xl"
+        :class="
+          isLightBackground ? 'bg-white/98 border-slate-200' : 'bg-[#080D14]/98 border-white/10'
+        "
       >
         <nav aria-label="Seções da página" class="flex flex-col gap-1 pt-4">
           <a
@@ -221,15 +272,20 @@ onUnmounted(() => {
             class="hdr-focus flex items-center justify-between min-h-11 px-4 py-3 rounded-xl text-sm font-medium transition-colors duration-200"
             :class="
               isActive(link.href)
-                ? 'text-white bg-emerald-500/10'
-                : 'text-slate-300 hover:text-white hover:bg-white/5'
+                ? isLightBackground
+                  ? 'text-slate-900 bg-emerald-500/10'
+                  : 'text-white bg-emerald-500/10'
+                : isLightBackground
+                  ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
             "
             :aria-current="isActive(link.href) ? 'location' : undefined"
             @click="closeMenu()"
           >
             <span>{{ link.name }}</span>
             <svg
-              class="w-4 h-4 text-slate-600"
+              class="w-4 h-4"
+              :class="isLightBackground ? 'text-slate-400' : 'text-slate-600'"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -245,11 +301,19 @@ onUnmounted(() => {
           </a>
         </nav>
 
-        <div class="flex flex-col gap-3 mt-3 pt-4 border-t border-white/10 pb-5">
+        <div
+          class="flex flex-col gap-3 mt-3 pt-4 border-t pb-5"
+          :class="isLightBackground ? 'border-slate-200' : 'border-white/10'"
+        >
           <!-- Login: secundária -->
           <NuxtLink
             to="/"
-            class="hdr-focus inline-flex items-center justify-center h-11 rounded-xl border border-white/10 bg-white/[0.04] text-sm font-semibold text-slate-200 hover:text-white hover:bg-white/[0.08] transition-colors duration-200"
+            class="hdr-focus inline-flex items-center justify-center h-11 rounded-xl border text-sm font-semibold transition-colors duration-200"
+            :class="
+              isLightBackground
+                ? 'border-slate-200 bg-slate-50 text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                : 'border-white/10 bg-white/[0.04] text-slate-200 hover:text-white hover:bg-white/[0.08]'
+            "
             @click="closeMenu()"
           >
             Entrar
