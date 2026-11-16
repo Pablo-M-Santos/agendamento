@@ -33,10 +33,11 @@
                       <UIcon :name="currentStep.icon" class="h-4 w-4" />
                       <span>{{ currentStep.tag }}</span>
                     </div>
-                    <h2
-                      class="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-white"
-                      v-html="currentStep.title"
-                    />
+                    <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+                      {{ currentStep.title }}
+                      <br />
+                      <span class="text-emerald-400">{{ currentStep.titleAccent }}</span>
+                    </h2>
                     <p class="text-lg leading-relaxed text-slate-400">
                       {{ currentStep.desc }}
                     </p>
@@ -175,7 +176,8 @@ const steps = [
   {
     tag: 'Celular',
     icon: 'lucide:smartphone',
-    title: 'Agende na palma<br><span class="text-emerald-400">da mão</span>',
+    title: 'Agende na palma',
+    titleAccent: 'da mão',
     desc: 'Seus clientes escolhem, confirmam e pagam pelo celular em menos de um minuto. Sem mensagens, sem ligações.',
     features: [
       {
@@ -193,7 +195,8 @@ const steps = [
   {
     tag: 'Desktop',
     icon: 'lucide:laptop',
-    title: 'Painel completo<br><span class="text-emerald-400">no computador</span>',
+    title: 'Painel completo',
+    titleAccent: 'no computador',
     desc: 'Relatórios, controle financeiro e gestão de múltiplos profissionais — tudo no painel de administração.',
     features: [
       {

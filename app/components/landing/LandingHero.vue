@@ -66,8 +66,8 @@ onUnmounted(() => {
   <section
     id="home"
     ref="heroRef"
-    @mousemove="handleMouseMove"
     class="relative min-h-[95vh] lg:min-h-dvh flex flex-col justify-center items-center py-20 lg:py-28 overflow-hidden bg-[#F8FAFC] text-slate-900"
+    @mousemove="handleMouseMove"
   >
     <LandingBackground :scroll-y-pos="scrollYPos" />
 

@@ -61,7 +61,9 @@ const handleMouseMove = (e: MouseEvent) => {
         </p>
       </header>
 
-      <div class="features-bento"><div class="bento-card bento-hero spotlight-card observe-animate anim-1 delay-1"
+      <div class="features-bento">
+        <div
+          class="bento-card bento-hero spotlight-card observe-animate anim-1 delay-1"
           @mousemove="handleMouseMove"
         >
           <div class="card-glow" />
