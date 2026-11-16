@@ -3,19 +3,19 @@ import path from 'path'
 
 export default defineConfig({
   root: __dirname,
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'app'),
+      '~': path.resolve(__dirname, 'app'),
+      '~~': path.resolve(__dirname, 'app'),
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,
     setupFiles: './tests/setup.ts',
     include: ['tests/**/*.{test,spec}.{js,ts}'],
     exclude: ['tests/e2e/**', 'tests/e2e/**/*'],
-    resolve: {
-      alias: {
-        '~/': path.resolve(__dirname, 'app/'),
-        '~~/': path.resolve(__dirname, 'app/'),
-        '^vue': path.resolve(__dirname, 'node_modules/vue'),
-      },
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
