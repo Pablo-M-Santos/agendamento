@@ -1,7 +1,9 @@
 <template>
-  <section ref="sectionRef" class="relative scroll-section">
-    <div class="sticky top-0 flex h-screen flex-col overflow-hidden pt-20 lg:pt-24 text-white">
-      <div class="wave-top" aria-hidden="true">
+  <section ref="sectionRef" class="relative scroll-section" :class="{ 'is-visible': isVisible }">
+    <div
+      class="showcase-sticky sticky top-0 flex h-screen flex-col overflow-hidden pt-20 lg:pt-24 text-white animate-item"
+    >
+      <div class="wave-top observe-animate" aria-hidden="true">
         <svg viewBox="0 0 1440 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <path
             class="wave-path wave-back"
@@ -165,6 +167,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 
 const sectionRef = ref<HTMLElement | null>(null)
+const { isVisible } = useSectionReveal(sectionRef)
 const activeStep = ref(0)
 const scrollProgress = ref(0)
 
@@ -213,17 +216,27 @@ function jumpToStep(step: number) {
   if (!sectionRef.value) return
   const sectionTop = sectionRef.value.getBoundingClientRect().top + window.scrollY
   const scrollable = sectionRef.value.offsetHeight - window.innerHeight
-  window.scrollTo({ top: sectionTop + ((step + 0.5) / 2) * scrollable, behavior: 'smooth' })
+  const stepCount = steps.length
+  const stepPosition = (step + 0.5) / stepCount
+  window.scrollTo({
+    top: sectionTop + stepPosition * scrollable,
+    behavior: prefersReducedMotion() ? 'auto' : 'smooth'
+  })
 }
 
 function handleScroll() {
   if (!sectionRef.value) return
   const rect = sectionRef.value.getBoundingClientRect()
-  const scrollable = sectionRef.value.offsetHeight - window.innerHeight
+  const scrollable = Math.max(sectionRef.value.offsetHeight - window.innerHeight, 1)
   const progress = Math.max(0, Math.min(1, -rect.top / scrollable))
   scrollProgress.value = progress
-  activeStep.value = Math.min(1, Math.floor(progress * 2))
+  activeStep.value = Math.min(steps.length - 1, Math.floor(progress * steps.length))
 }
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 onMounted(async () => {
   await nextTick()
@@ -241,6 +254,10 @@ onUnmounted(() => {
   min-height: 300vh;
 }
 
+.showcase-sticky {
+  isolation: isolate;
+}
+
 .bg-transition-layer {
   position: absolute;
   inset: 0;
@@ -251,9 +268,9 @@ onUnmounted(() => {
   position: relative;
   margin: 0 auto;
   display: flex;
-  height: 480px;
+  height: clamp(360px, 58vh, 560px);
   width: 100%;
-  max-width: 750px;
+  max-width: 800px;
   align-items: center;
   justify-content: center;
 }
@@ -279,14 +296,14 @@ onUnmounted(() => {
 }
 
 .phone-bg {
-  width: 487px;
-  height: 752px;
+  width: min(390px, 48vw);
+  aspect-ratio: 487 / 752;
   background-image: url('/mobile-agendar.png');
 }
 
 .desktop-bg {
-  width: 800px;
-  height: 550px;
+  width: min(800px, 70vw);
+  aspect-ratio: 800 / 550;
   background-image: url('/desktop-dashboard.png');
 }
 
@@ -447,6 +464,209 @@ onUnmounted(() => {
   }
   .wave-front {
     animation: waveFront 5s ease-in-out infinite;
+  }
+}
+
+/* --- Entrada da seção --- */
+
+.observe-animate {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: none;
+}
+
+.scroll-section.is-visible .observe-animate {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* A seção em si começa visível; são os filhos que animam */
+.animate-item {
+  opacity: 0;
+  transform: translateY(25px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-section.is-visible .animate-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.device-mockup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.device-mockup.is-active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+  z-index: 50;
+}
+
+.device-mockup.is-active.observe-animate {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: floatAnimation 4s ease-in-out infinite;
+}
+
+.scroll-section.is-visible .device-mockup.is-active.observe-animate {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: floatAnimation 4s ease-in-out infinite;
+}
+
+@media (max-width: 1024px) {
+  .showcase-container {
+    height: clamp(320px, 48vh, 460px);
+  }
+
+  .phone-bg {
+    width: min(320px, 42vw);
+  }
+
+  .desktop-bg {
+    width: min(650px, 68vw);
+  }
+
+  .badge-phone-1,
+  .badge-phone-3 {
+    left: -3rem;
+  }
+
+  .badge-phone-2,
+  .badge-desk-2 {
+    right: -3rem;
+  }
+
+  .badge-desk-1 {
+    left: -2rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .scroll-section {
+    min-height: 260vh;
+  }
+
+  .showcase-sticky {
+    min-height: 100svh;
+    height: auto;
+    padding-top: 5rem;
+  }
+
+  .showcase-sticky > .relative {
+    overflow-y: auto;
+    padding-bottom: 2rem;
+  }
+
+  .showcase-container {
+    height: clamp(260px, 42vh, 370px);
+    max-width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .phone-bg {
+    width: min(235px, 58vw);
+  }
+
+  .desktop-bg {
+    width: min(560px, 92vw);
+  }
+
+  .floating-badge {
+    gap: 0.5rem;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.75rem;
+  }
+
+  .floating-badge > div:last-child {
+    display: none;
+  }
+
+  .badge-phone-1,
+  .badge-phone-3,
+  .badge-desk-1 {
+    left: 0;
+  }
+
+  .badge-phone-2,
+  .badge-desk-2 {
+    right: 0;
+  }
+
+  .badge-phone-1,
+  .badge-desk-1 {
+    top: 8%;
+  }
+
+  .badge-phone-3 {
+    bottom: 8%;
+  }
+
+  .badge-phone-2,
+  .badge-desk-2 {
+    bottom: 12%;
+    top: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .showcase-container {
+    height: 280px;
+  }
+
+  .phone-bg {
+    width: 190px;
+  }
+
+  .desktop-bg {
+    width: 94vw;
+  }
+
+  .floating-badge {
+    transform: translateY(0) scale(0.9);
+  }
+
+  .device-mockup.is-active .floating-badge {
+    transform: translateY(0) scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .device-mockup,
+  .floating-badge,
+  .step-enter-active,
+  .step-leave-active,
+  .step-delay-enter-active,
+  .step-delay-leave-active {
+    transition-duration: 0.01ms;
+  }
+
+  .device-mockup.is-active .floating-badge,
+  .wave-back,
+  .wave-front {
+    animation: none;
   }
 }
 </style>
