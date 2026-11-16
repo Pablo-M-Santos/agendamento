@@ -149,7 +149,7 @@ const emailariaDescribedBy = computed(() =>
       </button>
 
       <div class="text-center mt-4 sm:mt-6">
-        <NuxtLink to="/" class="auth-link">
+        <NuxtLink to="/login" class="auth-link">
           Já tem uma conta? <span class="font-bold text-[var(--color-accent-primary)]">Entrar</span>
         </NuxtLink>
       </div>

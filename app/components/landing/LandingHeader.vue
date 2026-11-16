@@ -8,11 +8,11 @@ const isLightBackground = ref(false)
 const toggleRef = ref<HTMLButtonElement | null>(null)
 
 const navLinks = [
-  { name: 'Produtos', href: '#home' },
+  { name: 'Início', href: '#home' },
   { name: 'Funcionalidades', href: '#funcionalidades' },
-  { name: 'Recursos', href: '#recursos' },
-  { name: 'Blog', href: '#blog' },
-  { name: 'Preços', href: '#precos' }
+  { name: 'Módulos', href: '#modulos' },
+  { name: 'Depoimentos', href: '#depoimentos' },
+  { name: 'Simulador', href: '#deck-simulador' }
 ]
 
 const idOf = (href: string) => href.slice(1)
@@ -165,7 +165,7 @@ onUnmounted(() => {
 
         <!-- Login: ação secundária -->
         <NuxtLink
-          to="/"
+          to="/login"
           class="hdr-focus inline-flex items-center justify-center h-11 px-3.5 sm:px-4 rounded-xl text-sm font-semibold transition-colors duration-200"
           :class="
             isLightBackground
@@ -307,7 +307,7 @@ onUnmounted(() => {
         >
           <!-- Login: secundária -->
           <NuxtLink
-            to="/"
+            to="/login"
             class="hdr-focus inline-flex items-center justify-center h-11 rounded-xl border text-sm font-semibold transition-colors duration-200"
             :class="
               isLightBackground
