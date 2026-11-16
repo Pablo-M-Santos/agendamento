@@ -50,20 +50,18 @@ const handleMouseMove = (e: MouseEvent) => {
     :class="{ 'is-visible': isVisible }"
   >
     <div class="features-inner">
-      <header class="features-header animate-item">
+      <header class="features-header observe-animate anim-1">
         <span class="features-badge">Arquitetura de Alta Performance</span>
         <h2 class="features-title">
           Controle total da sua operação,<br />sem atrito ou planilhas.
         </h2>
-        <p class="features-desc">
+        <p class="features-desc observe-animate anim-2">
           Da reserva ao faturamento, uma plataforma unificada projetada para eliminar gargalos e
           acelerar o seu dia com precisão cirúrgica.
         </p>
       </header>
 
-      <div class="features-bento">
-        <div
-          class="bento-card bento-hero spotlight-card animate-item delay-1"
+      <div class="features-bento"><div class="bento-card bento-hero spotlight-card observe-animate anim-1 delay-1"
           @mousemove="handleMouseMove"
         >
           <div class="card-glow" />
@@ -97,7 +95,7 @@ const handleMouseMove = (e: MouseEvent) => {
         </div>
 
         <div class="bento-stack">
-          <div class="bento-card spotlight-card animate-item delay-2" @mousemove="handleMouseMove">
+          <div class="bento-card spotlight-card observe-animate anim-2 delay-2" @mousemove="handleMouseMove">
             <div class="card-glow" />
             <div class="feature-card-icon">
               <svg
@@ -118,7 +116,7 @@ const handleMouseMove = (e: MouseEvent) => {
             </p>
           </div>
 
-          <div class="bento-card spotlight-card animate-item delay-3" @mousemove="handleMouseMove">
+          <div class="bento-card spotlight-card observe-animate anim-3 delay-3" @mousemove="handleMouseMove">
             <div class="card-glow" />
             <div class="feature-card-icon">
               <svg
@@ -325,6 +323,33 @@ const handleMouseMove = (e: MouseEvent) => {
   font-size: 0.925rem;
   color: #475569;
   line-height: 1.65;
+}
+
+.observe-animate {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: none;
+}
+
+.features.is-visible .observe-animate.anim-1 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+.features.is-visible .observe-animate.anim-2 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+.features.is-visible .observe-animate.anim-3 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-item {

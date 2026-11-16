@@ -86,7 +86,7 @@ watch(isVisible, (visible) => {
   >
     <div class="social-proof-inner">
       <!-- Cabeçalho -->
-      <header class="social-proof-header animate-item">
+      <header class="social-proof-header observe-animate anim-1">
         <span class="section-tag">Resultados Comprovados</span>
         <h2 class="social-proof-title">Confiado por quem busca<br />eficiência de verdade.</h2>
         <p class="social-proof-desc">
@@ -96,16 +96,16 @@ watch(isVisible, (visible) => {
       </header>
 
       <!-- Faixa editorial: métrica dominante + métricas de apoio assimétricas -->
-      <div class="proof-grid animate-item delay-1">
+      <div class="proof-grid observe-animate anim-2 delay-1">
         <div class="proof-dominant">
-          <span class="dominant-value">{{ dominantCount.display }}</span>
+          <span class="dominant-value observe-animate anim-4">{{ dominantCount.display }}</span>
           <span class="dominant-rule" aria-hidden="true" />
           <span class="dominant-label">{{ dominant.label }}</span>
           <p class="dominant-desc">{{ dominant.desc }}</p>
         </div>
 
         <div class="proof-supporting">
-          <div v-for="row in supportRows" :key="row.stat.value" class="support-row">
+          <div v-for="row in supportRows" :key="row.stat.value" class="support-row observe-animate anim-5">
             <div class="support-info">
               <span class="support-value">{{ row.count.display }}</span>
               <span class="support-label">{{ row.stat.label }}</span>
@@ -160,7 +160,7 @@ watch(isVisible, (visible) => {
       </div>
 
       <!-- Depoimentos: destaque editorial + pull quotes secundárias -->
-      <div class="testimonials-editorial animate-item delay-2">
+      <div class="testimonials-editorial observe-animate anim-3 delay-2">
         <figure class="quote-featured">
           <span class="quote-mark" aria-hidden="true">“</span>
           <div class="stars-rating" aria-hidden="true">
@@ -628,5 +628,60 @@ watch(isVisible, (visible) => {
     top: -1.75rem;
     left: -0.5rem;
   }
+}
+
+/* --- Entrada da seção --- */
+
+.observe-animate {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: none;
+}
+
+.social-proof-section.is-visible .observe-animate.anim-1 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+.social-proof-section.is-visible .observe-animate.anim-2 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+.social-proof-section.is-visible .observe-animate.anim-3 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+.social-proof-section.is-visible .observe-animate.anim-4 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+.social-proof-section.is-visible .observe-animate.anim-5 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-item {
+  opacity: 0;
+  transform: translateY(25px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.social-proof-section.is-visible .animate-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.delay-1 {
+  transition-delay: 0.15s;
+}
+.delay-2 {
+  transition-delay: 0.3s;
 }
 </style>

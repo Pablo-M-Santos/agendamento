@@ -20,7 +20,9 @@
         </div>
 
         <div>
-          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Produto</h2>
+          <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-white">
+            Links rápidos
+          </h2>
           <nav class="flex flex-col items-start gap-3 text-sm" aria-label="Links do produto">
             <a href="#funcionalidades" class="transition-colors hover:text-emerald-400">
               Funcionalidades

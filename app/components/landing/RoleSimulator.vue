@@ -117,19 +117,19 @@ watch([isVisible, selectedCard], ([visible]) => {
     :class="{ 'is-visible': isVisible }"
   >
     <div class="deck-inner">
-      <header class="section-header animate-item">
+      <header class="section-header observe-animate anim-1">
         <span class="section-tag">Simulador Interativo</span>
-        <h2 class="section-title">Escolha o perfil e veja o poder do sistema.</h2>
-        <p class="section-desc">
+        <h2 class="section-title observe-animate anim-2">Escolha o perfil e veja o poder do sistema.</h2>
+        <p class="section-desc observe-animate anim-3">
           Clique nas cartas para alternar a perspectiva e projetar os indicadores de cada nível da
           sua operação.
         </p>
       </header>
 
-      <div class="simulator animate-item delay-1">
+      <div class="simulator observe-animate anim-4 delay-1">
         <!-- Seletor acessível de perspectivas (tablist com teclado) -->
         <div
-          class="role-selector"
+          class="role-selector observe-animate anim-5"
           role="tablist"
           aria-orientation="vertical"
           aria-label="Perspectivas do simulador"
@@ -140,7 +140,7 @@ watch([isVisible, selectedCard], ([visible]) => {
             :id="`role-tab-${index}`"
             :key="card.id"
             :ref="(el) => setTabRef(el, index)"
-            class="role-tab"
+            class="role-tab observe-animate"
             type="button"
             role="tab"
             aria-controls="role-panel"
@@ -537,9 +537,11 @@ watch([isVisible, selectedCard], ([visible]) => {
 .dot.red {
   background: #ef4444;
 }
+
 .dot.yellow {
   background: #f59e0b;
 }
+
 .dot.green {
   background: #10b981;
 }
@@ -920,6 +922,50 @@ watch([isVisible, selectedCard], ([visible]) => {
 }
 
 /* --- Entrada da seção --- */
+
+.observe-animate {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: none;
+}
+
+.deck-section.is-visible .observe-animate.anim-1 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+}
+
+.deck-section.is-visible .observe-animate.anim-2 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+.deck-section.is-visible .observe-animate.anim-3 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.deck-section.is-visible .observe-animate.anim-4 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+.deck-section.is-visible .observe-animate.anim-5 {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+/* Elementos observe-animate sem numeração (ex: role-tab, role-selector)
+   devem ficar visíveis quando a section é revelada */
+.deck-section.is-visible .observe-animate:not(.anim-1):not(.anim-2):not(.anim-3):not(.anim-4):not(.anim-5) {
+  animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .animate-item {
   opacity: 0;
   transform: translateY(25px);
