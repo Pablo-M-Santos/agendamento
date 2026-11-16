@@ -65,7 +65,7 @@ const selectCard = (index: number) => {
   selectedCard.value = index
 }
 
-const setTabRef = (el: Element | unknown, index: number) => {
+const setTabRef = (index: number) => (el: unknown) => {
   if (el instanceof HTMLElement) tabRefs.value[index] = el
 }
 
@@ -139,7 +139,7 @@ watch([isVisible, selectedCard], ([visible]) => {
             v-for="(card, index) in simulatorCards"
             :id="`role-tab-${index}`"
             :key="card.id"
-            :ref="(el) => setTabRef(el, index)"
+            :ref="setTabRef(index)"
             class="role-tab observe-animate"
             type="button"
             role="tab"
